@@ -1,0 +1,33 @@
+<!-- KeyboardNode.svelte -->
+<script lang="ts">
+    import { Keyboard } from 'lucide-svelte';
+    import NodeWrapper from './NodeWrapper.svelte';
+    import Select from './Select.svelte';
+    import Slider from './Slider.svelte';
+    import type { ComponentType } from 'svelte';
+
+    // Props for the KeyboardInputNode
+    export let title: string = 'KeyPress';
+    export let icon: ComponentType = Keyboard;
+    export let color: string = 'bg-gradient-to-r from-purple-500 to-purple-600';
+    export let keyActions: string[] = ['Press', 'Hold', 'Release'];
+    export let modifierKeys: string[] = ['None', 'Shift', 'Ctrl', 'Alt', 'Windows']; // will need Command for Mac
+    export let pressDuration: number = 50;
+
+    function handleDuplicate() {
+        console.log("Duplicate action triggered");
+    }
+
+    function handleDelete() {
+        console.log("Delete action triggered");
+    }
+
+    $$restProps;
+</script>
+
+<NodeWrapper {icon} {title} {color} on:duplicate={handleDuplicate} on:delete={handleDelete}>
+    <!-- Node Content for configuring Keyboard Input options -->
+    <Select label="Key Action" options={keyActions} icon={Keyboard} />
+    <Select label="Modifier Key" options={modifierKeys} />
+    <Slider label="Press Duration" defaultValue={pressDuration} />
+</NodeWrapper>
