@@ -2,7 +2,6 @@
 	import { Button as ButtonPrimitive } from "bits-ui";
 	import { type Events, type Props, buttonVariants } from "./index.js";
 	import { cn } from "$lib/utils.js";
-	import {link} from 'svelte-spa-router'
 
 	type $$Props = Props;
 	type $$Events = Events;

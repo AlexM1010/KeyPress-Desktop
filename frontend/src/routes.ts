@@ -1,4 +1,4 @@
-import Home from './routes/+page.svelte'
+import Home from './routes/+page.svelte' //remove
 import Login from './routes/login/+page.svelte'
 import Workspace from './routes/workspace/+page.svelte'
 

@@ -42,6 +42,7 @@
 		"@prisma/client": "^5.21.1",
 		"@supabase/auth-ui-shared": "^0.1.8",
 		"@supabase/auth-ui-svelte": "latest",
+		"@supabase/supabase-js": "^2.46.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@xyflow/svelte": "^0.1.21",
 		"crypto-js": "^4.2.0",
@@ -52,7 +53,6 @@
 		"pg": "^8.13.1",
 		"sass": "^1.79.5",
 		"svelte-preprocess": "^6.0.3",
-		"svelte-spa-router": "^4.0.1",
 		"svelvet": "^10.0.2"
 	}
 }

@@ -24,6 +24,8 @@ frontend/
           1.js
           2.js
           3.js
+          4.js
+          5.js
         app.js
         matchers.js
       server/
@@ -31,6 +33,96 @@ frontend/
       root.js
       root.svelte
     output/
+      client/
+        _app/
+          immutable/
+            assets/
+              _layout.BV1eDtrG.css
+              _page.BJBHtx96.css
+              _page.CpIm1qZx.css
+              0.BV1eDtrG.css
+              3.BJBHtx96.css
+              5.DuvDVzS5.css
+              app.v5By6zoX.css
+            chunks/
+              app.CTiCmxGO.js
+              authStore.bUMFgHRS.js
+              entry.kikB5_OM.js
+              Icon.0c9ThxFu.js
+              index.B0pppUlX.js
+              index.BYxlUQlx.js
+              index.Dk3C_s6U.js
+              scheduler.CXTpCuy5.js
+              spread.CgU5AtxT.js
+              themeStore.C16bqr0X.js
+            entry/
+              app.BRvt2-64.js
+              start.XOTwc-BC.js
+            nodes/
+              0.BtFHPqEa.js
+              1.CdP74P0d.js
+              2.Q4_rkqAm.js
+              3.CPOwhpPR.js
+              4.CCacLRr8.js
+              5.ChKHVYTl.js
+          version.json
+        .vite/
+          manifest.json
+        favicon.png
+      prerendered/
+        dependencies/
+          _app/
+            env.js
+        pages/
+          index.html
+          login.html
+          profile.html
+          workspace.html
+      server/
+        _app/
+          immutable/
+            assets/
+              _layout.BV1eDtrG.css
+              _page.BJBHtx96.css
+              _page.CpIm1qZx.css
+              app.v5By6zoX.css
+        .vite/
+          manifest.json
+        chunks/
+          client.js
+          exports.js
+          Icon.js
+          index.js
+          index2.js
+          internal.js
+          names.js
+          ssr.js
+          themeStore.js
+        entries/
+          fallbacks/
+            error.svelte.js
+          pages/
+            login/
+              _page.svelte.js
+            profile/
+              _page.svelte.js
+            workspace/
+              _page.svelte.js
+            _layout.svelte.js
+            _layout.ts.js
+            _page.svelte.js
+        nodes/
+          0.js
+          1.js
+          2.js
+          3.js
+          4.js
+          5.js
+        stylesheets/
+        index.js
+        internal.js
+        manifest-full.js
+        manifest.js
     types/
       src/
         routes/
@@ -101,6 +193,7 @@ frontend/
             index.ts
             label.svelte
       stores/
+        authStore.ts
         themeStore.ts
       theme/
       types/
@@ -118,6 +211,7 @@ frontend/
           main/
             App.d.ts
             App.js
+          models.ts
         runtime/
           package.json
           runtime.d.ts
@@ -147,7 +241,8 @@ frontend/
       ThemeToggle.svelte
     app.css
     app.html
-    types.ts
+    global.d.ts
+    routes.ts
     wails.d.ts
   static/
     favicon.png
@@ -201,394 +296,6 @@ wails.json
 # Active Tabs Content
 
 
-## main.go
-
-```go
-// main.go
-package main
-
-import (
-	"embed"
-	"log"
-
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-)
-
-//go:embed all:frontend/dist
-var assets embed.FS
-
-func main() {
-	app := NewApp()
-
-	err := wails.Run(&options.App{
-		Title:  "KeyPress",
-		Width:  1024,
-		Height: 768,
-		AssetServer: &assetserver.Options{
-			Assets: assets,
-		},
-		OnStartup:  app.Startup,
-		OnShutdown: app.Shutdown,
-		Bind: []interface{}{
-			app,
-		},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-```
-
-
-## app.go
-
-```go
-// app.go
-package main
-
-import (
-	"context"
-	"fmt"
-	"log"
-	"os"
-
-	"github.com/joho/godotenv"
-	"github.com/supabase-community/supabase-go"
-)
-
-// App struct encapsulates the application state
-type App struct {
-	supabaseClient *supabase.Client
-	ctx            context.Context
-	currentSession *supabase.Session
-}
-
-// NewApp initializes the App with a Supabase client
-func NewApp() *App {
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	supabaseUrl := os.Getenv("SUPABASE_URL")
-	supabaseKey := os.Getenv("SUPABASE_KEY")
-	client := supabase.CreateClient(supabaseUrl, supabaseKey)
-
-	return &App{
-		supabaseClient: client,
-	}
-}
-
-// LoginRequest represents the login form data
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-// LoginResponse represents the response after attempting to log in
-type LoginResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// Login handles user authentication using Supabase
-func (a *App) Login(ctx context.Context, req LoginRequest) (LoginResponse, error) {
-	// Example authentication logic with Supabase
-	session, err := a.supabaseClient.Auth.SignIn(ctx, req.Email, req.Password)
-	if err != nil || session == nil {
-		return LoginResponse{Success: false, Message: "Invalid credentials"}, err
-	}
-	a.currentSession = session
-	// Emit an auth state change event to the frontend
-	// Assuming you have a method to emit events
-	// For example:
-	// a.ctx.Emit("authStateChange", a.currentSession)
-	return LoginResponse{Success: true, Message: "Login successful"}, nil
-}
-
-// LogoutResponse represents the response after attempting to log out
-type LogoutResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// Logout handles user sign-out
-func (a *App) Logout(ctx context.Context) (LogoutResponse, error) {
-	err := a.supabaseClient.Auth.SignOut(ctx)
-	if err != nil {
-		return LogoutResponse{Success: false, Message: "Logout failed"}, err
-	}
-	a.currentSession = nil
-	// Emit an auth state change event to the frontend
-	// a.ctx.Emit("authStateChange", a.currentSession)
-	return LogoutResponse{Success: true, Message: "Logout successful"}, nil
-}
-
-// GetSessionResponse represents the current session data
-type GetSessionResponse struct {
-	UserEmail  string `json:"userEmail,omitempty"`
-	IsLoggedIn bool   `json:"isLoggedIn"`
-}
-
-// GetSession retrieves the current session information
-func (a *App) GetSession(ctx context.Context) (GetSessionResponse, error) {
-	if a.currentSession != nil && a.currentSession.User != nil {
-		return GetSessionResponse{
-			UserEmail:  a.currentSession.User.Email,
-			IsLoggedIn: true,
-		}, nil
-	}
-	return GetSessionResponse{
-		UserEmail:  "",
-		IsLoggedIn: false,
-	}, nil
-}
-
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
-}
-
-// Startup is called when the app starts
-func (a *App) Startup(ctx context.Context) {
-	a.ctx = ctx
-	// Optionally, fetch the initial session
-	session, err := a.supabaseClient.Auth.GetSession(ctx)
-	if err == nil && session != nil {
-		a.currentSession = session
-	}
-}
-
-// Shutdown is called when the app is shutting down
-func (a *App) Shutdown(ctx context.Context) {}
-```
-
-
-## frontend\tsconfig.json
-
-```json
-{
-	"extends": "./.svelte-kit/tsconfig.json",
-	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"moduleResolution": "bundler",
-		"types": ["svelte", "@sveltejs/kit"]
-	},
-	"include": ["src/**/*", "src/**/*.svelte", "src/node_modules/**/*"],
-	"exclude": ["node_modules", "__sapper__/*", "public/*"]
-	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
-	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
-	//
-	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
-	// from the referenced tsconfig.json - TypeScript does not merge them in
-}
-```
-
-
-## frontend\src\routes\login\Login.svelte
-
-```svelte
-<script lang="ts">
-  import "./login.scss";
-  import { z } from "zod";
-  import { CircleX } from "lucide-svelte";
-  import { onMount } from "svelte";
-  import { writable, get } from "svelte/store";
-  import type { LoginRequest, LoginResponse } from "../../types"; // Adjust path as needed
-
-  // Define the form schema using Zod
-  const formSchema = z.object({
-      email: z.string().email({ message: "Invalid email address" }),
-      password: z.string().min(6, { message: "Password must be at least 6 characters" }),
-  });
-
-  // Define types based on the schema
-  type FormData = z.infer<typeof formSchema>;
-  type ErrorsData = Partial<Record<keyof FormData, string>>;
-
-  // Initialize Svelte stores
-  const form = writable<FormData>({ email: '', password: '' });
-  const errors = writable<ErrorsData>({});
-  const message = writable<string>('');
-
-  let modal: HTMLElement;
-  let modalButton: HTMLElement;
-  let closeButton: HTMLElement;
-  let scrollDown: HTMLElement;
-  let isOpened = false;
-
-  // Modal control functions
-  const openModal = () => {
-      if (modal) {
-          modal.classList.add("is-open");
-          document.body.style.overflow = "hidden";
-      }
-  };
-
-  const closeModal = () => {
-      if (modal) {
-          modal.classList.remove("is-open");
-          document.body.style.overflow = "initial";
-      }
-  };
-
-  const handleScroll = () => {
-      if (window.scrollY > window.innerHeight / 3 && !isOpened) {
-          isOpened = true;
-          if (scrollDown) {
-              scrollDown.style.display = "none";
-          }
-          openModal();
-      }
-  };
-
-  const handleKeydown = (evt: KeyboardEvent) => {
-      if (evt.key === "Escape") {
-          closeModal();
-      }
-  };
-
-  onMount(() => {
-      window.addEventListener("scroll", handleScroll);
-      document.addEventListener("keydown", handleKeydown);
-
-      return () => {
-          window.removeEventListener("scroll", handleScroll);
-          document.removeEventListener("keydown", handleKeydown);
-      };
-  });
-
-  // Form validation function
-  const validateForm = (): boolean => {
-      const currentForm: FormData = get(form);
-      const result = formSchema.safeParse(currentForm);
-      if (result.success) {
-          errors.set({});
-          return true;
-      } else {
-          const formattedErrors: ErrorsData = {};
-          result.error.errors.forEach(err => {
-              const field = err.path[0] as keyof FormData;
-              formattedErrors[field] = err.message;
-          });
-          errors.set(formattedErrors);
-          return false;
-      }
-  };
-
-  // Handle form submission
-  const handleSubmit = async (event: Event) => {
-      event.preventDefault();
-      if (validateForm()) {
-          const loginRequest: LoginRequest = get(form);
-          try {
-              const response: LoginResponse = await window.backend.Login(loginRequest);
-              if (response.success) {
-                  message.set(response.message);
-                  // Handle successful login (e.g., close modal, redirect)
-                  closeModal();
-              } else {
-                  message.set(response.message);
-              }
-          } catch (error) {
-              message.set("An error occurred during login.");
-              console.error(error);
-          }
-      }
-  };
-</script>
-
-<div class="modal" bind:this={modal}>
-  <div class="modal-container">
-      <div class="modal-left">
-          <h1 class="modal-title">Welcome!</h1>
-          <p class="modal-desc">
-              Fanny pack hexagon food truck, street art waistcoat kitsch.
-          </p>
-
-          <form on:submit|preventDefault={handleSubmit}>
-              {#if $message}
-                  <div class="alert alert-error mb-4">
-                      {$message}
-                  </div>
-              {/if}
-
-              <div class="input-block">
-                  <label class="input-label" for="email">Email</label>
-                  <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      class="input"
-                      placeholder="Email"
-                      bind:value={$form.email}
-                  />
-                  {#if $errors.email}
-                      <div class="text-red-500 text-sm mt-1">{$errors.email}</div>
-                  {/if}
-              </div>
-
-              <div class="input-block">
-                  <label class="input-label" for="password">Password</label>
-                  <input
-                      type="password"
-                      id="password"
-                      name="password"
-                      class="input"
-                      placeholder="Password"
-                      bind:value={$form.password}
-                  />
-                  {#if $errors.password}
-                      <div class="text-red-500 text-sm mt-1">{$errors.password}</div>
-                  {/if}
-              </div>
-
-              <div class="modal-buttons">
-                  <a href="/forgot-password">Forgot your password?</a>
-                  <button type="submit" class="input-button">Login</button>
-              </div>
-
-              <button class="input-button">Sign In With GitHub</button>
-          </form>
-
-          <p class="sign-up">
-              Don't have an account? <a href="/register">Sign up now</a>
-          </p>
-      </div>
-
-      <div class="modal-right">
-          <img
-              src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?ixlib=rb-0.3.5..."
-              alt=""
-          />
-      </div>
-
-      <button
-          class="icon-button close-button"
-          aria-label="Close"
-          on:click={closeModal}
-          bind:this={closeButton}
-      >
-          <CircleX strokeWidth="1.5" size="32" />
-      </button>
-  </div>
-  <button class="modal-button" on:click={openModal} bind:this={modalButton}>
-      Click here to login
-  </button>
-</div>
-```
-
-
 ## frontend\src\routes\+layout.svelte
 
 ```svelte
@@ -598,134 +305,45 @@ func (a *App) Shutdown(ctx context.Context) {}
     import { generateUserId } from '$lib/utils';
     import ThemeToggle from './ThemeToggle.svelte';
     import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import type { LoginResponse, LogoutResponse, GetSessionResponse } from '../types'; // Adjust the path as needed
+    import { authStore } from '$lib/stores/authStore';
+    import type { User } from '../global';
+    import "../app.css";
 
-    // Initialize Svelte stores
-    const session = writable<{ userEmail: string; isLoggedIn: boolean }>({
-        userEmail: "",
-        isLoggedIn: false
-    });
-    const message = writable<string>("");
-
-    let modal: HTMLElement;
-    let modalButton: HTMLElement;
-    let closeButton: HTMLElement;
-    let scrollDown: HTMLElement;
-    let isOpened = false;
-
-    // Reactive variables
-    $: userEmail = $session.userEmail || "user@example.com"; // Default email if user is not set
-    $: userId = $session.isLoggedIn ? generateUserId(userEmail) : ""; // Generate unique user ID
-
-    /**
-     * Fetch the current session from the backend
-     */
-    async function fetchSession() {
-        try {
-            const currentSession: GetSessionResponse = await window.backend.GetSession();
-            session.set({
-                userEmail: currentSession.userEmail,
-                isLoggedIn: currentSession.isLoggedIn
-            });
-        } catch (error) {
-            console.error("Error fetching session:", error);
-            session.set({
-                userEmail: "",
-                isLoggedIn: false
-            });
-        }
-    }
-
-    /**
-     * Handle user logout by calling the backend's Logout method
-     */
-    async function handleLogout() {
-        console.log("Logout button clicked");
-        try {
-            const response: LogoutResponse = await window.backend.Logout();
-            if (response.success) {
-                message.set(response.message);
-                // Update session state
-                session.set({
-                    userEmail: "",
-                    isLoggedIn: false
-                });
-            } else {
-                message.set(response.message);
-            }
-        } catch (error) {
-            console.error("Error logging out:", error);
-            message.set("An error occurred during logout.");
-        }
-    }
-
-    /**
-     * Setup event listeners for authentication state changes
-     * Assumes the backend emits an 'authStateChange' event with session data
-     */
-    function setupAuthListeners() {
-        window.runtime.EventsOn("authStateChange", (newSession: GetSessionResponse) => {
-            session.set({
-                userEmail: newSession.userEmail,
-                isLoggedIn: newSession.isLoggedIn
-            });
-        });
-    }
+    let isReady = false;
+    
+    // Use the $ prefix to automatically subscribe to the store
+    $: isAuthenticated = $authStore.isAuthenticated;
+    $: currentUser = $authStore.user;
 
     onMount(() => {
-        // Initial session fetch
-        fetchSession();
+        // Check if we're in dev mode (no Wails)
+        if (!window.runtime) {
+            console.log('Running in dev mode');
+            isReady = true;
+            return;
+        }
 
-        // Setup auth state change listeners
-        setupAuthListeners();
-
-        // Modal scroll and keydown event listeners
-        window.addEventListener("scroll", handleScroll);
-        document.addEventListener("keydown", handleKeydown);
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            document.removeEventListener("keydown", handleKeydown);
-            window.runtime.EventsOff("authStateChange");
-        };
+        // Initialize if Wails is available
+        if (window.backend) {
+            const init = async () => {
+                await authStore.init();
+                isReady = true;
+            };
+            init();
+        } else {
+            // Fallback for when backend isn't available
+            console.log('No backend available');
+            isReady = true;
+        }
     });
 
-    /**
-     * Modal control functions
-     */
-    const openModal = () => {
-        if (modal) {
-            modal.classList.add("is-open");
-            document.body.style.overflow = "hidden";
-        }
-    };
-
-    const closeModal = () => {
-        if (modal) {
-            modal.classList.remove("is-open");
-            document.body.style.overflow = "initial";
-        }
-    };
-
-    const handleScroll = () => {
-        if (window.scrollY > window.innerHeight / 3 && !isOpened) {
-            isOpened = true;
-            if (scrollDown) {
-                scrollDown.style.display = "none";
-            }
-            openModal();
-        }
-    };
-
-    const handleKeydown = (evt: KeyboardEvent) => {
-        if (evt.key === "Escape") {
-            closeModal();
-        }
-    };
+    // Handle logout
+    async function handleLogout() {
+        await authStore.clearAuth();
+    }
 </script>
 
-<ModeWatcher /> <!-- Automatically detect user preference for dark mode -->
+<ModeWatcher />
 
 <!-- Navbar -->
 <div class="bg-background border-b text-black dark:text-white">
@@ -733,18 +351,22 @@ func (a *App) Shutdown(ctx context.Context) {}
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4">
             <a href="/">
-                <img src="/src/lib/assets/logo-no-background.png" alt="KeyPress Logo" class="h-10 w-auto max-w-full object-contain" />
+                <img 
+                    src="/src/lib/assets/logo-no-background.png" 
+                    alt="KeyPress Logo" 
+                    class="h-10 w-auto max-w-full object-contain" 
+                />
             </a>
-            {#if $session.isLoggedIn}
-                <Button href={`/workspace/${userId}`} variant="ghost">
+            {#if isAuthenticated && currentUser}
+                <Button href={`/workspace`} variant="ghost">
                     Workspace
                 </Button>
             {/if}
         </div>
         <!-- Right side of navbar -->
         <div class="flex items-center space-x-4">
-            {#if $session.isLoggedIn}
-                <span class="text-foreground">{userEmail}</span>
+            {#if isAuthenticated && currentUser}
+                <span class="text-foreground">{currentUser.email}</span>
                 <Button on:click={handleLogout} variant="ghost">
                     Logout
                 </Button>
@@ -760,6 +382,437 @@ func (a *App) Shutdown(ctx context.Context) {}
         </div>
     </div>
 </div>
-<slot></slot>
+
+{#if !isReady}
+    <div class="flex items-center justify-center h-screen">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+    </div>
+{:else}
+    <slot />
+{/if}
+```
+
+
+## app.go
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
+
+// App struct
+type App struct {
+	ctx     context.Context
+	session *Session
+	mu      sync.RWMutex
+}
+
+type Session struct {
+	User  *User
+	Token string
+}
+
+type User struct {
+	ID    string `json:"id"`
+	Email string `json:"email"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Token   string `json:"token,omitempty"`
+	User    *User  `json:"user,omitempty"`
+}
+
+type LogoutResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+type SessionResponse struct {
+	Valid bool   `json:"valid"`
+	User  *User  `json:"user,omitempty"`
+	Token string `json:"token,omitempty"`
+}
+
+// JWT claims structure
+type Claims struct {
+	UserID string `json:"user_id"`
+	Email  string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+// NewApp creates a new App application struct
+func NewApp() *App {
+	return &App{}
+}
+
+// Startup is called when the app starts
+func (a *App) Startup(ctx context.Context) {
+	a.ctx = ctx
+}
+
+// Login handles user authentication
+func (a *App) Login(request LoginRequest) LoginResponse {
+	// TODO: Replace with actual authentication logic
+	if request.Email == "test@example.com" && request.Password == "password123" {
+		user := &User{
+			ID:    "1",
+			Email: request.Email,
+		}
+
+		// Create claims with expiry
+		claims := &Claims{
+			UserID: user.ID,
+			Email:  user.Email,
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+				IssuedAt:  jwt.NewNumericDate(time.Now()),
+			},
+		}
+
+		// Create token
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		tokenString, err := token.SignedString([]byte("your-secret-key"))
+		if err != nil {
+			return LoginResponse{
+				Success: false,
+				Message: "Failed to generate token",
+			}
+		}
+
+		// Store session
+		a.mu.Lock()
+		a.session = &Session{
+			User:  user,
+			Token: tokenString,
+		}
+		a.mu.Unlock()
+
+		return LoginResponse{
+			Success: true,
+			Message: "Login successful",
+			Token:   tokenString,
+			User:    user,
+		}
+	}
+
+	return LoginResponse{
+		Success: false,
+		Message: "Invalid credentials",
+	}
+}
+
+// Logout handles user logout
+func (a *App) Logout() LogoutResponse {
+	a.mu.Lock()
+	a.session = nil
+	a.mu.Unlock()
+
+	return LogoutResponse{
+		Success: true,
+		Message: "Logout successful",
+	}
+}
+
+// GetSession checks if a user session is valid
+func (a *App) GetSession() SessionResponse {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	if a.session == nil || a.session.User == nil {
+		return SessionResponse{
+			Valid: false,
+		}
+	}
+
+	// Validate the token
+	token, err := a.validateToken(a.session.Token)
+	if err != nil || !token.Valid {
+		// Clear invalid session
+		a.mu.RUnlock()
+		a.mu.Lock()
+		a.session = nil
+		a.mu.Unlock()
+		a.mu.RLock()
+
+		return SessionResponse{
+			Valid: false,
+		}
+	}
+
+	return SessionResponse{
+		Valid: true,
+		User:  a.session.User,
+		Token: a.session.Token,
+	}
+}
+
+// validateToken validates a JWT token
+func (a *App) validateToken(tokenString string) (*jwt.Token, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte("your-secret-key"), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok {
+		// Check if token is expired
+		if claims.ExpiresAt != nil && claims.ExpiresAt.Before(time.Now()) {
+			return nil, fmt.Errorf("token expired")
+		}
+	}
+
+	return token, nil
+}
+
+// ValidateStoredToken validates a token from the frontend
+func (a *App) ValidateStoredToken(tokenString string) SessionResponse {
+	token, err := a.validateToken(tokenString)
+	if err != nil || !token.Valid {
+		return SessionResponse{
+			Valid: false,
+		}
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok {
+		return SessionResponse{
+			Valid: false,
+		}
+	}
+
+	user := &User{
+		ID:    claims.UserID,
+		Email: claims.Email,
+	}
+
+	// Update session with valid token
+	a.mu.Lock()
+	a.session = &Session{
+		User:  user,
+		Token: tokenString,
+	}
+	a.mu.Unlock()
+
+	return SessionResponse{
+		Valid: true,
+		User:  user,
+		Token: tokenString,
+	}
+}
+```
+
+
+## frontend\src\lib\stores\authStore.ts
+
+```ts
+import { writable } from 'svelte/store';
+import { goto } from '$app/navigation';
+import type { User, LoginResponse, SessionResponse, LogoutResponse } from '../../global';
+
+interface AuthState {
+    isAuthenticated: boolean;
+    token: string | null;
+    user: User | null;
+    isInitialized: boolean;
+}
+
+function createAuthStore() {
+    const { subscribe, set, update } = writable<AuthState>({
+        isAuthenticated: false,
+        token: null,
+        user: null,
+        isInitialized: false
+    });
+
+    const isWailsAvailable = () => {
+        return typeof window !== 'undefined' && window.backend && window.backend.GetSession;
+    };
+
+    async function validateStoredAuth() {
+        const stored = localStorage.getItem('auth');
+        if (!stored) return false;
+
+        try {
+            const { token } = JSON.parse(stored);
+            if (!token) return false;
+
+            // Check if ValidateStoredToken is available
+            if (window.backend.ValidateStoredToken) {
+                const response = await window.backend.ValidateStoredToken(token);
+                return response.valid ? response : false;
+            } else {
+                // Fallback to GetSession if ValidateStoredToken is not available
+                const sessionResponse = await window.backend.GetSession();
+                return sessionResponse.valid ? sessionResponse : false;
+            }
+        } catch {
+            return false;
+        }
+    }
+
+    return {
+        subscribe,
+        setAuth: (token: string, user: User) => {
+            set({
+                isAuthenticated: true,
+                token,
+                user,
+                isInitialized: true
+            });
+            localStorage.setItem('auth', JSON.stringify({ token, user }));
+        },
+        clearAuth: async () => {
+            try {
+                if (isWailsAvailable()) {
+                    await window.backend.Logout();
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            localStorage.removeItem('auth');
+            set({
+                isAuthenticated: false,
+                token: null,
+                user: null,
+                isInitialized: true
+            });
+            goto('/login');
+        },
+        init: async () => {
+            try {
+                if (!isWailsAvailable()) {
+                    console.log('Wails backend not available');
+                    set({ isAuthenticated: false, token: null, user: null, isInitialized: true });
+                    return;
+                }
+
+                // First try to validate stored token
+                const validatedSession = await validateStoredAuth();
+                if (validatedSession) {
+                    set({
+                        isAuthenticated: true,
+                        token: validatedSession.token ?? null,
+                        user: validatedSession.user ?? null,
+                        isInitialized: true
+                    });
+                    return;
+                }
+
+                // If no stored token or invalid, check current session
+                const response = await window.backend.GetSession();
+                if (response.valid && response.user && response.token) {
+                    set({
+                        isAuthenticated: true,
+                        token: response.token,
+                        user: response.user,
+                        isInitialized: true
+                    });
+                    localStorage.setItem('auth', JSON.stringify({ 
+                        token: response.token, 
+                        user: response.user 
+                    }));
+                } else {
+                    localStorage.removeItem('auth');
+                    set({
+                        isAuthenticated: false,
+                        token: null,
+                        user: null,
+                        isInitialized: true
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to initialize auth store:', error);
+                localStorage.removeItem('auth');
+                set({
+                    isAuthenticated: false,
+                    token: null,
+                    user: null,
+                    isInitialized: true
+                });
+            }
+        }
+    };
+}
+
+export const authStore = createAuthStore();
+```
+
+
+## frontend\src\global.d.ts
+
+```ts
+// frontend/src/global.d.ts
+
+// Import the types we need
+interface User {
+  id: string;
+  email: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token?: string;
+  user?: User;
+}
+
+interface LogoutResponse {
+  success: boolean;
+  message: string;
+}
+
+interface SessionResponse {
+  valid: boolean;
+  user?: User;
+  token?: string;
+}
+
+declare global {
+  interface Window {
+    backend: {
+      Login: (request: LoginRequest) => Promise<LoginResponse>;
+      Logout: () => Promise<LogoutResponse>;
+      GetSession: () => Promise<SessionResponse>;
+      ValidateStoredToken: (token: string) => Promise<SessionResponse>;
+    };
+    runtime: {
+      EventsOn: (eventName: string, callback: (...args: any[]) => void) => void;
+      EventsOff: (eventName: string) => void;
+    };
+  }
+}
+
+export type {
+  User,
+  LoginRequest,
+  LoginResponse,
+  LogoutResponse,
+  SessionResponse
+};
 ```
 

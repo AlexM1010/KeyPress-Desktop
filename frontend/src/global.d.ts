@@ -1,18 +1,53 @@
 // frontend/src/global.d.ts
 
-export {};
+// Import the types we need
+interface User {
+  id: string;
+  email: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  token?: string;
+  user?: User;
+}
+
+interface LogoutResponse {
+  success: boolean;
+  message: string;
+}
+
+interface SessionResponse {
+  valid: boolean;
+  user?: User;
+  token?: string;
+}
 
 declare global {
   interface Window {
-    runtime: {
-      EventsOn: (event: string, callback: (...args: any[]) => void) => void;
-      EventsOff: (event: string) => void;
-    };
     backend: {
-      Login: (email: string, password: string) => Promise<LoginResponse>;
+      Login: (request: LoginRequest) => Promise<LoginResponse>;
       Logout: () => Promise<LogoutResponse>;
-      GetSession: () => Promise<GetSessionResponse>;
-      // Add other backend methods here
+      GetSession: () => Promise<SessionResponse>;
+      ValidateStoredToken: (token: string) => Promise<SessionResponse>;
+    };
+    runtime: {
+      EventsOn: (eventName: string, callback: (...args: any[]) => void) => void;
+      EventsOff: (eventName: string) => void;
     };
   }
 }
+
+export type {
+  User,
+  LoginRequest,
+  LoginResponse,
+  LogoutResponse,
+  SessionResponse
+};
