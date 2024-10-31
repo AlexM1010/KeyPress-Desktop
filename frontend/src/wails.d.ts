@@ -3,12 +3,16 @@ export {};
 
 declare global {
     interface Window {
-        backend: {
-            Login(request: LoginRequest): Promise<LoginResponse>;
-            Logout(): Promise<LogoutResponse>;
-            GetSession(): Promise<GetSessionResponse>;
-            Greet(name: string): Promise<string>;
-            // Add other bound methods as needed
-        };
+      backend: {
+        Login: (request: LoginRequest) => Promise<LoginResponse>;
+        Logout: () => Promise<LogoutResponse>;
+        GetSession: () => Promise<SessionResponse>;
+        ValidateStoredToken: (token: string) => Promise<SessionResponse>;
+        SaveFlow: (request: SaveFlowRequest) => Promise<SaveFlowResponse>;
+      };
+      runtime: {
+        EventsOn: (eventName: string, callback: (...args: any[]) => void) => void;
+        EventsOff: (eventName: string) => void;
+      };
     }
-}
+  }

@@ -1,47 +1,42 @@
 // frontend/src/global.d.ts
 
-// Import the types we need
 interface User {
-  id: string;
-  email: string;
+  ID: string;    
+  Email: string; 
 }
 
 interface LoginRequest {
-  email: string;
-  password: string;
+  Email: string;    
+  Password: string; 
 }
 
 interface LoginResponse {
-  success: boolean;
-  message: string;
-  token?: string;
-  user?: User;
+  Success: boolean;  
+  Message: string;   
+  Token?: string;    
+  User?: User;       
 }
 
 interface LogoutResponse {
-  success: boolean;
-  message: string;
+  Success: boolean;  
+  Message: string;   
 }
 
 interface SessionResponse {
-  valid: boolean;
-  user?: User;
-  token?: string;
+  Valid: boolean;   
+  User?: User;      
+  Token?: string;   
 }
 
-declare global {
-  interface Window {
-    backend: {
-      Login: (request: LoginRequest) => Promise<LoginResponse>;
-      Logout: () => Promise<LogoutResponse>;
-      GetSession: () => Promise<SessionResponse>;
-      ValidateStoredToken: (token: string) => Promise<SessionResponse>;
-    };
-    runtime: {
-      EventsOn: (eventName: string, callback: (...args: any[]) => void) => void;
-      EventsOff: (eventName: string) => void;
-    };
-  }
+interface SaveFlowRequest {
+  userId: string;
+  flowName: string;
+  flowData: string;
+}
+
+interface SaveFlowResponse {
+  Success: boolean;
+  Message: string;
 }
 
 export type {
@@ -51,3 +46,34 @@ export type {
   LogoutResponse,
   SessionResponse
 };
+
+// Define the structure of your Go backend methods
+export interface Backend {
+  InitializeFromToken(token: string): Promise<void>;
+  SignIn(email: string, password: string): Promise<{
+      access_token: string;
+      refresh_token: string;
+      // Add other properties returned by SignIn
+  }>;
+  SignOut(token: string): Promise<void>;
+  // Add other backend methods as needed
+}
+
+// Define the Wails runtime interface
+export interface WailsRuntime {
+  EventsOn(eventName: string, callback: (data: any) => void): void;
+  EventsEmit(eventName: string, ...data: any[]): void;
+  // Add other runtime methods as needed
+}
+
+// Extend the window interface
+declare global {
+  interface Window {
+      go: {
+          main: {
+              App: Backend;
+          };
+      };
+      runtime: WailsRuntime;
+  }
+}

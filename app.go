@@ -4,219 +4,133 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/supabase-community/auth-go"
+	"github.com/supabase-community/auth-go/types"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-// App struct
+// AuthStore manages authentication state
+type AuthStore struct {
+	mu            sync.RWMutex
+	currentUser   *types.UserResponse
+	isInitialized bool
+}
+
+// Extended App struct with AuthStore
 type App struct {
-	ctx     context.Context
-	session *Session
-	mu      sync.RWMutex
+	ctx        context.Context
+	authClient auth.Client
+	authStore  *AuthStore
 }
 
-type Session struct {
-	User  *User
-	Token string
-}
-
-type User struct {
-	ID    string `json:"id"`
-	Email string `json:"email"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type LoginResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Token   string `json:"token,omitempty"`
-	User    *User  `json:"user,omitempty"`
-}
-
-type LogoutResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type SessionResponse struct {
-	Valid bool   `json:"valid"`
-	User  *User  `json:"user,omitempty"`
-	Token string `json:"token,omitempty"`
-}
-
-// JWT claims structure
-type Claims struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	jwt.RegisteredClaims
-}
-
-// NewApp creates a new App application struct
+// NewApp creates a new App application struct with AuthStore
 func NewApp() *App {
-	return &App{}
+	authClient := auth.New("https://fuobfyypdlixgvwzrvoy.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk") //os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_KEY"))
+
+	return &App{
+		authClient: authClient,
+		authStore:  &AuthStore{},
+	}
 }
 
-// Startup is called when the app starts
-func (a *App) Startup(ctx context.Context) {
+// EmitAuthState sends the current auth state to frontend
+func (a *App) emitAuthState() {
+	a.authStore.mu.RLock()
+	defer a.authStore.mu.RUnlock()
+
+	authState := map[string]interface{}{
+		"user":          a.authStore.currentUser,
+		"isInitialized": a.authStore.isInitialized,
+	}
+
+	// Emit the auth state change event to frontend
+	runtime.EventsEmit(a.ctx, "auth:stateChange", authState)
+}
+
+// Initialize auth state on startup
+func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	a.authStore.isInitialized = true
+	a.emitAuthState()
 }
 
-// Login handles user authentication
-func (a *App) Login(request LoginRequest) LoginResponse {
-	// TODO: Replace with actual authentication logic
-	if request.Email == "test@example.com" && request.Password == "password123" {
-		user := &User{
-			ID:    "1",
-			Email: request.Email,
-		}
-
-		// Create claims with expiry
-		claims := &Claims{
-			UserID: user.ID,
-			Email:  user.Email,
-			RegisteredClaims: jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-				IssuedAt:  jwt.NewNumericDate(time.Now()),
-			},
-		}
-
-		// Create token
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		tokenString, err := token.SignedString([]byte("your-secret-key"))
-		if err != nil {
-			return LoginResponse{
-				Success: false,
-				Message: "Failed to generate token",
-			}
-		}
-
-		// Store session
-		a.mu.Lock()
-		a.session = &Session{
-			User:  user,
-			Token: tokenString,
-		}
-		a.mu.Unlock()
-
-		return LoginResponse{
-			Success: true,
-			Message: "Login successful",
-			Token:   tokenString,
-			User:    user,
-		}
-	}
-
-	return LoginResponse{
-		Success: false,
-		Message: "Invalid credentials",
-	}
-}
-
-// Logout handles user logout
-func (a *App) Logout() LogoutResponse {
-	a.mu.Lock()
-	a.session = nil
-	a.mu.Unlock()
-
-	return LogoutResponse{
-		Success: true,
-		Message: "Logout successful",
-	}
-}
-
-// GetSession checks if a user session is valid
-func (a *App) GetSession() SessionResponse {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-
-	if a.session == nil || a.session.User == nil {
-		return SessionResponse{
-			Valid: false,
-		}
-	}
-
-	// Validate the token
-	token, err := a.validateToken(a.session.Token)
-	if err != nil || !token.Valid {
-		// Clear invalid session
-		a.mu.RUnlock()
-		a.mu.Lock()
-		a.session = nil
-		a.mu.Unlock()
-		a.mu.RLock()
-
-		return SessionResponse{
-			Valid: false,
-		}
-	}
-
-	return SessionResponse{
-		Valid: true,
-		User:  a.session.User,
-		Token: a.session.Token,
-	}
-}
-
-// validateToken validates a JWT token
-func (a *App) validateToken(tokenString string) (*jwt.Token, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte("your-secret-key"), nil
-	})
-
+// SignIn with updated store management
+func (a *App) SignIn(email, password string) (*types.TokenResponse, error) {
+	response, err := a.authClient.SignInWithEmailPassword(email, password)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("signin failed: %w", err)
 	}
 
-	if claims, ok := token.Claims.(*Claims); ok {
-		// Check if token is expired
-		if claims.ExpiresAt != nil && claims.ExpiresAt.Before(time.Now()) {
-			return nil, fmt.Errorf("token expired")
-		}
+	// Get user details with the new token
+	authedClient := a.authClient.WithToken(response.AccessToken)
+	user, err := authedClient.GetUser()
+	if err != nil {
+		return nil, fmt.Errorf("get user failed: %w", err)
 	}
 
-	return token, nil
+	// Update store
+	a.authStore.mu.Lock()
+	a.authStore.currentUser = user
+	a.authStore.mu.Unlock()
+
+	// Emit state change
+	a.emitAuthState()
+
+	return response, nil
 }
 
-// ValidateStoredToken validates a token from the frontend
-func (a *App) ValidateStoredToken(tokenString string) SessionResponse {
-	token, err := a.validateToken(tokenString)
-	if err != nil || !token.Valid {
-		return SessionResponse{
-			Valid: false,
-		}
+// SignOut with store update
+func (a *App) SignOut(token string) error {
+	authedClient := a.authClient.WithToken(token)
+
+	err := authedClient.Logout()
+	if err != nil {
+		return fmt.Errorf("signout failed: %w", err)
 	}
 
-	claims, ok := token.Claims.(*Claims)
-	if !ok {
-		return SessionResponse{
-			Valid: false,
-		}
+	// Clear store
+	a.authStore.mu.Lock()
+	a.authStore.currentUser = nil
+	a.authStore.mu.Unlock()
+
+	// Emit state change
+	a.emitAuthState()
+
+	return nil
+}
+
+// GetAuthState returns current auth state
+func (a *App) GetAuthState() map[string]interface{} {
+	a.authStore.mu.RLock()
+	defer a.authStore.mu.RUnlock()
+
+	return map[string]interface{}{
+		"user":          a.authStore.currentUser,
+		"isInitialized": a.authStore.isInitialized,
+	}
+}
+
+// InitializeFromToken initializes the auth state from a stored token
+func (a *App) InitializeFromToken(token string) error {
+	if token == "" {
+		a.authStore.mu.Lock()
+		a.authStore.currentUser = nil
+		a.authStore.mu.Unlock()
+		a.emitAuthState()
+		return nil
 	}
 
-	user := &User{
-		ID:    claims.UserID,
-		Email: claims.Email,
+	authedClient := a.authClient.WithToken(token)
+	user, err := authedClient.GetUser()
+	if err != nil {
+		return fmt.Errorf("initialize from token failed: %w", err)
 	}
 
-	// Update session with valid token
-	a.mu.Lock()
-	a.session = &Session{
-		User:  user,
-		Token: tokenString,
-	}
-	a.mu.Unlock()
+	a.authStore.mu.Lock()
+	a.authStore.currentUser = user
+	a.authStore.mu.Unlock()
 
-	return SessionResponse{
-		Valid: true,
-		User:  user,
-		Token: tokenString,
-	}
+	a.emitAuthState()
+	return nil
 }

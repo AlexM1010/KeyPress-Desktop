@@ -1,12 +1,11 @@
 <!-- src/routes/login/Login.svelte -->
- 
 <script lang="ts">
     import "./login.scss";
     import { z } from "zod";
     import { CircleX } from "lucide-svelte";
     import { onMount } from "svelte";
     import { writable, get } from "svelte/store";
-    import { authStore } from '$lib/stores/authStore';
+    import { auth, isAuthenticated } from '$lib/stores/authStore';
     import { goto } from '$app/navigation';
     
     // Form Schema
@@ -23,6 +22,11 @@
     const errors = writable<ErrorsData>({});
     const message = writable<string>('');
     const isLoading = writable<boolean>(false);
+
+    // Redirect if already authenticated
+    $: if ($isAuthenticated) {
+        goto('/workspace');
+    }
 
     // Modal elements
     let modal: HTMLElement;
@@ -75,11 +79,11 @@
 
     // Form submission handler
     const handleSubmit = async (event: Event) => {
-    event.preventDefault();
-    const currentForm = get(form);
-    
-    // Validate form
-    const result = formSchema.safeParse(currentForm);
+        event.preventDefault();
+        const currentForm = get(form);
+        
+        // Validate form
+        const result = formSchema.safeParse(currentForm);
         if (!result.success) {
             const formattedErrors: ErrorsData = {};
             result.error.errors.forEach(err => {
@@ -94,26 +98,14 @@
         message.set('');
 
         try {
-            // Create the login request object
-            const loginRequest = {
-                email: currentForm.email,
-                password: currentForm.password
-            };
-
-            const response = await window.backend.Login(loginRequest);
-
-            if (response.success && response.token && response.user) {
-                // Update auth store with user data
-                authStore.setAuth(response.token, response.user);
-                message.set('Login successful');
-                closeModal();
-                goto('/workspace');
-            } else {
-                message.set(response.message || 'Login failed');
-            }
+            await auth.signIn(currentForm.email, currentForm.password);
+            message.set('Login successful');
+            closeModal();
+            await goto('/workspace');
         } catch (error) {
             console.error('Login error:', error);
-            message.set('An error occurred during login');
+            message.set(error instanceof Error ? error.message : 'An error occurred during login');
+            errors.set({});
         } finally {
             isLoading.set(false);
         }

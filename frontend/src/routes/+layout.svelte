@@ -1,19 +1,17 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button';
     import { ModeWatcher } from "mode-watcher";
     import { generateUserId } from '$lib/utils';
     import ThemeToggle from './ThemeToggle.svelte';
     import { onMount } from 'svelte';
-    import { authStore } from '$lib/stores/authStore';
+    import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/authStore';
     import type { User } from '../global';
     import "../app.css";
 
+    // No need for manual store subscriptions since we're using the derived stores
     let isReady = false;
     
-    // Use the $ prefix to automatically subscribe to the store
-    $: isAuthenticated = $authStore.isAuthenticated;
-    $: currentUser = $authStore.user;
-
     onMount(() => {
         // Check if we're in dev mode (no Wails)
         if (!window.runtime) {
@@ -23,23 +21,33 @@
         }
 
         // Initialize if Wails is available
-        if (window.backend) {
-            const init = async () => {
-                await authStore.init();
+        const init = async () => {
+            try {
+                await auth.init();
+            } catch (error) {
+                console.error('Auth initialization failed:', error);
+            } finally {
                 isReady = true;
-            };
-            init();
-        } else {
-            // Fallback for when backend isn't available
-            console.log('No backend available');
-            isReady = true;
-        }
+            }
+        };
+
+        init();
     });
 
     // Handle logout
     async function handleLogout() {
-        await authStore.clearAuth();
+        try {
+            await auth.signOut();
+            await goto('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Optionally show an error notification
+        }
     }
+
+    // Debug logging (you can remove these in production)
+    $: console.log('isAuthenticated:', $isAuthenticated);
+    $: console.log('currentUser:', $user);
 </script>
 
 <ModeWatcher />
@@ -49,31 +57,31 @@
     <div class="max-w-3xl mx-auto flex justify-between items-center py-4 px-4">
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4">
-            <a href="/">
+            <button on:click={() => goto('/')} class="flex items-center">
                 <img 
                     src="/src/lib/assets/logo-no-background.png" 
                     alt="KeyPress Logo" 
                     class="h-10 w-auto max-w-full object-contain" 
                 />
-            </a>
-            {#if isAuthenticated && currentUser}
-                <Button href={`/workspace`} variant="ghost">
+            </button>
+            {#if $isAuthenticated && $user}
+                <Button on:click={() => goto('/workspace')} variant="ghost">
                     Workspace
                 </Button>
             {/if}
         </div>
         <!-- Right side of navbar -->
         <div class="flex items-center space-x-4">
-            {#if isAuthenticated && currentUser}
-                <span class="text-foreground">{currentUser.email}</span>
+            {#if $isAuthenticated && $user}
+                <span class="text-foreground">{$user.Email}</span>
                 <Button on:click={handleLogout} variant="ghost">
                     Logout
                 </Button>
             {:else}
-                <Button href="/register" variant="ghost">
+                <Button on:click={() => goto('/register')} variant="ghost">
                     Register
                 </Button>
-                <Button href="/login" variant="ghost">
+                <Button on:click={() => goto('/login')} variant="ghost">
                     Login
                 </Button>
             {/if}
@@ -82,7 +90,7 @@
     </div>
 </div>
 
-{#if !isReady}
+{#if !($isInitialized && isReady)}
     <div class="flex items-center justify-center h-screen">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
