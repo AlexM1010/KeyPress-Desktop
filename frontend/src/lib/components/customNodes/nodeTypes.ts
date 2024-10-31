@@ -6,11 +6,13 @@ import SVGNode from './SVGNode.svelte';
 import BinNode from '$lib/components/customNodes/BinNode.svelte';
 import MouseClickNode from './MouseClickNode.svelte';
 import KeyPressNode from './KeyPressNode.svelte';
+import StartNode from './StartNode.svelte';
 
 export const nodeTypes: NodeTypes = {
   'color-picker': ColorPickerNode as unknown as typeof SvelteComponent,
   'svgNode': SVGNode as unknown as typeof SvelteComponent,
   'bin-node': BinNode as unknown as typeof SvelteComponent,
   'mouse-click-node': MouseClickNode as unknown as typeof SvelteComponent,
-  'keypress-node': KeyPressNode as unknown as typeof SvelteComponent
+  'keypress-node': KeyPressNode as unknown as typeof SvelteComponent,
+  'start-node': StartNode as unknown as typeof SvelteComponent,
 };

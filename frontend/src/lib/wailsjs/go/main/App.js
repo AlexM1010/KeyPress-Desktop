@@ -6,12 +6,24 @@ export function GetAuthState() {
   return window['go']['main']['App']['GetAuthState']();
 }
 
+export function GetIsExecuting() {
+  return window['go']['main']['App']['GetIsExecuting']();
+}
+
 export function InitializeFromToken(arg1) {
   return window['go']['main']['App']['InitializeFromToken'](arg1);
 }
 
-export function RunSimpleClick() {
-  return window['go']['main']['App']['RunSimpleClick']();
+export function KeyTap(arg1) {
+  return window['go']['main']['App']['KeyTap'](arg1);
+}
+
+export function MouseClick(arg1) {
+  return window['go']['main']['App']['MouseClick'](arg1);
+}
+
+export function MouseMove(arg1, arg2) {
+  return window['go']['main']['App']['MouseMove'](arg1, arg2);
 }
 
 export function SignIn(arg1, arg2) {
@@ -20,4 +32,16 @@ export function SignIn(arg1, arg2) {
 
 export function SignOut(arg1) {
   return window['go']['main']['App']['SignOut'](arg1);
+}
+
+export function StartExecution(arg1) {
+  return window['go']['main']['App']['StartExecution'](arg1);
+}
+
+export function StopExecution() {
+  return window['go']['main']['App']['StopExecution']();
+}
+
+export function TypeString(arg1) {
+  return window['go']['main']['App']['TypeString'](arg1);
 }

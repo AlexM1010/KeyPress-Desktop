@@ -1,4 +1,5 @@
 <!-- src/routes/workspace/Flow.svelte -->
+
 <script lang="ts">
   import {
     SvelteFlow,
@@ -17,7 +18,6 @@
     onNodeDragStop,
     onLayout,
   } from "./utils";
-  import { lastSavedFlowData, saveOrUpdateFlow } from "./utils";
   import CustomEdge from "./CustomEdge.svelte";
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
   import { flowTheme } from "$lib/stores/themeStore";
@@ -25,8 +25,9 @@
   import Sidebar from "./Sidebar.svelte";
   import ConnectionLine from './ConnectionLine.svelte';
   import { goto } from '$app/navigation';
+  import { get } from 'svelte/store';
 
-  // Use the reactive auth store values
+  // Redirect to login if not authenticated
   $: if (!$isAuthenticated || !$user) {
     goto('/login');
   }
@@ -35,40 +36,28 @@
 
   const { toObject, screenToFlowPosition } = useSvelteFlow();
 
-  // Updated save handler using the auth store
-  async function handleSave() {
-    console.log("Triggering manual save...");
-    if (!$user) {
-      console.error("User not authenticated");
-      return;
-    }
-
+  // Function to handle running the entire flow
+  async function handleRunFlow() {
     try {
-      // Get the current flow state
-      let flowName = "Untitled Flow";
+      // Serialize the current flow data
       const currentFlowData = toObject();
-      
-      // Get the current auth token
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        throw new Error("No auth token found");
-      }
+      alert(currentFlowData);
 
-      /*const response = await window.go.main.App.SaveFlow({
-        flowData: currentFlowData,
-        flowName: flowName,
-        userId: $user.id
-      });
+      // Ensure the flow has a Start node
+      //const hasStartNode = currentFlowData.nodes.some(node => node.type === "Start");
+      //if (!hasStartNode) {
+      //  alert("Flowchart must contain a Start node.");
+      //  return;
+      //}
 
-      if (response.success) {
-        console.log("Flow saved successfully!");
-        lastSavedFlowData.set(JSON.stringify(currentFlowData));
-      } else {
-        throw new Error(response.error);
-      }*/
+      // Send the flow data to the backend's StartExecution method
+      const response = await window.go.main.App.StartExecution(JSON.stringify(currentFlowData));
+
+      console.log("Flow execution started:", response);
     } catch (error) {
-      console.error("Failed to save flow:", error);
-      // Optionally show an error notification to the user
+      console.error("Failed to run flow:", error);
+      // Optionally, display an error notification to the user
+      alert("Failed to run flow. Check the console for details.");
     }
   }
 
@@ -120,14 +109,19 @@
     $nodes = [...$nodes, newNode];
   };
 
-  async function handleSimpleClick() {
+  // Save handler (if needed)
+  async function handleSave() {
+    console.log("Triggering manual save...");
+    if (!$user) {
+      console.error("User not authenticated");
+      return;
+    }
+
     try {
-      const response = await window.go.main.App.RunSimpleClick();
-      if (response.success) {
-        console.log("TagUI click executed successfully!");
-      }
+      // Implement your save logic here
     } catch (error) {
-      console.error("Failed to run TagUI click:", error);
+      console.error("Failed to save flow:", error);
+      // Optionally show an error notification to the user
     }
   }
 </script>
@@ -156,7 +150,7 @@
         <Panel position="top-right">
           <button
             class="bg-background text-foreground px-4 py-2 rounded"
-            on:click={handleSimpleClick}>Run</button
+            on:click={handleRunFlow}>Run Flow</button
           >
           <button
             class="bg-background text-foreground px-4 py-2 rounded"

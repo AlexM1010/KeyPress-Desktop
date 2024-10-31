@@ -4,10 +4,22 @@ import {types} from '../models';
 
 export function GetAuthState():Promise<{[key: string]: any}>;
 
+export function GetIsExecuting():Promise<boolean>;
+
 export function InitializeFromToken(arg1:string):Promise<void>;
 
-export function RunSimpleClick():Promise<{[key: string]: any}>;
+export function KeyTap(arg1:string):Promise<void>;
+
+export function MouseClick(arg1:string):Promise<void>;
+
+export function MouseMove(arg1:number,arg2:number):Promise<void>;
 
 export function SignIn(arg1:string,arg2:string):Promise<types.TokenResponse>;
 
 export function SignOut(arg1:string):Promise<void>;
+
+export function StartExecution(arg1:string):Promise<void>;
+
+export function StopExecution():Promise<void>;
+
+export function TypeString(arg1:string):Promise<void>;

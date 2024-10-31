@@ -55,3 +55,20 @@ export interface SVGNodeData {
   width?: number;
   height?: number;
 }
+
+export interface AutomationNode {
+  id: string;
+  type: 'startNode' | 'endNode' | 'clickNode' | 'moveNode' | 'keyNode' | 'delayNode';
+  data: {
+      label: string;
+      clickType?: 'left' | 'right' | 'double';
+      key?: string;
+      delay?: number;
+      mouseX?: number;
+      mouseY?: number;
+  };
+  position: {
+      x: number;
+      y: number;
+  };
+}

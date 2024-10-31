@@ -9,78 +9,10 @@ const baseX = 0;
 const baseY = 0;
 const xSpacing = 200;
 
-export const initialNodes: Node[] = [ /*
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'input' },
-    position
-  },
-  {
-    id: '2',
-    data: { label: 'node 2' },
-    position
-  },
-  {
-    id: '2a',
-    data: { label: 'node 2a' },
-    position
-  },
-  {
-    id: '2b',
-    data: { label: 'node 2b' },
-    position
-  },
-  {
-    id: '2c',
-    data: { label: 'node 2c' },
-    position
-  },
-  {
-    id: '2d',
-    data: { label: 'node 2d' },
-    position
-  },
-  {
-    id: '3',
-    data: { label: 'node 3' },
-    position
-  },
-  {
-    id: '4',
-    data: { label: 'node 4' },
-    position
-  },
-  {
-    id: '5',
-    data: { label: 'node 5' },
-    position
-  },
-  {
-    id: '6',
-    type: 'output',
-    data: { label: 'output' },
-    position
-  },
-  { id: '7', type: 'output', data: { label: 'output' }, position },
-  {
-    id: '8',
-    // this type needs to match the newly defined node type
-    type: 'color-picker',
-    position: { x: 0, y: 0 },
-    // data is used to store the current color value
-    data: { color: writable('#ff4000') },
-  },
-  {
-    id: 'button-1',
-    type: 'input',
-    data: { label: 'Button Edge 1' },
-    position: { x: 125, y: 0 }
-  },
-  { id: 'button-2', data: { label: 'Button Edge 2' }, position: { x: 125, y: 200 } },
-  { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, */
+export const initialNodes: Node[] = [ 
+  /* { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, */
   { 
-    id: 'start',
+    id: 'startsvg',
     type: 'svgNode',
     position: { x: baseX, y: baseY },
     data: {
@@ -173,6 +105,16 @@ export const initialNodes: Node[] = [ /*
       buttonTypes: ['Press', 'Hold', 'Release'],
       actions: ['None', 'Shift', 'Ctrl', 'Alt', 'Windows'], // Will need Command for Mac
       clickDuration: 75
+    }
+  },
+  {
+    id: 'Start',
+    type: 'start-node',
+    position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
+    data: {
+      label: 'Start',
+      icon: 'Play',
+      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
     }
   },
 ];
