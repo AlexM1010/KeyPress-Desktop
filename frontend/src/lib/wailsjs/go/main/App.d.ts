@@ -6,6 +6,8 @@ export function GetAuthState():Promise<{[key: string]: any}>;
 
 export function InitializeFromToken(arg1:string):Promise<void>;
 
+export function RunSimpleClick():Promise<{[key: string]: any}>;
+
 export function SignIn(arg1:string,arg2:string):Promise<types.TokenResponse>;
 
 export function SignOut(arg1:string):Promise<void>;

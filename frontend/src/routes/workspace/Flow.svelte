@@ -119,6 +119,17 @@
 
     $nodes = [...$nodes, newNode];
   };
+
+  async function handleSimpleClick() {
+    try {
+      const response = await window.go.main.App.RunSimpleClick();
+      if (response.success) {
+        console.log("TagUI click executed successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to run TagUI click:", error);
+    }
+  }
 </script>
 
 {#if $isAuthenticated && $user}
@@ -145,15 +156,15 @@
         <Panel position="top-right">
           <button
             class="bg-background text-foreground px-4 py-2 rounded"
-            on:click={handleSave}>Save Flow</button
+            on:click={handleSimpleClick}>Run</button
           >
           <button
             class="bg-background text-foreground px-4 py-2 rounded"
-            on:click={() => onLayout("TB")}>Vertical Layout</button
+            on:click={handleSave}>Save</button
           >
           <button
             class="bg-background text-foreground px-4 py-2 rounded"
-            on:click={() => onLayout("LR")}>Horizontal Layout</button
+            on:click={() => onLayout("TB")}>Layout</button
           >
         </Panel>
         <Controls />

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"sync"
 
 	"github.com/supabase-community/auth-go"
@@ -135,4 +137,29 @@ func (a *App) InitializeFromToken(token string) error {
 
 	a.emitAuthState()
 	return nil
+}
+
+func (a *App) RunSimpleClick() map[string]interface{} {
+	// Create a simple TagUI script for a single click
+	script := "click element"
+
+	// Write to temporary file
+	tmpFile, err := os.CreateTemp("", "tagui-*.tag")
+	if err != nil {
+		return map[string]interface{}{"success": false, "error": err.Error()}
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.WriteString(script); err != nil {
+		return map[string]interface{}{"success": false, "error": err.Error()}
+	}
+
+	// Run TagUI
+	cmd := exec.Command("tagui", tmpFile.Name(), "live") // "live" flag so dosen't open new browser
+	err = cmd.Run()
+	if err != nil {
+		return map[string]interface{}{"success": false, "error": err.Error()}
+	}
+
+	return map[string]interface{}{"success": true}
 }

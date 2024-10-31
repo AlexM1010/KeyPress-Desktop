@@ -10,6 +10,10 @@ export function InitializeFromToken(arg1) {
   return window['go']['main']['App']['InitializeFromToken'](arg1);
 }
 
+export function RunSimpleClick() {
+  return window['go']['main']['App']['RunSimpleClick']();
+}
+
 export function SignIn(arg1, arg2) {
   return window['go']['main']['App']['SignIn'](arg1, arg2);
 }

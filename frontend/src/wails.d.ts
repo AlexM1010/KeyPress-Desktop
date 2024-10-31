@@ -21,6 +21,7 @@ declare global {
                 // Add other properties returned by SignIn
             }>;
             SignOut(token: string): Promise<void>;
+            RunSimpleClick: () => Promise<{ success: boolean; error?: string }>;
         };
         runtime: WailsRuntime;
     }
