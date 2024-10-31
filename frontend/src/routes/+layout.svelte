@@ -73,7 +73,7 @@
         <!-- Right side of navbar -->
         <div class="flex items-center space-x-4">
             {#if $isAuthenticated && $user}
-                <span class="text-foreground">{$user.Email}</span>
+                <span class="text-foreground">{$user.email}</span>
                 <Button on:click={handleLogout} variant="ghost">
                     Logout
                 </Button>

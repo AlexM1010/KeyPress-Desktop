@@ -1,11 +1,6 @@
 // src/lib/stores/auth.ts
 import { writable, derived } from 'svelte/store';
-import type { User } from '../../global.d.ts';
-
-interface AuthState {
-    user: User | null;
-    isInitialized: boolean;
-}
+import type { AuthState } from '../../global.d.ts';
 
 function createAuthStore() {
     const { subscribe, set, update } = writable<AuthState>({

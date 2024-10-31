@@ -26,8 +26,10 @@ type App struct {
 
 // NewApp creates a new App application struct with AuthStore
 func NewApp() *App {
-	authClient := auth.New("https://fuobfyypdlixgvwzrvoy.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk") //os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_KEY"))
-
+	authClient := auth.New( //os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_KEY"))
+		"fuobfyypdlixgvwzrvoy", //https://*.supabase.co
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
+	)
 	return &App{
 		authClient: authClient,
 		authStore:  &AuthStore{},

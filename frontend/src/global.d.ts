@@ -1,8 +1,8 @@
 // frontend/src/global.d.ts
 
-interface User {
-  ID: string;    
-  Email: string; 
+interface User { //TODO update to full user structure
+  id?: string;    
+  email?: string; 
 }
 
 interface LoginRequest {
@@ -39,41 +39,18 @@ interface SaveFlowResponse {
   Message: string;
 }
 
-export type {
-  User,
-  LoginRequest,
-  LoginResponse,
-  LogoutResponse,
-  SessionResponse
+interface AuthState {
+  user: User | null;
+  isInitialized: boolean;
+}
+
+export type { 
+  User, 
+  LoginRequest, 
+  LoginResponse, 
+  LogoutResponse, 
+  SessionResponse, 
+  SaveFlowRequest, 
+  SaveFlowResponse, 
+  AuthState 
 };
-
-// Define the structure of your Go backend methods
-export interface Backend {
-  InitializeFromToken(token: string): Promise<void>;
-  SignIn(email: string, password: string): Promise<{
-      access_token: string;
-      refresh_token: string;
-      // Add other properties returned by SignIn
-  }>;
-  SignOut(token: string): Promise<void>;
-  // Add other backend methods as needed
-}
-
-// Define the Wails runtime interface
-export interface WailsRuntime {
-  EventsOn(eventName: string, callback: (data: any) => void): void;
-  EventsEmit(eventName: string, ...data: any[]): void;
-  // Add other runtime methods as needed
-}
-
-// Extend the window interface
-declare global {
-  interface Window {
-      go: {
-          main: {
-              App: Backend;
-          };
-      };
-      runtime: WailsRuntime;
-  }
-}
