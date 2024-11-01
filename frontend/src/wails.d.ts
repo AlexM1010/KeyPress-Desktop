@@ -35,6 +35,16 @@ interface Backend {
     KeyTap(key: string): Promise<void>;
     GetMousePosition(): Promise<MousePosition>;
     StartExecution(nodesJSON: string): Promise<void>;
+
+    // New methods for task and execution events
+    StartExecution(data: string): Promise<void>;
+    OnTaskStarted(callback: (taskId: string) => void): void;
+    OnTaskCompleted(callback: (taskId: string) => void): void;
+    OnTaskError(callback: (payload: { taskID: string; error: string }) => void): void;
+    OnExecutionCompleted(callback: () => void): void;
+    OnExecutionError(callback: (errorMsg: string) => void): void;
+    OnExecutionStopped(callback: () => void): void;
+    OnExecutionTimedOut(callback: () => void): void;
 }
 
 // Single consolidated Window interface declaration

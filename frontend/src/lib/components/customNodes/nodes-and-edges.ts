@@ -1,4 +1,4 @@
-import type { Node, Edge } from '@xyflow/svelte';
+import type { Node, Edge, Position } from '@xyflow/svelte';
 import { writable } from 'svelte/store';
 import { nodeShapes } from './NodeSVGStore';  // Add this import
 
@@ -83,7 +83,7 @@ export const initialNodes: Node[] = [
   },
   {
     id: 'mouse-click',
-    type: 'mouse-click-node',
+    type: 'Click',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: {
       label: 'Mouse Click',
@@ -93,6 +93,12 @@ export const initialNodes: Node[] = [
       actions: ["Single", "Double", "Triple", "Hold"],
       clickDuration: 75
     }
+  },
+  {
+    id: 'mouse-click1',
+    type: 'Click',
+    position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
+    data: { }
   },
   {
     id: 'keypress',
@@ -109,13 +115,25 @@ export const initialNodes: Node[] = [
   },
   {
     id: 'Start',
-    type: 'start-node',
+    type: 'Start',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: {
       label: 'Start',
       icon: 'Play',
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
     }
+  },
+  {
+    id: 'MoveMouse-node',
+    type: 'MoveMouse',
+    position: { x: baseX + xSpacing * 4, y: baseY + xSpacing }, // Adjust position as needed
+    data: {
+      x: 300.0,
+      y: 400.0
+    },
+    targetPosition: 'right' as Position,
+    sourcePosition: 'left' as Position,
+    measured: { width: 100, height: 50 }
   },
 ];
 

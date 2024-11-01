@@ -1,3 +1,4 @@
+<!-- NodeWrapper.svelte -->
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { ChevronDown } from 'lucide-svelte';
@@ -65,10 +66,12 @@
 
     function handleDuplicate() {
         console.log("Duplicate action triggered");
+        // You can dispatch an event or handle duplication logic here
     }
 
     function handleDelete() {
         console.log("Delete action triggered");
+        // You can dispatch an event or handle deletion logic here
     }
 </script>
 
@@ -79,6 +82,7 @@
     on:contextmenu={openContextMenu}
     role="button"
     tabindex="0"
+    {...$$restProps} 
 >
     <!-- Svelte Flow Handles -->
     {#each handles as handle (handle.id)}

@@ -1,4 +1,4 @@
-//app.go
+// app.go
 
 package main
 
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/go-vgo/robotgo"
 	"github.com/supabase-community/auth-go"
@@ -37,8 +38,6 @@ type App struct {
 	nodeMap      map[string]Node
 	notifyCh     chan string
 }
-
-// Flowchart interpreter structs
 
 // Node represents a single node in the flowchart.
 type Node struct {
@@ -81,8 +80,8 @@ type TaskQueue struct {
 
 // NewApp creates a new App application struct with AuthStore
 func NewApp() *App {
-	authClient := auth.New( //os.Getenv("SUPABASE_URL"), os.Getenv("SUPABASE_KEY"))
-		"fuobfyypdlixgvwzrvoy", //https://*.supabase.co
+	authClient := auth.New(
+		"fuobfyypdlixgvwzrvoy", // Supabase URL
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
 	)
 	return &App{
@@ -114,7 +113,8 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.authStore.isInitialized = true
 	a.emitAuthState()
-	a.taskQueue.app = a // Set the app reference in TaskQueue
+	a.taskQueue.app = a  // Set the app reference in TaskQueue
+	a.taskQueue.Start(3) // Start 3 workers by default
 }
 
 // SignIn with updated store management
@@ -245,15 +245,18 @@ func (q *TaskQueue) Start(workerCount int) {
 		q.wg.Add(1)
 		go q.worker(i)
 	}
+	log.Printf("TaskQueue started with %d workers", workerCount)
 }
 
 // worker processes tasks from the queue.
 func (q *TaskQueue) worker(workerID int) {
 	defer q.wg.Done()
+	log.Printf("Worker %d started", workerID)
 	for {
 		select {
 		case task, ok := <-q.tasks:
 			if !ok {
+				log.Printf("Worker %d stopping: task channel closed", workerID)
 				return
 			}
 			log.Printf("Worker %d processing task %s of type %s", workerID, task.ID, task.Type)
@@ -263,6 +266,7 @@ func (q *TaskQueue) worker(workerID int) {
 			// Notify task completion for dependency handling
 			q.app.notifyTaskCompletion(task.ID)
 		case <-q.ctx.Done():
+			log.Printf("Worker %d stopping: context canceled", workerID)
 			return
 		}
 	}
@@ -272,6 +276,7 @@ func (q *TaskQueue) worker(workerID int) {
 func (q *TaskQueue) Enqueue(task Task) {
 	select {
 	case q.tasks <- task:
+		log.Printf("Enqueued task %s of type %s", task.ID, task.Type)
 	case <-q.ctx.Done():
 		log.Println("Task queue is closed. Cannot enqueue task:", task.ID)
 	}
@@ -279,13 +284,29 @@ func (q *TaskQueue) Enqueue(task Task) {
 
 // Stop gracefully shuts down the task queue.
 func (q *TaskQueue) Stop() {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	if !q.started {
+		return
+	}
 	q.cancel()
 	close(q.tasks)
 	q.wg.Wait()
+	q.started = false
+	log.Println("TaskQueue has been stopped")
 }
 
 // executeTask performs the action based on the task type.
 func executeTask(task Task, app *App) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Recovered from panic in task %s: %v", task.ID, r)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  fmt.Sprintf("panic: %v", r),
+			})
+		}
+	}()
 	switch task.Type {
 	case "MoveMouse":
 		x, ok1 := task.Data["x"].(float64)
@@ -309,7 +330,29 @@ func executeTask(task Task, app *App) {
 			})
 			return
 		}
-		robotgo.MouseClick(button, true)
+		robotgo.Click(button, true)
+	case "TypeString":
+		text, ok := task.Data["text"].(string)
+		if !ok {
+			log.Printf("Invalid text for TypeString task %s", task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  "Invalid text",
+			})
+			return
+		}
+		robotgo.TypeStr(text)
+	case "KeyTap":
+		key, ok := task.Data["key"].(string)
+		if !ok {
+			log.Printf("Invalid key for KeyTap task %s", task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  "Invalid key",
+			})
+			return
+		}
+		robotgo.KeyTap(key)
 	default:
 		log.Printf("Unknown task type: %s", task.Type)
 		app.emitEvent("task-error", map[string]interface{}{
@@ -325,20 +368,31 @@ func (a *App) StartExecution(flow string) error {
 	defer a.execMutex.Unlock()
 
 	if a.isExecuting {
+		log.Println("StartExecution called but execution is already in progress")
 		return errors.New("execution already in progress")
 	}
 	a.isExecuting = true
+	log.Println("Execution started")
+	defer func() {
+		if r := recover(); r != nil {
+			a.setExecuting(false)
+			log.Printf("Recovered from panic in StartExecution: %v", r)
+			a.emitEvent("execution-error", fmt.Sprintf("panic: %v", r))
+		}
+	}()
 
 	var flowchart Flowchart
 	err := json.Unmarshal([]byte(flow), &flowchart)
 	if err != nil {
 		a.isExecuting = false
-		return err
+		log.Printf("Failed to unmarshal flowchart: %v", err)
+		return fmt.Errorf("invalid flowchart data: %w", err)
 	}
 
 	// Validate flowchart
 	if len(flowchart.Nodes) == 0 {
 		a.isExecuting = false
+		log.Println("Flowchart validation failed: no nodes found")
 		return errors.New("flowchart must contain at least one node")
 	}
 
@@ -349,6 +403,7 @@ func (a *App) StartExecution(flow string) error {
 	}
 
 	// Build dependencies
+	a.dependencies = make(map[string][]string)
 	for _, edge := range flowchart.Edges {
 		a.dependencies[edge.Source] = append(a.dependencies[edge.Source], edge.Target)
 	}
@@ -358,13 +413,11 @@ func (a *App) StartExecution(flow string) error {
 	a.completed = make(map[string]bool)
 	a.completedMux.Unlock()
 
-	// Start the task queue if not started
-	a.taskQueue.Start(3) // Start 3 workers
-
 	// Enqueue initial tasks (StartNode)
 	startNode, err := a.findStartNode(flowchart.Nodes)
 	if err != nil {
 		a.isExecuting = false
+		log.Printf("StartExecution failed: %v", err)
 		return err
 	}
 
@@ -393,42 +446,64 @@ func (a *App) findStartNode(nodes []Node) (Node, error) {
 
 // notifyTaskCompletion is called by TaskQueue workers when a task is completed.
 func (a *App) notifyTaskCompletion(taskID string) {
-	a.notifyCh <- taskID
+	select {
+	case a.notifyCh <- taskID:
+		log.Printf("Task %s completion notified", taskID)
+	default:
+		log.Printf("Notification channel full. Unable to notify completion of task %s", taskID)
+	}
 }
 
 // handleCompletions listens for completed tasks and enqueues dependent tasks.
 func (a *App) handleCompletions() {
-	for taskID := range a.notifyCh {
-		a.completedMux.Lock()
-		a.completed[taskID] = true
-		a.completedMux.Unlock()
+	for {
+		select {
+		case taskID := <-a.notifyCh:
+			a.completedMux.Lock()
+			a.completed[taskID] = true
+			a.completedMux.Unlock()
+			log.Printf("Task %s marked as completed", taskID)
 
-		// Find dependent tasks
-		dependents := a.dependencies[taskID]
-		for _, depID := range dependents {
-			if a.canEnqueue(depID) {
-				node, exists := a.nodeMap[depID]
-				if !exists {
-					log.Printf("Node ID %s not found in nodeMap", depID)
-					continue
+			// Find dependent tasks
+			dependents := a.dependencies[taskID]
+			for _, depID := range dependents {
+				if a.canEnqueue(depID) {
+					node, exists := a.nodeMap[depID]
+					if !exists {
+						log.Printf("Node ID %s not found in nodeMap", depID)
+						continue
+					}
+					task := Task{
+						ID:   node.ID,
+						Type: node.Type,
+						Data: node.Data,
+					}
+					a.taskQueue.Enqueue(task)
 				}
-				task := Task{
-					ID:   node.ID,
-					Type: node.Type,
-					Data: node.Data,
-				}
-				a.taskQueue.Enqueue(task)
 			}
-		}
 
-		// Check if all tasks are completed
-		a.completedMux.Lock()
-		allCompleted := len(a.completed) == len(a.nodeMap)
-		a.completedMux.Unlock()
+			// Check if all tasks are completed
+			a.completedMux.Lock()
+			allCompleted := len(a.completed) == len(a.nodeMap)
+			a.completedMux.Unlock()
 
-		if allCompleted {
+			if allCompleted {
+				a.setExecuting(false)
+				a.emitEvent("execution-completed", nil)
+				log.Println("All tasks completed. Execution finished.")
+				return
+			}
+		case <-a.taskQueue.ctx.Done():
 			a.setExecuting(false)
-			a.emitEvent("execution-completed", nil)
+			log.Println("Execution stopped due to task queue cancellation")
+			a.emitEvent("execution-stopped", nil)
+			return
+		case <-time.After(10 * time.Minute):
+			// Optional: Timeout to prevent indefinite waiting
+			a.setExecuting(false)
+			a.taskQueue.Stop()
+			log.Println("Execution timed out after 10 minutes")
+			a.emitEvent("execution-timed-out", nil)
 			return
 		}
 	}
@@ -437,7 +512,6 @@ func (a *App) handleCompletions() {
 // canEnqueue checks if all dependencies of a node are met.
 func (a *App) canEnqueue(nodeID string) bool {
 	// Find all nodes that this node depends on
-	// Iterate through dependencies to see if nodeID is a target
 	var dependencies []string
 	for source, targets := range a.dependencies {
 		for _, target := range targets {
@@ -465,12 +539,14 @@ func (a *App) StopExecution() {
 	defer a.execMutex.Unlock()
 
 	if !a.isExecuting {
+		log.Println("StopExecution called but no execution is in progress")
 		return
 	}
 
 	a.taskQueue.Stop()
 	a.setExecuting(false)
 	a.emitEvent("execution-stopped", nil)
+	log.Println("Execution has been stopped by the user")
 }
 
 // setExecuting updates the execution state.
@@ -478,6 +554,7 @@ func (a *App) setExecuting(state bool) {
 	a.execMutex.Lock()
 	a.isExecuting = state
 	a.execMutex.Unlock()
+	log.Printf("Execution state set to: %v", state)
 }
 
 // emitEvent emits an event to the frontend.
