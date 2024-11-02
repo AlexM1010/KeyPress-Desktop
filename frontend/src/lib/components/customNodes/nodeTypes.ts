@@ -10,7 +10,7 @@ import StartNode from './StartNode.svelte';
 import MouseMoveNode from './MouseMoveNode.svelte';
 
 export const nodeTypes: NodeTypes = {
-  'color-picker': ColorPickerNode as unknown as typeof SvelteComponent,
+  'ColorPicker': ColorPickerNode as unknown as typeof SvelteComponent,
   'svgNode': SVGNode as unknown as typeof SvelteComponent,
   'bin-node': BinNode as unknown as typeof SvelteComponent,
   'Click': MouseClickNode as unknown as typeof SvelteComponent,

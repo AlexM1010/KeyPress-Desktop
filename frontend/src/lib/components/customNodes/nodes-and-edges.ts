@@ -20,67 +20,20 @@ export const initialNodes: Node[] = [
       label: 'Start',
       styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
     }
-  },
-  {
-    id: 'input',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing, y: baseY },
-    data: {
-      shape: nodeShapes.input,
-      label: 'Input',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
-  },
-  {
-    id: 'process',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing * 2, y: baseY },
-    data: {
-      shape: nodeShapes.process,
-      label: 'Process',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
-  },
-  {
-    id: 'decision',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing * 3, y: baseY },
-    data: {
-      shape: nodeShapes.decision,
-      label: 'Decision',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
-  },
-  {
-    id: 'Store',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing * 5, y: baseY },
-    data: {
-      shape: nodeShapes.store,
-      label: 'Store',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
-  },
-  {
-    id: 'delay',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing * 12, y: baseY },
-    data: {
-      shape: nodeShapes.delay,
-      label: 'Wait',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
-  },
-  {
-    id: 'end',
-    type: 'svgNode',
-    position: { x: baseX + xSpacing * 13, y: baseY },
-    data: {
-      shape: nodeShapes.end,
-      label: 'End',
-      styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
-    }
   }, */
+  {
+    id: 'colorpicker-1',
+    type: 'ColorPicker',
+    position: { x: baseX + xSpacing * 3, y: baseY + xSpacing * 2 },
+    data: {
+      label: 'Color Picker',
+      colorStore: '#6366f1', // Default to indigo
+      icon: 'Palette',
+      color: 'bg-gradient-to-r from-violet-500 to-purple-500'
+    },
+    targetPosition: 'left' as Position,
+    sourcePosition: 'right' as Position
+  },
   {
     id: 'mouse-click',
     type: 'Click',

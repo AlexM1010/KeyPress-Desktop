@@ -179,7 +179,7 @@
 
     .node-wrapper:hover {
         box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
     }
 
     /* Header styling */
@@ -201,6 +201,40 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    .expand-animation {
+        animation: expand 0.5s ease-out forwards;
+    }
+
+    .retract-animation {
+        animation: retract 0.5s ease-in forwards;
+    }
+
+    @keyframes expand {
+        from {
+            max-height: 0;
+            opacity: 0;
+        }
+        to {
+            max-height: 500px;
+            opacity: 1;
+        }
+    }
+
+    @keyframes retract {
+        0% {
+            max-height: 500px;
+            padding: 1rem;
+        }
+        99% {
+            max-height: 0;
+            padding: 1rem;
+        }
+        100% {
+            max-height: 0;
+            padding: 0;
+        }
+    }
+
     /* Connection handle styling */
     :global(.svelte-flow__handle) {
         background: #9ca3af;
@@ -213,12 +247,20 @@
         transform-origin: center center;
     }
 
+    :global(.svelte-flow__handle::before) {
+        content: "";
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        right: -12px;
+        bottom: -12px;
+    }
+
     :global(.svelte-flow__handle:hover) {
         background: #3b82f6;
         width: 10px;
         height: 10px;
         margin: -1px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-        transform: scale(1.1);
     }
 </style>
