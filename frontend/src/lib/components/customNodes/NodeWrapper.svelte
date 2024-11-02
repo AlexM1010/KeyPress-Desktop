@@ -115,6 +115,7 @@
     <div
         class={`flex items-center justify-between p-4 rounded-t-lg ${color} 
                node-header ${!isExpanded ? "rounded-bottom" : ""} cursor-pointer`}
+        style="background: {color}"
         role="button"
         tabindex="0"
         on:click={toggleExpand}

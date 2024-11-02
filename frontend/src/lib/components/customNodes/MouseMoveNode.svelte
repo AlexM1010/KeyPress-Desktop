@@ -38,13 +38,9 @@
     icon={icon}
     {title}
     {color}
-    id="move-mouse" 
-    type="move-mouse-node"
+    id="MoveMouse" 
+    type="MoveMouse"
     data={{ x, y }}
-    position={{ x: 200, y: 0 }}
-    targetPosition="bottom"
-    sourcePosition="top"
-    measured={{ width: 100, height: 50 }}
     on:duplicate
     on:delete
 >

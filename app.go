@@ -298,6 +298,7 @@ func (q *TaskQueue) Stop() {
 
 // executeTask performs the action based on the task type.
 func executeTask(task Task, app *App) {
+	log.Printf("Starting execution of task ID: %s, Type: %s", task.ID, task.Type)
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("Recovered from panic in task %s: %v", task.ID, r)
@@ -306,58 +307,104 @@ func executeTask(task Task, app *App) {
 				"error":  fmt.Sprintf("panic: %v", r),
 			})
 		}
+		log.Printf("Completed execution of task ID: %s", task.ID)
 	}()
+
 	switch task.Type {
+	case "Start":
+		log.Printf("Flow Started - Task ID: %s", task.ID)
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "Start",
+		})
+
 	case "MoveMouse":
+		log.Printf("MoveMouse task starting - Data: %+v", task.Data)
 		x, ok1 := task.Data["x"].(float64)
 		y, ok2 := task.Data["y"].(float64)
 		if !ok1 || !ok2 {
-			log.Printf("Invalid coordinates for MoveMouse task %s", task.ID)
+			err := fmt.Sprintf("Invalid coordinates - x: %v, y: %v", task.Data["x"], task.Data["y"])
+			log.Printf("MoveMouse error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
-				"error":  "Invalid coordinates",
+				"error":  err,
 			})
 			return
 		}
+		log.Printf("Moving mouse to x: %v, y: %v", x, y)
 		robotgo.Move(int(x), int(y))
+		time.Sleep(100 * time.Millisecond)
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "MoveMouse",
+		})
+
 	case "Click":
+		log.Printf("Click task starting - Data: %+v", task.Data)
 		button, ok := task.Data["button"].(string)
 		if !ok {
-			log.Printf("Invalid button for Click task %s", task.ID)
+			err := fmt.Sprintf("Invalid button value: %v", task.Data["button"])
+			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
-				"error":  "Invalid button",
+				"error":  err,
 			})
 			return
 		}
+		log.Printf("Clicking button: %s", button)
 		robotgo.Click(button, true)
+		time.Sleep(100 * time.Millisecond)
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "Click",
+		})
+
 	case "TypeString":
+		log.Printf("TypeString task starting - Data: %+v", task.Data)
 		text, ok := task.Data["text"].(string)
 		if !ok {
-			log.Printf("Invalid text for TypeString task %s", task.ID)
+			err := fmt.Sprintf("Invalid text value: %v", task.Data["text"])
+			log.Printf("TypeString error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
-				"error":  "Invalid text",
+				"error":  err,
 			})
 			return
 		}
+		log.Printf("Typing text: %s", text)
 		robotgo.TypeStr(text)
+		time.Sleep(100 * time.Millisecond)
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "TypeString",
+		})
+
 	case "KeyTap":
+		log.Printf("KeyTap task starting - Data: %+v", task.Data)
 		key, ok := task.Data["key"].(string)
 		if !ok {
-			log.Printf("Invalid key for KeyTap task %s", task.ID)
+			err := fmt.Sprintf("Invalid key value: %v", task.Data["key"])
+			log.Printf("KeyTap error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
-				"error":  "Invalid key",
+				"error":  err,
 			})
 			return
 		}
+		log.Printf("Tapping key: %s", key)
 		robotgo.KeyTap(key)
+		time.Sleep(100 * time.Millisecond)
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "KeyTap",
+		})
+
 	default:
-		log.Printf("Unknown task type: %s", task.Type)
+		err := fmt.Sprintf("Unknown task type: %s", task.Type)
+		log.Printf("%s for task %s", err, task.ID)
 		app.emitEvent("task-error", map[string]interface{}{
 			"taskID": task.ID,
-			"error":  "Unknown task type",
+			"error":  err,
 		})
 	}
 }
@@ -401,6 +448,21 @@ func (a *App) StartExecution(flow string) error {
 	for _, node := range flowchart.Nodes {
 		a.nodeMap[node.ID] = node
 	}
+
+	// Filter out unconnected nodes
+	connectedNodeIDs := make(map[string]bool)
+	for _, edge := range flowchart.Edges {
+		connectedNodeIDs[edge.Source] = true
+		connectedNodeIDs[edge.Target] = true
+	}
+
+	connectedNodeMap := make(map[string]Node)
+	for id := range connectedNodeIDs {
+		if node, exists := a.nodeMap[id]; exists {
+			connectedNodeMap[id] = node
+		}
+	}
+	a.nodeMap = connectedNodeMap
 
 	// Build dependencies
 	a.dependencies = make(map[string][]string)

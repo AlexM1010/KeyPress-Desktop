@@ -7,7 +7,7 @@ const edgeType = 'smoothstep';
 
 const baseX = 0;
 const baseY = 0;
-const xSpacing = 200;
+const xSpacing = 600;
 
 export const initialNodes: Node[] = [ 
   /* { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, 

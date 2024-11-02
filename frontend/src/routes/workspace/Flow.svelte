@@ -59,14 +59,18 @@
 
   // Array to store status messages
   let statusMessages: { id: string; type: string; message: string }[] = [];
+  let isSuccess = false;
 
   // Computed property to determine the current execution status and icon
   $: executionStatus = (() => {
     const hasError = statusMessages.some((msg) => msg.type === "error");
     const hasWarning = statusMessages.some((msg) => msg.type === "warning");
+    const hasSuccess = statusMessages.some((msg) => msg.type === "success" && msg.message.includes("Flow execution completed"));
+    
     if (isExecuting) return { icon: Loader, color: "text-blue-500" };
     if (hasError) return { icon: X, color: "text-red-500" };
     if (hasWarning) return { icon: TriangleAlert, color: "text-yellow-500" };
+    if (hasSuccess) return { icon: Play, color: "text-green-500" };
     return { icon: Play, color: "text-foreground" };
   })();
 
@@ -119,6 +123,7 @@
   async function handleRunFlow() {
     try {
       isExecuting = true;
+      isSuccess = false;
       statusMessages = [];
 
       // Get the current flow data as an object
@@ -224,7 +229,7 @@
   }
 
   // Set up event listeners for various execution events
-  function setupEventListeners() {
+  function setupEventListeners() { //TODO fix infinite loading when nothing connects to the start node
     window.runtime.EventsOn("task-started", (taskId: string) => {
       addStatusMessage({
         id: `task-started-${taskId}`,
@@ -253,15 +258,6 @@
       }
     );
 
-    window.runtime.EventsOn("execution-completed", () => {
-      isExecuting = false;
-      addStatusMessage({
-        id: `exec-completed-${Date.now()}`,
-        type: "success",
-        message: "Flow execution completed.",
-      });
-    });
-
     window.runtime.EventsOn("execution-error", (errorMsg: string) => {
       isExecuting = false;
       addStatusMessage({
@@ -287,6 +283,20 @@
         type: "warning",
         message: "Flow execution timed out.",
       });
+    });
+
+    window.runtime.EventsOn("execution-completed", () => {
+      isExecuting = false;
+      isSuccess = true;
+      addStatusMessage({
+          id: `exec-completed-${Date.now()}`,
+          type: "success",
+          message: "Flow execution completed.",
+      });
+      // Reset success state after 3 seconds
+      setTimeout(() => {
+          isSuccess = false;
+      }, 1000);
     });
   }
 
