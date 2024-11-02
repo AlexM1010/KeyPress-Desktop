@@ -30,6 +30,8 @@
 
     // Watch for changes and update data accordingly
     $: updateData();
+
+    $$restProps
 </script>
 
 <NodeWrapper

@@ -146,6 +146,8 @@
 
     // Reactive declarations
     $: macroDisplay = macroKeys.join('+');
+
+    $$restProps
 </script>
 
 <!-- Template remains unchanged but with improved class organization -->

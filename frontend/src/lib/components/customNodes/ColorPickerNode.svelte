@@ -41,7 +41,7 @@
     export const draggable: boolean = false;
     export const parentId: string = '';
     export const zIndex: number = 0;
-    export const isConnectable: boolean = false;
+    export const isConnectable: boolean = true;
     export const positionAbsoluteX: number = 0;
     export const positionAbsoluteY: number = 0;
     export const dragging: boolean = false;
@@ -49,6 +49,8 @@
     // Color store setup
     const { colorStore: initialColor } = data;
     const colorStore = writable(initialColor || '#000000');
+
+    $$restProps
 </script>
 
 <NodeWrapper
