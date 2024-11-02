@@ -10,7 +10,7 @@ const baseY = 0;
 const xSpacing = 200;
 
 export const initialNodes: Node[] = [ 
-  /* { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, */
+  /* { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, 
   { 
     id: 'startsvg',
     type: 'svgNode',
@@ -80,7 +80,7 @@ export const initialNodes: Node[] = [
       label: 'End',
       styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
     }
-  },
+  }, */
   {
     id: 'mouse-click',
     type: 'Click',

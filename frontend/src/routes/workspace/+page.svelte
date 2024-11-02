@@ -3,6 +3,16 @@
   import Flow from './Flow.svelte';
 </script>
 
-<SvelteFlowProvider>
-  <Flow/> 
-</SvelteFlowProvider>
+<div class="flow-wrapper h-screen w-full overflow-hidden">
+  <SvelteFlowProvider>
+    <Flow />
+  </SvelteFlowProvider>
+</div>
+
+<style>
+  .flow-wrapper {
+    position: fixed;
+    left: 0;
+    right: 0;
+  }
+</style>
