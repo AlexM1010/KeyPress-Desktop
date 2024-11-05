@@ -70,7 +70,7 @@
   export let targetX: $$Props["targetX"];
   export let targetY: $$Props["targetY"];
   export let targetPosition: $$Props["targetPosition"];
-  export let markerEnd: $$Props["markerEnd"] = "url(#arrow)";
+  //export let markerEnd: $$Props["markerEnd"] = "url(#arrow)";
   export let style: $$Props["style"] = undefined;
 
   // State
@@ -270,7 +270,7 @@
   $$restProps; // Silence warnings 
 </script>
 
-<!-- Arrow marker definition -->
+<!-- Arrow marker definition 
 <svg style="position: absolute; width: 0; height: 0;">
   <defs>
     <marker
@@ -286,7 +286,7 @@
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af" />
     </marker>
   </defs>
-</svg>
+</svg> -->
 
 <!-- Edge container with invisible hit area -->
 <g
@@ -304,7 +304,7 @@
     stroke-width="10"
     style="pointer-events: stroke;"
   />
-  <BaseEdge path={edgePath} {markerEnd} {style} />
+  <BaseEdge path={edgePath}  {style} /> <!-- {markerEnd} -->
 </g>
 
 <!-- Hover points with delete buttons -->

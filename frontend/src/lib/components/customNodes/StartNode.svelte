@@ -51,6 +51,7 @@
     ];
 
     // Props with default values
+    export let id: string;
     export let title: string = 'Start';
     export let icon: ComponentType = Play;
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
@@ -150,13 +151,16 @@
     $$restProps
 </script>
 
-<!-- Template remains unchanged but with improved class organization -->
+<!-- Template remains unchanged but with improved class organization TODO: Link up data to input fields -->
 <NodeWrapper 
     {icon} 
     {title} 
     {color}
     handles={handles}
     {isConnectable}
+    id={id}
+    type="start"
+    data={{ macroKeys, isRecording, currentOS }} 
     on:duplicate={handleDuplicate} 
     on:delete={handleDelete}
 >
