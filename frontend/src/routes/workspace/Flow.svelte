@@ -1,3 +1,4 @@
+<!-- frontend\src\routes\workspace\Flow.svelte -->
 <script lang="ts">
   // Import necessary components and utilities from @xyflow/svelte
   import {
@@ -25,6 +26,7 @@
   // Import icons from Lucide Svelte
   import {
     Check,
+    Save,
     X,
     Play,
     Loader,
@@ -344,7 +346,6 @@
                 disabled={isExecuting}
               >
                 <svelte:component this={executionStatus.icon} class="w-5 h-5 {executionStatus.color}" style={isExecuting ? "animation: spin 1s linear infinite" : ""} />
-                <span>Run Flow</span>
               </button>
               <!-- Save Button -->
               <button
@@ -353,11 +354,10 @@
                 disabled={isSaving}
               >
                 <svelte:component 
-                  this={isSaving ? Loader : saveError ? X : Check}
+                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
                   class="w-5 h-5 {isSaving ? 'text-blue-500' : saveError ? 'text-red-500' : saveSuccess ? 'text-green-500' : ''}"
                   style={isSaving ? "animation: spin 1s linear infinite" : ""}
                 />
-                <span>Save</span>
               </button>
               <!-- Layout Button -->
               <button

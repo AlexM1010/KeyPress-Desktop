@@ -1,11 +1,10 @@
-<!-- NodeWrapper.svelte -->
 <script lang="ts">
+    import { fly, slide } from 'svelte/transition';
     import { ChevronDown } from "lucide-svelte";
     import type { ComponentType } from "svelte";
     import { Handle, Position } from "@xyflow/svelte";
     import type { HandleConfig } from "./types";
     import ContextMenu from "./ContextMenu.svelte";
-    import { slide } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
     import nodesStore from '../../stores/nodesStore';
     import { createEventDispatcher } from 'svelte';
@@ -16,13 +15,30 @@
     export let color: string;
     export let isExpanded = true;
     export let isConnectable = true;
-    export let handles: HandleConfig[] = []; // Provide a default value
-
+    export let handles: HandleConfig[] = [];
     export let id: string;
     export let type: string;
-    export let data: any; // Dynamic data structure
+    export let data: any;
 
     const dispatch = createEventDispatcher();
+
+    // UI State Management
+    let isHovered = false;
+
+    // Event Handlers
+    function handleDuplicate() {
+        dispatch('duplicate', { id });
+    }
+
+    function handleDelete() {
+        dispatch('delete', { id });
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            isExpanded = !isExpanded;
+        }
+    }
 
     // Reactive statement to update nodesStore when data changes
     $: {
@@ -37,61 +53,24 @@
         });
     }
 
-    // Event Handlers
-    function toggleExpand(): void {
-        isExpanded = !isExpanded;
-    }
-
-    function openContextMenu(event: MouseEvent): void {
-        event.preventDefault();
-        if (!(event.currentTarget instanceof HTMLElement)) return;
-
-        const rect = event.currentTarget.getBoundingClientRect();
-        contextMenuPosition.x = event.clientX - rect.left;
-        contextMenuPosition.y = event.clientY - rect.top;
-        showContextMenu = true;
-    }
-
-    function closeContextMenu(): void {
-        showContextMenu = false;
-    }
-
-    function handleDuplicate() {
-        dispatch('duplicate', { id });
-    }
-
-    function handleDelete() {
-        dispatch('delete', { id });
-    }
-
-    // UI State Management
-    let isHovered = false;
-    let showContextMenu = false;
-    let contextMenuPosition = { x: 0, y: 0 };
-
     function getHandlePosition(handle: HandleConfig): string {
         const offsetX = handle.offsetX ?? 0;
         const offsetY = handle.offsetY ?? 0;
-
         const positionMap = {
             [Position.Left]: `top: ${offsetY}%; left: ${offsetX}%;`,
             [Position.Right]: `top: ${offsetY}%; right: ${offsetX}%;`,
             [Position.Top]: `left: ${offsetY}%; top: ${offsetX}%;`,
             [Position.Bottom]: `left: ${offsetY}%; bottom: ${offsetX}%;`,
         };
-
         return positionMap[handle.position] || "";
     }
 </script>
 
-<!-- Node Container -->
 <div
-    class="node-wrapper relative border border-gray-200 transition-all duration-300"
+    class="node-wrapper relative transition-all duration-300 overflow-visible" 
     on:mouseenter={() => isHovered = true}
     on:mouseleave={() => isHovered = false}
-    on:contextmenu={openContextMenu}
-    role="button"
-    tabindex="0"
+    role="region"
     {...$$restProps}
 >
     <!-- Connection Handles -->
@@ -107,51 +86,41 @@
 
     <!-- Node Header -->
     <div
-        class={`flex items-center justify-between p-4 rounded-t-lg ${color} 
-               node-header ${!isExpanded ? "rounded-bottom" : ""} cursor-pointer`}
+        class={`flex items-center justify-between p-4 rounded-t-lg ${color} node-header cursor-pointer ${!isExpanded ? "rounded-bottom" : ""}`}
         style="background: {color}"
+        on:click={() => (isExpanded = !isExpanded)}
+        on:keydown={handleKeyDown}
         role="button"
         tabindex="0"
-        on:click={toggleExpand}
-        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && toggleExpand()}
     >
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-white/20 rounded-lg transform transition-transform duration-200 hover:scale-105">
-                <svelte:component this={icon} class="w-5 h-5 text-white transition-colors duration-200" />
+            <div class="p-2 bg-white/20 rounded-lg transform hover:scale-105">
+                <svelte:component this={icon} class="w-5 h-5 text-white" />
             </div>
-            <h3 class="text-sm font-semibold text-white transition-colors duration-200">
-                {title}
-            </h3>
+            <h3 class="text-sm font-semibold text-white">{title}</h3>
         </div>
-        
         <button
-            on:click={toggleExpand}
             class="text-white/80 hover:text-white p-2"
             aria-expanded={isExpanded}
-            aria-label="Toggle expand"
         >
-            <ChevronDown 
-                class={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-            />
+            <ChevronDown class={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
         </button>
     </div>
 
     <!-- Expandable Content -->
     {#if isExpanded}
-        <div
-            class="content space-y-4 p-4"
-            transition:slide={{ duration: 300, easing: cubicOut }}
-        >
+        <div class="content space-y-4 p-4" transition:slide={{ duration: 300, easing: cubicOut }}>
             <slot />
         </div>
     {/if}
 
-    <!-- Context Menu -->
-    {#if showContextMenu}
-        <div transition:slide={{ duration: 150 }}>
+    <!-- Slide-out Context Menu -->
+    {#if isHovered}
+        <div
+            class="context-menu-wrapper"
+            transition:fly={{ y: 10, duration: 150 }}
+        >
             <ContextMenu
-                position={contextMenuPosition}
-                on:close={closeContextMenu}
                 on:duplicate={handleDuplicate}
                 on:delete={handleDelete}
             />
