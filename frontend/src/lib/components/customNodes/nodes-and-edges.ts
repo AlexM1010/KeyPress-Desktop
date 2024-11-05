@@ -47,6 +47,12 @@ export const initialNodes: Node[] = [
     data: {}
   },
   {
+    id: 'DelayNode',
+    type: 'Delay',
+    position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
+    data: {}
+  },
+  {
     id: 'Start',
     type: 'Start',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },

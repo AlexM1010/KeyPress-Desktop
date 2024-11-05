@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -451,6 +452,82 @@ func executeTask(task Task, app *App) {
 		app.emitEvent("task-success", map[string]interface{}{
 			"taskID": task.ID,
 			"type":   "KeyTap",
+		})
+	case "Delay":
+		log.Printf("Delay task starting - Data: %+v", task.Data)
+
+		// Get delayType
+		delayType, ok := task.Data["delayType"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid delayType value: %v", task.Data["delayType"])
+			log.Printf("Delay error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		switch delayType {
+		case "Fixed":
+			// Get time
+			timeFloat, ok := task.Data["time"].(float64)
+			if !ok {
+				err := fmt.Sprintf("Invalid time value: %v", task.Data["time"])
+				log.Printf("Delay error: %s for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  err,
+				})
+				return
+			}
+			duration := time.Duration(timeFloat) * time.Millisecond
+			log.Printf("Executing fixed delay of %v milliseconds", timeFloat)
+			time.Sleep(duration)
+
+		case "Random":
+			// Get minTime and maxTime
+			minTimeFloat, ok1 := task.Data["minTime"].(float64)
+			maxTimeFloat, ok2 := task.Data["maxTime"].(float64)
+			if !ok1 || !ok2 {
+				err := fmt.Sprintf("Invalid minTime or maxTime values: minTime=%v, maxTime=%v", task.Data["minTime"], task.Data["maxTime"])
+				log.Printf("Delay error: %s for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  err,
+				})
+				return
+			}
+			if minTimeFloat > maxTimeFloat {
+				err := "minTime cannot be greater than maxTime"
+				log.Printf("Delay error: %s for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  err,
+				})
+				return
+			}
+
+			// Generate random delay using a local random generator
+			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			delay := minTimeFloat + r.Float64()*(maxTimeFloat-minTimeFloat)
+			duration := time.Duration(delay) * time.Millisecond
+			log.Printf("Executing random delay between %v and %v milliseconds. Selected delay: %v milliseconds", minTimeFloat, maxTimeFloat, delay)
+			time.Sleep(duration)
+
+		default:
+			err := fmt.Sprintf("Unsupported delayType: %s", delayType)
+			log.Printf("Delay error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		app.emitEvent("task-success", map[string]interface{}{
+			"taskID": task.ID,
+			"type":   "Delay",
 		})
 
 	default:
