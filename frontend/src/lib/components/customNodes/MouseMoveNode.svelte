@@ -1,46 +1,37 @@
 <!-- MouseMoveNode.svelte -->
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { MousePointer } from 'lucide-svelte';
     import NodeWrapper from './NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { Handle, Position } from "@xyflow/svelte";
+    import type { HandleConfig } from "./types";
 
-    const dispatch = createEventDispatcher();
-
-    // Props for the MouseMoveNode
+    export let id: string;
     export let title: string = 'Move Mouse';
     export let icon: ComponentType = MousePointer;
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
     export let initialX: number = 300;
     export let initialY: number = 400;
 
-    // Internal state for x and y
-    let x: number = initialX;
-    let y: number = initialY;
+    // Initialize data with x and y
+    export let data = { x: initialX, y: initialY };
 
-    // Dispatch data changes to parent (e.g., to update node data)
-    function updateData() {
-        dispatch('update', { x, y });
-    }
-
-    // Initialize data on mount
-    onMount(() => {
-        updateData();
-    });
-
-    // Watch for changes and update data accordingly
-    $: updateData();
-
-    $$restProps
+    // Define handles for the node
+    const handles: HandleConfig[] = [
+        { id: "right", type: "source", position: Position.Right, offsetY: 50 },
+        { id: "left", type: "target", position: Position.Left, offsetY: 50 },
+    ];
 </script>
 
 <NodeWrapper
+    id={id}
     icon={icon}
     {title}
     {color}
-    id="MoveMouse" 
     type="MoveMouse"
-    data={{ x, y }}
+    {handles}
+    bind:data 
     on:duplicate
     on:delete
 >
@@ -54,7 +45,7 @@
                 min="0"
                 max="1920"
                 step="1"
-                bind:value={x}
+                bind:value={data.x} 
                 class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
         </div>
@@ -66,7 +57,7 @@
                 min="0"
                 max="1080"
                 step="1"
-                bind:value={y}
+                bind:value={data.y} 
                 class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
         </div>

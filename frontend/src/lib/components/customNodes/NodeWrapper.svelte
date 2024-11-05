@@ -1,12 +1,5 @@
 <!-- NodeWrapper.svelte -->
-<!-- 
- * @component NodeWrapper
- * @description A configurable wrapper component for flow diagram nodes with expandable content,
- * context menu support, and customizable connection handles. Used as a building block for
- * visual programming interfaces and workflow editors.
- -->
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { ChevronDown } from "lucide-svelte";
     import type { ComponentType } from "svelte";
     import { Handle, Position } from "@xyflow/svelte";
@@ -14,42 +7,68 @@
     import ContextMenu from "./ContextMenu.svelte";
     import { slide } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
+    import nodesStore from '../../stores/nodesStore';
+    import { createEventDispatcher } from 'svelte';
 
     // Component Props
-    export let icon: ComponentType;            // Icon component to display in the header
-    export let title: string;                  // Node title displayed in header
-    export let color: string;                  // Background color of the header
-    export let isExpanded = true;             // Initial expansion state
-    export let isConnectable = true;          // Whether handles accept connections
+    export let icon: ComponentType;
+    export let title: string;
+    export let color: string;
+    export let isExpanded = true;
+    export let isConnectable = true;
+    export let handles: HandleConfig[] = []; // Provide a default value
 
-    // Default connection handle configuration
-    const defaultHandles: HandleConfig[] = [
-        { 
-            id: "right", 
-            type: "source", 
-            position: Position.Right, 
-            offsetY: 50 
-        },
-        { 
-            id: "left", 
-            type: "target", 
-            position: Position.Left, 
-            offsetY: 50 
-        },
-    ];
+    export let id: string;
+    export let type: string;
+    export let data: any; // Dynamic data structure
 
-    export let handles: HandleConfig[] = defaultHandles;
+    const dispatch = createEventDispatcher();
+
+    // Reactive statement to update nodesStore when data changes
+    $: {
+        nodesStore.update(nodes => {
+            const nodeIndex = nodes.findIndex(node => node.id === id);
+            if (nodeIndex !== -1) {
+                nodes[nodeIndex] = { id, type, data };
+            } else {
+                nodes.push({ id, type, data });
+            }
+            return nodes;
+        });
+    }
+
+    // Event Handlers
+    function toggleExpand(): void {
+        isExpanded = !isExpanded;
+    }
+
+    function openContextMenu(event: MouseEvent): void {
+        event.preventDefault();
+        if (!(event.currentTarget instanceof HTMLElement)) return;
+
+        const rect = event.currentTarget.getBoundingClientRect();
+        contextMenuPosition.x = event.clientX - rect.left;
+        contextMenuPosition.y = event.clientY - rect.top;
+        showContextMenu = true;
+    }
+
+    function closeContextMenu(): void {
+        showContextMenu = false;
+    }
+
+    function handleDuplicate() {
+        dispatch('duplicate', { id });
+    }
+
+    function handleDelete() {
+        dispatch('delete', { id });
+    }
 
     // UI State Management
-    const isHovered = writable(false);
-    const showContextMenu = writable(false);
-    const contextMenuPosition = { x: 0, y: 0 };
+    let isHovered = false;
+    let showContextMenu = false;
+    let contextMenuPosition = { x: 0, y: 0 };
 
-    /**
-     * Calculates CSS positioning for connection handles based on their configuration
-     * @param handle - The handle configuration object
-     * @returns CSS position string
-     */
     function getHandlePosition(handle: HandleConfig): string {
         const offsetX = handle.offsetX ?? 0;
         const offsetY = handle.offsetY ?? 0;
@@ -63,38 +82,13 @@
 
         return positionMap[handle.position] || "";
     }
-
-    /**
-     * Event Handlers
-     */
-    function toggleExpand(): void {
-        isExpanded = !isExpanded;
-    }
-
-    function openContextMenu(event: MouseEvent): void {
-        event.preventDefault();
-        if (!(event.currentTarget instanceof HTMLElement)) return;
-
-        const rect = event.currentTarget.getBoundingClientRect();
-        contextMenuPosition.x = event.clientX - rect.left;
-        contextMenuPosition.y = event.clientY - rect.top;
-        showContextMenu.set(true);
-    }
-
-    function closeContextMenu(): void {
-        showContextMenu.set(false);
-    }
-
-    // TODO: Implement actual duplicate/delete functionality
-    const handleDuplicate = () => console.log("Duplicate action triggered");
-    const handleDelete = () => console.log("Delete action triggered");
 </script>
 
 <!-- Node Container -->
 <div
     class="node-wrapper relative border border-gray-200 transition-all duration-300"
-    on:mouseenter={() => isHovered.set(true)}
-    on:mouseleave={() => isHovered.set(false)}
+    on:mouseenter={() => isHovered = true}
+    on:mouseleave={() => isHovered = false}
     on:contextmenu={openContextMenu}
     role="button"
     tabindex="0"
@@ -119,7 +113,7 @@
         role="button"
         tabindex="0"
         on:click={toggleExpand}
-        on:keydown={(e) => e.key === "Enter" || e.key === " " && toggleExpand()}
+        on:keydown={(e) => (e.key === "Enter" || e.key === " ") && toggleExpand()}
     >
         <div class="flex items-center gap-3">
             <div class="p-2 bg-white/20 rounded-lg transform transition-transform duration-200 hover:scale-105">
@@ -153,7 +147,7 @@
     {/if}
 
     <!-- Context Menu -->
-    {#if $showContextMenu}
+    {#if showContextMenu}
         <div transition:slide={{ duration: 150 }}>
             <ContextMenu
                 position={contextMenuPosition}
