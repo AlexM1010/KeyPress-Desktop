@@ -1,5 +1,6 @@
+<!-- frontend\src\lib\components\customNodes\NodeWrapper.svelte -->
 <script lang="ts">
-    import { fly, slide } from 'svelte/transition';
+    import { slide, fly } from 'svelte/transition';
     import { ChevronDown } from "lucide-svelte";
     import type { ComponentType } from "svelte";
     import { Handle, Position } from "@xyflow/svelte";
@@ -24,6 +25,7 @@
 
     // UI State Management
     let isHovered = false;
+    let isHeaderHovered = false;
 
     // Event Handlers
     function handleDuplicate() {
@@ -73,6 +75,27 @@
     role="region"
     {...$$restProps}
 >
+    <!-- Slide-out Context Menu -->
+    {#if isHeaderHovered}
+    <div 
+        on:mouseenter={() => isHeaderHovered = true} 
+        on:mouseleave={() => isHeaderHovered = false} 
+        class="context-menu-container"
+        role="menu"
+        tabindex="0"
+        transition:fly={{
+            y: 10,
+            duration: 200,
+            easing: cubicOut
+        }}
+    >
+        <ContextMenu
+            on:duplicate={handleDuplicate}
+            on:delete={handleDelete}
+        />
+    </div>
+    {/if}
+
     <!-- Connection Handles -->
     {#each handles as handle (handle.id)}
         <Handle
@@ -90,6 +113,8 @@
         style="background: {color}"
         on:click={() => (isExpanded = !isExpanded)}
         on:keydown={handleKeyDown}
+        on:mouseenter={() => isHeaderHovered = true}
+        on:mouseleave={() => isHeaderHovered = false} 
         role="button"
         tabindex="0"
     >
@@ -113,19 +138,6 @@
             <slot />
         </div>
     {/if}
-
-    <!-- Slide-out Context Menu -->
-    {#if isHovered}
-        <div
-            class="context-menu-wrapper"
-            transition:fly={{ y: 10, duration: 150 }}
-        >
-            <ContextMenu
-                on:duplicate={handleDuplicate}
-                on:delete={handleDelete}
-            />
-        </div>
-    {/if}
 </div>
 
 <style>
@@ -135,10 +147,10 @@
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
         min-width: 250px;
         transform-origin: center center;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
     }
 
     .node-wrapper:hover {
@@ -161,7 +173,6 @@
         background: rgba(255, 255, 255, 0.05);
         border-top: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 0 0 1rem 1rem;
-        overflow: hidden;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -176,11 +187,9 @@
     @keyframes expand {
         from {
             max-height: 0;
-            opacity: 0;
         }
         to {
             max-height: 500px;
-            opacity: 1;
         }
     }
 
@@ -227,4 +236,5 @@
         margin: -1px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
+    
 </style>

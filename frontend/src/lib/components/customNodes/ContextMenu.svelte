@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Trash2, Copy } from 'lucide-svelte';
     import { createEventDispatcher } from 'svelte';
+    import { isDarkMode } from '$lib/stores/themeStore';
 
     const dispatch = createEventDispatcher();
 
@@ -13,7 +14,7 @@
     }
 </script>
 
-<div class="context-menu">
+<div class="context-menu" class:dark={$isDarkMode}>
     <button
         on:click={handleDuplicate}
         aria-label="Duplicate"
@@ -31,32 +32,53 @@
 </div>
 
 <style>
-    .context-menu {
+   .context-menu {
+        --icon-color: #4a5568;          /* Medium gray */
+        --icon-hover-color: #2d3748;    /* Darker medium gray */
+        
         display: flex;
+        flex-direction: row;
+        align-items: center;
         gap: 0.5rem;
-        background: rgba(0, 0, 0, 0.8);
         padding: 0.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 1rem; 
+        position: absolute;           
         z-index: 1;
+        top: -50px;    
+        right: 10px; 
+    }
+
+    .context-menu.dark {
+        --icon-color: #9ca3af;          /* Light gray */
+        --icon-hover-color: #d1d5db;    /* Lighter gray */
     }
 
     .icon-button {
         background: none;
         border: none;
         cursor: pointer;
-        color: white;
+        color: var(--icon-color);
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 36px;
+        height: 36px;
     }
 
     .icon-button:hover {
-        color: #f3f4f6;
+        color: var(--icon-hover-color);
     }
 
-    .icon {
-        width: 24px;
-        height: 24px;
+    :global(.context-menu-container) {
+        animation: slideIn 200ms cubic-bezier() forwards;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(50px);
+        }
+        to {
+            transform: translateY(0);
+        }
     }
 </style>
