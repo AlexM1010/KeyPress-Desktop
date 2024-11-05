@@ -10,7 +10,7 @@ const baseY = 0;
 const xSpacing = 600;
 
 export const initialNodes: Node[] = [ 
-  /* { id: 'bin-node', type: 'group', position: { x: 0, y: 0 }, data: { label: 'Bin Node' } }, 
+  /*
   { 
     id: 'startsvg',
     type: 'svgNode',
@@ -35,20 +35,7 @@ export const initialNodes: Node[] = [
     sourcePosition: 'right' as Position
   },
   {
-    id: 'mouse-click',
-    type: 'Click',
-    position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
-    data: {
-      label: 'Mouse Click',
-      icon: 'MousePointer',
-      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
-      buttonTypes: ["Left Click", "Right Click", "Middle Click"],
-      actions: ["Single", "Double", "Triple", "Hold"],
-      clickDuration: 75
-    }
-  },
-  {
-    id: 'mouse-click1',
+    id: 'Click',
     type: 'Click',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: { }
@@ -57,14 +44,7 @@ export const initialNodes: Node[] = [
     id: 'keypress',
     type: 'keypress-node',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
-    data: {
-      label: 'Mouse Click',
-      icon: 'MousePointer',
-      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
-      buttonTypes: ['Press', 'Hold', 'Release'],
-      actions: ['None', 'Shift', 'Ctrl', 'Alt', 'Windows'], // Will need Command for Mac
-      clickDuration: 75
-    }
+    data: {}
   },
   {
     id: 'Start',

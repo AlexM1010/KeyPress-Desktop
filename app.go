@@ -197,29 +197,6 @@ func (a *App) InitializeFromToken(token string) error {
 	return nil
 }
 
-// Automation methods
-
-// New RobotGo methods
-func (a *App) MouseMove(x, y int) error {
-	robotgo.Move(x, y)
-	return nil
-}
-
-func (a *App) MouseClick(button string) error {
-	robotgo.Click(button)
-	return nil
-}
-
-func (a *App) TypeString(text string) error {
-	robotgo.TypeStr(text)
-	return nil
-}
-
-func (a *App) KeyTap(key string) error {
-	robotgo.KeyTap(key)
-	return nil
-}
-
 //=============================================== Flow Execution ===============================================
 
 // NewTaskQueue initializes a new TaskQueue.
@@ -341,9 +318,11 @@ func executeTask(task Task, app *App) {
 
 	case "Click":
 		log.Printf("Click task starting - Data: %+v", task.Data)
-		button, ok := task.Data["button"].(string)
+
+		// Get buttonType
+		buttonType, ok := task.Data["buttonType"].(string)
 		if !ok {
-			err := fmt.Sprintf("Invalid button value: %v", task.Data["button"])
+			err := fmt.Sprintf("Invalid buttonType value: %v", task.Data["buttonType"])
 			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -351,9 +330,84 @@ func executeTask(task Task, app *App) {
 			})
 			return
 		}
-		log.Printf("Clicking button: %s", button)
-		robotgo.Click(button, true)
-		time.Sleep(100 * time.Millisecond)
+
+		// Map buttonType to robotgo button
+		var button string
+		switch buttonType {
+		case "Left Click":
+			button = "left"
+		case "Right Click":
+			button = "right"
+		case "Middle Click":
+			button = "middle"
+		default:
+			err := fmt.Sprintf("Unsupported buttonType: %s", buttonType)
+			log.Printf("Click error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		// Get actionType
+		actionType, ok := task.Data["actionType"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid actionType value: %v", task.Data["actionType"])
+			log.Printf("Click error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		// Get clickDuration
+		clickDurationFloat, ok := task.Data["clickDuration"].(float64)
+		if !ok {
+			err := fmt.Sprintf("Invalid clickDuration value: %v", task.Data["clickDuration"])
+			log.Printf("Click error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+		clickDuration := time.Duration(clickDurationFloat) * time.Millisecond
+
+		// Perform the click action
+		switch actionType {
+		case "Single":
+			log.Printf("Performing single %s click with duration %v", buttonType, clickDuration)
+			robotgo.Click(button)
+			time.Sleep(clickDuration)
+		case "Double":
+			log.Printf("Performing double %s click with duration %v", buttonType, clickDuration)
+			for i := 0; i < 2; i++ {
+				robotgo.Click(button)
+				time.Sleep(clickDuration)
+			}
+		case "Triple":
+			log.Printf("Performing triple %s click with duration %v", buttonType, clickDuration)
+			for i := 0; i < 3; i++ {
+				robotgo.Click(button)
+				time.Sleep(clickDuration)
+			}
+		case "Hold":
+			log.Printf("Performing %s hold with duration %v", buttonType, clickDuration)
+			robotgo.MouseDown(button)
+			time.Sleep(clickDuration)
+			robotgo.MouseUp(button)
+		default:
+			err := fmt.Sprintf("Unsupported actionType: %s", actionType)
+			log.Printf("Click error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
 		app.emitEvent("task-success", map[string]interface{}{
 			"taskID": task.ID,
 			"type":   "Click",

@@ -1,7 +1,7 @@
 <script lang="ts">
     export let label: string;
     export let defaultValue: number = 50;
-    let value = defaultValue;
+    export let value: number = defaultValue; // Add this line
   </script>
   
   <div class="space-y-1.5">
