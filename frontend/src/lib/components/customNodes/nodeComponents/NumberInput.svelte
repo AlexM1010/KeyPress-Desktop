@@ -1,5 +1,7 @@
 <!-- frontend\src\lib\components\customNodes\NumberInput.svelte -->
 <script lang="ts">
+    //TODO: update input component primary colours based on header primary colour adjust components for dark mode
+    //TODO: add more tooltips to properly explain controls, allows more vauge descriptions 
     import { ChevronUp, ChevronDown } from 'lucide-svelte';
 
     export let label: string = '';

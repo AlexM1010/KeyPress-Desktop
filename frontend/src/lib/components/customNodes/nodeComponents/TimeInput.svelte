@@ -99,6 +99,8 @@
     } else {
         isInvalid = false;
     }
+
+    //TODO: reduce spacing at start of input field
 </script>
 
 <div class="flex items-center gap-2">

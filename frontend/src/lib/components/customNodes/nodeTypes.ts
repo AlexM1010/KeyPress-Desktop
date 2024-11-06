@@ -1,7 +1,7 @@
 // src/lib/nodeTypes.ts
 import type { NodeTypes } from '@xyflow/svelte';
 import type { SvelteComponent } from 'svelte';
-import ColorPickerNode from '$lib/components/customNodes/ColorPickerNode.svelte';
+import ColorPickerNode from './ColorPickerNode.svelte';
 import SVGNode from './SVGNode.svelte';
 import MouseClickNode from './MouseClickNode.svelte';
 import KeyPressNode from './KeyPressNode.svelte';

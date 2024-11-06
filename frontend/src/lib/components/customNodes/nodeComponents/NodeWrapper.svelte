@@ -4,10 +4,10 @@
     import { ChevronDown } from "lucide-svelte";
     import type { ComponentType } from "svelte";
     import { Handle, Position } from "@xyflow/svelte";
-    import type { HandleConfig } from "./types";
+    import type { HandleConfig } from "../types";
     import ContextMenu from "./ContextMenu.svelte";
     import { cubicOut } from "svelte/easing";
-    import nodesStore from '../../stores/nodesStore';
+    import nodesStore from '../../../stores/nodesStore';
     import { createEventDispatcher } from 'svelte';
 
     // Component Props
@@ -150,7 +150,7 @@
 
     .node-wrapper:hover {
         box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
+        transform: translateY(-4px);
     }
 
     /* Header styling */

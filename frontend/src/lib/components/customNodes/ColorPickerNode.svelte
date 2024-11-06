@@ -2,7 +2,7 @@
     import { Position } from '@xyflow/svelte';
     import { Palette } from 'lucide-svelte';
     import { writable } from 'svelte/store';
-    import NodeWrapper from './NodeWrapper.svelte';
+    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { BaseNodeProps } from '$lib/types/nodeProps';
     import type { TVariant } from '$lib/types/tailwind';
     import type { CtrlData } from '$lib/types/block';
@@ -59,6 +59,9 @@
     color="bg-gradient-to-r from-violet-500 to-purple-500"
     {handles}
     {isConnectable}
+    id={id}
+    type={type}
+    data={data}
     {...$$restProps}
 >
     <div class="flex flex-col gap-2">

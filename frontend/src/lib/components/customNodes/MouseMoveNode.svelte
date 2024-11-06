@@ -2,7 +2,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { Mouse } from 'lucide-svelte';
-    import NodeWrapper from './NodeWrapper.svelte';
+    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import { Handle, Position } from "@xyflow/svelte";
     import type { HandleConfig } from "./types";

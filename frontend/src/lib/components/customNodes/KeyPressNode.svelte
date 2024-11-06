@@ -1,9 +1,9 @@
 <!-- KeyboardNode.svelte -->
 <script lang="ts">
     import { Keyboard } from 'lucide-svelte';
-    import NodeWrapper from './NodeWrapper.svelte';
-    import Select from './Select.svelte';
-    import Slider from './Slider.svelte';
+    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
+    import Select from './nodeComponents/Select.svelte';
+    import Slider from './nodeComponents/Slider.svelte';
     import type { ComponentType } from 'svelte';
 
     // Props for the KeyboardInputNode
@@ -25,7 +25,16 @@
     $$restProps;
 </script>
 
-<NodeWrapper {icon} {title} {color} on:duplicate={handleDuplicate} on:delete={handleDelete}>
+<NodeWrapper 
+    {icon} 
+    {title} 
+    {color} 
+    id="unique-id" 
+    type="custom-type" 
+    data={{}} 
+    on:duplicate={handleDuplicate} 
+    on:delete={handleDelete}
+>
     <!-- Node Content for configuring Keyboard Input options -->
     <Select label="Key Action" options={keyActions} icon={Keyboard} />
     <Select label="Modifier Key" options={modifierKeys} />

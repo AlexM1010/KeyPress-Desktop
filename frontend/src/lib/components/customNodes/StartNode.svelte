@@ -15,7 +15,7 @@
     import { onMount, onDestroy, createEventDispatcher } from 'svelte';
     import { slide, fade } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
-    import NodeWrapper from './NodeWrapper.svelte';
+    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import type { HandleConfig } from './types';
 
