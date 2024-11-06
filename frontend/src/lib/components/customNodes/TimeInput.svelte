@@ -1,5 +1,7 @@
+<!-- frontend\src\lib\components\customNodes\TimeInput.svelte -->
 <script lang="ts">
     import { writable, type Writable, derived } from 'svelte/store';
+    import { ChevronUp, ChevronDown } from 'lucide-svelte';
 
     type TimeUnit = 'ms' | 's' | 'min';
 
@@ -28,6 +30,12 @@
     export let value = writable(defaultValue * 1000);
     export let unit: Writable<TimeUnit> = writable('s');
 
+    // Arrow controls
+    export let showArrows: boolean = true;
+    export let step: number = 1;
+    export let minValue: number | null = null;
+    export let maxValue: number | null = null;
+
     const UNITS: TimeUnit[] = ['ms', 's', 'min'];
     let significantDigits = 2;
 
@@ -54,7 +62,7 @@
         // Convert input value to milliseconds
         const numericValue = Number(inputValue);
         if (!isNaN(numericValue)) {
-            const valueInMs = Math.round(numericValue * TO_MS[$unit]);
+            const valueInMs = numericValue * TO_MS[$unit];
             value.set(valueInMs);
         }
     }
@@ -63,6 +71,33 @@
         unit.update(currentUnit => 
             UNITS[(UNITS.indexOf(currentUnit) + 1) % UNITS.length]
         );
+    }
+
+    function increment() { //TODO update these methods to work when holding down up/down buttons - NumberInput also needs 
+        let newValue = $displayValue + step;
+        if (maxValue === null || newValue <= maxValue) {
+            const valueInMs = newValue * TO_MS[$unit];
+            value.set(valueInMs);
+        }
+    }
+
+    function decrement() {
+        let newValue = $displayValue - step;
+        const min = minValue !== null ? minValue : 0;
+        if (newValue >= min) {
+            const valueInMs = newValue * TO_MS[$unit];
+            value.set(valueInMs);
+        }
+    }
+
+    $: inputWidth = `${Math.max(String($displayValue).length * 0.6 + 1.2, 3)}em`;
+
+    // Handle invalid input
+    let isInvalid: boolean = false;
+    $: if (maxValue !== null && $displayValue > maxValue) {
+        isInvalid = true;
+    } else {
+        isInvalid = false;
     }
 </script>
 
@@ -76,25 +111,46 @@
         </label>
     {/if}
     
-    <div class="flex">
+    <div class="flex items-center">
         <input 
             type="number"
             value={$displayValue}
             on:input={handleInputChange}
             id="time-input" 
-            class="h-8 px-2 bg-gray-100 rounded-l-lg text-right border-r border-gray-300
-                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            style="width: {Math.max(String($displayValue).length * 0.6 + 1.2, 3)}em"
+            class="h-8 px-2 bg-gray-100 text-right border-r border-gray-300
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+                   {isInvalid ? 'border-red-500' : ''} {showArrows ? 'rounded-l-md' : 'rounded-l-lg'}"
+            style="width: {inputWidth}"
             step="any"
             min="0"
         />
 
+        {#if showArrows}
+            <div class="flex flex-col">
+                <button 
+                    on:click={increment}
+                    class="arrow-button"
+                    aria-label="Increment"
+                >
+                    <ChevronUp size={14} />
+                </button>
+                <button 
+                    on:click={decrement}
+                    class="arrow-button"
+                    aria-label="Decrement"
+                >
+                    <ChevronDown size={14} />
+                </button>
+            </div>
+        {/if}
+
         <button 
             type="button"
             on:click={handleUnitChange} 
-            class="h-8 px-2 bg-blue-500 text-white rounded-r-lg w-[40px] text-center 
+            class="h-8 px-2 bg-blue-500 text-white w-[40px] text-center 
                    relative group hover:bg-blue-600 focus:outline-none 
-                   focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                   focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                   {showArrows ? 'rounded-r-md' : 'rounded-r-lg'}"
         >
             {$unit}
             <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs 
@@ -125,5 +181,20 @@
     input[type="number"]:disabled {
         opacity: 0.7;
         cursor: not-allowed;
+    }
+
+    .arrow-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1rem;
+        background-color: #e5e7eb;
+        padding: 0;
+        transition: background-color 0.2s;
+    }
+
+    .arrow-button:hover {
+        background-color: #d1d5db;
     }
 </style>

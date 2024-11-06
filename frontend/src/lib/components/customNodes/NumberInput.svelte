@@ -1,3 +1,4 @@
+<!-- frontend\src\lib\components\customNodes\NumberInput.svelte -->
 <script lang="ts">
     import { ChevronUp, ChevronDown } from 'lucide-svelte';
 
@@ -6,6 +7,7 @@
     export let minValue: number | null = null;
     export let maxValue: number | null = null;
     export let step: number = 1;
+    export let showArrows: boolean = true;
 
     let isInvalid: boolean = false;
 
@@ -79,29 +81,32 @@
                 type="number"
                 bind:value
                 id="number-input" 
-                class="h-8 px-2 bg-gray-100 rounded-l-md text-right 
-                    {isInvalid ? 'border border-red-500 input-error' : ''}"
+                class="h-8 px-2 bg-gray-100 text-right 
+                    {isInvalid ? 'border border-red-500 input-error' : ''} 
+                    {showArrows ? 'rounded-l-md' : 'rounded-md'}"
                 style="width: {inputWidth}"
                 min={minValue}
                 max={maxValue}
                 step={step}
             />
-            <div class="flex flex-col">
-                <button 
-                    on:click={increment}
-                    class="arrow-button rounded-tr-md"
-                    aria-label="Increment"
-                >
-                    <ChevronUp size={14} />
-                </button>
-                <button 
-                    on:click={decrement}
-                    class="arrow-button rounded-br-md"
-                    aria-label="Decrement"
-                >
-                    <ChevronDown size={14} />
-                </button>
-            </div>
+            {#if showArrows}
+                <div class="flex flex-col">
+                    <button 
+                        on:click={increment}
+                        class="arrow-button rounded-tr-md"
+                        aria-label="Increment"
+                    >
+                        <ChevronUp size={14} />
+                    </button>
+                    <button 
+                        on:click={decrement}
+                        class="arrow-button rounded-br-md"
+                        aria-label="Decrement"
+                    >
+                        <ChevronDown size={14} />
+                    </button>
+                </div>
+            {/if}
         </div>
     </div>
 </div>

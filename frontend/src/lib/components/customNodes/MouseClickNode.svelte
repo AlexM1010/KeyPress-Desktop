@@ -160,7 +160,7 @@
                 </div>
                 <!-- Multiple Clicks Delay Configuration -->
                 {#if data.numberOfClicks > 1}
-                        <TimeInput label="between, wait" defaultValue={data.clickDelay}/>
+                        <TimeInput label="delay" defaultValue={data.clickDelay}/>
                 {/if}
             </div>
 
