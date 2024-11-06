@@ -80,14 +80,9 @@
     <div 
         on:mouseenter={() => isHeaderHovered = true} 
         on:mouseleave={() => isHeaderHovered = false} 
-        class="context-menu-container"
+        class="context-menu-wrapper"
         role="menu"
         tabindex="0"
-        transition:fly={{
-            y: 10,
-            duration: 200,
-            easing: cubicOut
-        }}
     >
         <ContextMenu
             on:duplicate={handleDuplicate}
