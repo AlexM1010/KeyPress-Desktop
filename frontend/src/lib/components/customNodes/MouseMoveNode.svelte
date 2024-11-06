@@ -1,7 +1,7 @@
 <!-- MouseMoveNode.svelte -->
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { MousePointer } from 'lucide-svelte';
+    import { Mouse } from 'lucide-svelte';
     import NodeWrapper from './NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import { Handle, Position } from "@xyflow/svelte";
@@ -9,7 +9,7 @@
 
     export let id: string;
     export let title: string = 'Move Mouse';
-    export let icon: ComponentType = MousePointer;
+    export let icon: ComponentType = Mouse;
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
     export let initialX: number = 300;
     export let initialY: number = 400;

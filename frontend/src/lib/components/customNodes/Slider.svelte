@@ -1,19 +1,105 @@
+<!-- frontend\src\lib\components\customNodes\Slider.svelte -->
 <script lang="ts">
     export let label: string;
     export let defaultValue: number = 50;
-    export let value: number = defaultValue; // Add this line
-  </script>
-  
-  <div class="space-y-1.5">
-    <div class="flex justify-between">
-      <label for="slider-input" class="text-xs font-medium text-gray-500">{label}</label>
-      <span class="text-xs text-gray-400">{value}%</span>
+    export let value: number = defaultValue;
+    export let unit: string = '%';
+    export let min: number = 0;
+    export let max: number = 100;
+    export let step: number = 1;
+    export let id = crypto.randomUUID();
+
+    // Validate and constrain value
+    $: value = Math.min(Math.max(value, min), max);
+
+    // Event handlers
+    function handleMouseDown(e: MouseEvent) {
+        e.stopPropagation();
+    }
+
+    function handleTouchStart(e: TouchEvent) {
+        e.stopPropagation();
+    }
+</script>
+
+<div class="slider-container space-y-1.5 select-none"> 
+    <div class="flex justify-between min-w-[120px]">
+        <label for={id} class="text-xs font-medium text-gray-500">{label}</label>
+        <span class="text-xs text-gray-400 w-12 text-right">{value}{unit}</span>
     </div>
     <input 
-      id="slider-input"
-      type="range" 
-      bind:value  
-      class="w-full h-2 bg-gray-100 rounded-lg accent-blue-500 cursor-pointer"
+        {id}
+        type="range"
+        {min}
+        {max}
+        {step}
+        bind:value
+        on:mousedown={handleMouseDown}
+        on:touchstart={handleTouchStart}
+        aria-label={label}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
+        class="w-full h-2 bg-gray-100 rounded-lg accent-blue-500 cursor-pointer touch-none"
     />
-  </div>
-  
+</div>
+
+<style>
+    .slider-container {
+        isolation: isolate;
+    }
+
+    input[type="range"] {
+        user-select: none;
+        -webkit-user-select: none;
+        pointer-events: auto !important;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #3b82f6;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.1s;
+        border: none;
+    }
+
+    input[type="range"]:focus {
+        outline: none;
+    }
+
+    input[type="range"]:focus::-webkit-slider-thumb {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    input[type="range"]:focus::-moz-range-thumb {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Prevent parent node dragging */
+    .slider-container {
+        pointer-events: none;
+    }
+
+    input[type="range"],
+    label,
+    span {
+        pointer-events: auto;
+    }
+</style>

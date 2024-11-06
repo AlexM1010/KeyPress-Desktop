@@ -48,7 +48,7 @@
 		"crypto-js": "^4.2.0",
 		"dotenv": "^16.4.5",
 		"drizzle-orm": "^0.35.3",
-		"lucide-svelte": "^0.453.0",
+		"lucide-svelte": "^0.454.0",
 		"mode-watcher": "^0.4.1",
 		"pg": "^8.13.1",
 		"sass": "^1.79.5",
