@@ -9,6 +9,8 @@
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import Checkbox from "./nodeComponents/Checkbox.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
+    import Slider from './nodeComponents/Slider.svelte';
+    import TimeInput from './nodeComponents/TimeInput.svelte';
 
     // Type imports
     import type { HandleConfig } from './types';
@@ -24,8 +26,8 @@
     const MAX_VARIANCE = 100;
 
     type PositionType = 'Mouse' | 'Fixed';
-    type PathType = 'Straight' | 'Human-like'; //| 'Recorded Path'
-    type SpeedType = 'Instant' | 'Human-like';
+    type PathType = 'Straight' | 'Human'; //| 'Recorded Path'
+    type SpeedType = 'Instant' | 'Human';
 
     interface Coordinates {
         x: number;
@@ -71,7 +73,7 @@
         showMovementSettings: false,
         dragWhileMoving: false,
         speed: {
-            type: 'Human-like',
+            type: 'Instant',
             value: DEFAULT_MOVE_SPEED,
             randomize: false,
             variance: DEFAULT_VARIANCE
@@ -103,7 +105,7 @@
             coordinates: { x: 0, y: 0 }
         };
         data.speed ||= {
-            type: 'Human-like',
+            type: 'Instant',
             value: DEFAULT_MOVE_SPEED,
             randomize: false,
             variance: DEFAULT_VARIANCE
@@ -120,8 +122,8 @@
         console.log("Delete action triggered");
     }
 
-    const pathTypes: PathType[] = ['Straight', 'Human-like'];
-    const speedTypes: SpeedType[] = ['Instant', 'Human-like'];
+    const pathTypes: PathType[] = ['Straight', 'Human'];
+    const speedTypes: SpeedType[] = ['Instant', 'Human'];
 </script>
 
 <NodeWrapper
@@ -269,25 +271,26 @@
                             {/each}
                         </div>
 
-                        {#if data.speed.type === 'Human-like'}
-                            <NumberInput
-                                label="Speed (ms)"
+                        {#if data.speed.type === 'Human'}
+                            <TimeInput
+                                label="Speed"
                                 bind:value={data.speed.value}
-                                minValue={MIN_SPEED}
-                                maxValue={MAX_SPEED}
+                                defaultValue={DEFAULT_MOVE_SPEED}
                             />
-                            <div class="space-y-2">
+                            <div class="flex items-center gap-4">
                                 <Checkbox
-                                    label="Randomize Speed"
+                                    label="Randomize"
                                     bind:checked={data.speed.randomize}
                                 />
                                 {#if data.speed.randomize}
-                                    <div class="pl-6">
-                                        <NumberInput
-                                            label="Variance %"
+                                    <div class="flex-1">
+                                        <Slider
+                                            label="Variance"
+                                            unit="%"
                                             bind:value={data.speed.variance}
-                                            minValue={MIN_VARIANCE}
-                                            maxValue={MAX_VARIANCE}
+                                            min={MIN_VARIANCE}
+                                            max={MAX_VARIANCE}
+                                            defaultValue={DEFAULT_VARIANCE}
                                         />
                                     </div>
                                 {/if}

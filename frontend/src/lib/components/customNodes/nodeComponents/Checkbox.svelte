@@ -17,7 +17,6 @@
             bind:checked
             {disabled}
             class="sr-only absolute"
-            aria-checked={checked}
             aria-label={label}
         />
         <div class="checkbox-custom relative">

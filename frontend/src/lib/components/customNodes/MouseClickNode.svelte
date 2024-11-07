@@ -26,6 +26,7 @@
     // Default configuration constants
     const DEFAULT_CLICK_DELAY = 0.1;
     const DEFAULT_PRESS_DURATION = 0.1;
+    const DEFAULT_CLICKS = 1;
     const MIN_CLICKS = 0; //TODO allow MIN and add DEFAULT_CLICKS 
     const MAX_CLICKS = 1000;
     const MIN_SCROLL_LINES = 0;
@@ -56,7 +57,7 @@
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
     export let data: Data = {
         buttonType: 'Left',
-        numberOfClicks: MIN_CLICKS,
+        numberOfClicks: DEFAULT_CLICKS,
         clickDelay: DEFAULT_CLICK_DELAY,
         pressReleaseDelay: DEFAULT_PRESS_DURATION,
         releaseAfterPress: true,
@@ -74,6 +75,7 @@
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
 
+        
     // Lifecycle hook to initialize default values
     onMount(() => {
         initializeDefaultValues();
@@ -82,7 +84,7 @@
     // Initialize default data values if not provided
     function initializeDefaultValues() {
         data.buttonType ||= 'Left';
-        data.numberOfClicks ||= MIN_CLICKS;
+        data.numberOfClicks ||= DEFAULT_CLICKS;
         data.clickDelay ??= DEFAULT_CLICK_DELAY;
         data.pressReleaseDelay ??= DEFAULT_PRESS_DURATION;
         data.releaseAfterPress ??= true;
