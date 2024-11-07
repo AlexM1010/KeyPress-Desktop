@@ -1,44 +1,36 @@
-<!-- MouseClickNode.svelte -->
-<!-- 
- * @component MouseClickNode
- * @description A node component that handles mouse click configurations in a flow diagram
- * @exports {string} id - Unique identifier for the node
- * @exports {string} [title='Mouse Click'] - Display title for the node
- * @exports {ComponentType} [icon=MousePointer] - Icon component to display
- * @exports {string} [color='bg-gradient-to-r from-blue-500 to-blue-600'] - Background color/gradient
- * @exports {Data} data - Configuration data for the mouse click behavior
+<!--
+MouseClickNode.svelte
+A configurable node component for the XYFlow graph editor that handles mouse click operations.
+
+Features:
+- Configurable mouse button selection (Left, Middle, Right)
+- Click pattern settings including:
+  - Number of clicks (0-1000)
+  - Click delay timing between multiple clicks
+  - Press and release timing control
+  - Optional release after press behavior
+- Advanced scroll options:
+  - Directional scrolling (Vertical and/or Horizontal)
+  - Configurable scroll lines (0-1000)
+  - Collapsible advanced settings panel
+- Responsive UI with:
+  - Toggle buttons for button type selection
+  - Time input controls for delays
+  - Number input with validation
+  - Checkbox controls
+- Node connection handles for graph integration
+- Support for node duplication and deletion
+
+@component
+@requires @xyflow/svelte
+@requires lucide-svelte
 -->
-<script lang="ts">
-    //TODO: implement in app.go
-    // Core Svelte imports
-    import { Position } from "@xyflow/svelte";
-    import type { ComponentType } from 'svelte';
-    
-    // UI Component imports
-    import { MousePointer, ChevronDown } from 'lucide-svelte';
-    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
-    import Checkbox from "./nodeComponents/Checkbox.svelte";
-    import TimeInput from "./nodeComponents/TimeInput.svelte";
-    import NumberInput from './nodeComponents/NumberInput.svelte';
-    import type { HandleConfig } from './types';
 
-    // Default configuration constants
-    const DEFAULT_CLICK_DELAY = 0.1;
-    const DEFAULT_PRESS_DURATION = 0.1;
-    const DEFAULT_CLICKS = 1;
-    const MIN_CLICKS = 0; //TODO allow MIN and add DEFAULT_CLICKS 
-    const MAX_CLICKS = 1000;
-    const MIN_SCROLL_LINES = 0;
-    const MAX_SCROLL_LINES = 1000;
+<script context="module" lang="ts">
+    export type ButtonType = 'Left' | 'Middle' | 'Right';
+    export type ScrollDirection = 'Vertical' | 'Horizontal';
 
-    // Scroll slider step
-    const SLIDER_STEP = 10;
-
-    // Custom type definitions
-    type ButtonType = 'Left' | 'Middle' | 'Right';
-    type ScrollDirection = 'Vertical' | 'Horizontal';
-
-    interface Data {
+    export interface MouseClickConfig {
         buttonType: ButtonType;
         numberOfClicks: number;
         clickDelay: number;
@@ -48,60 +40,122 @@
         scrollDirection: ScrollDirection[];
         scrollLines: number;
     }
+</script>
 
-    // Component props with default values
+<script lang="ts">
+    import { Position } from "@xyflow/svelte";
+    import type { ComponentType } from 'svelte';
+    import { MousePointer, ChevronDown } from 'lucide-svelte';
+    import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
+    import Checkbox from "./nodeComponents/Checkbox.svelte";
+    import TimeInput from "./nodeComponents/TimeInput.svelte";
+    import NumberInput from './nodeComponents/NumberInput.svelte';
+    import type { HandleConfig } from './types';
+
+    // region Constants
+    const TIMING = {
+        DEFAULT_CLICK_DELAY: 0.1,
+        DEFAULT_PRESS_DURATION: 0.1
+    } as const;
+
+    const CLICK_CONSTRAINTS = {
+        DEFAULT: 1,
+        MIN: 0,
+        MAX: 1000
+    } as const;
+
+    const SCROLL_CONSTRAINTS = {
+        MIN_LINES: 0,
+        MAX_LINES: 1000,
+        SLIDER_STEP: 10
+    } as const;
+
+    const AVAILABLE_SCROLL_DIRECTIONS: ScrollDirection[] = ['Vertical', 'Horizontal'];
+
+    const BUTTON_TYPES: ButtonType[] = ['Left', 'Middle', 'Right'];
+
+    const DEFAULT_NODE_CONFIG: MouseClickConfig = {
+        buttonType: 'Left',
+        numberOfClicks: CLICK_CONSTRAINTS.DEFAULT,
+        clickDelay: TIMING.DEFAULT_CLICK_DELAY,
+        pressReleaseDelay: TIMING.DEFAULT_PRESS_DURATION,
+        releaseAfterPress: true,
+        showAdvanced: false,
+        scrollDirection: ['Vertical'],
+        scrollLines: SCROLL_CONSTRAINTS.MIN_LINES
+    };
+
+    const NODE_HANDLES: HandleConfig[] = [
+        { 
+            id: "right", 
+            type: "source", 
+            position: Position.Right, 
+            offsetY: 50 
+        },
+        { 
+            id: "left", 
+            type: "target", 
+            position: Position.Left, 
+            offsetY: 50 
+        },
+    ];
+    // endregion
+
+    // region Props
     export let id: string;
     export let title: string = 'Mouse Click';
     export let icon: ComponentType = MousePointer;
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
-    export let data: Data = {
-        buttonType: 'Left',
-        numberOfClicks: DEFAULT_CLICKS,
-        clickDelay: DEFAULT_CLICK_DELAY,
-        pressReleaseDelay: DEFAULT_PRESS_DURATION,
-        releaseAfterPress: true,
-        showAdvanced: false,
-        scrollDirection: ['Vertical'],
-        scrollLines: MIN_SCROLL_LINES
-    };
+    export let data: MouseClickConfig = DEFAULT_NODE_CONFIG;
+    // endregion
 
-    // Add reactive declaration to handle undefined values
     $: data = {
-        buttonType: data?.buttonType || 'Left',
-        numberOfClicks: data?.numberOfClicks ?? DEFAULT_CLICKS,
-        clickDelay: data?.clickDelay ?? DEFAULT_CLICK_DELAY,
-        pressReleaseDelay: data?.pressReleaseDelay ?? DEFAULT_PRESS_DURATION,
-        releaseAfterPress: data?.releaseAfterPress ?? true,
-        showAdvanced: data?.showAdvanced ?? false,
-        scrollDirection: data?.scrollDirection || ['Vertical'],
-        scrollLines: data?.scrollLines ?? MIN_SCROLL_LINES
+        ...DEFAULT_NODE_CONFIG,
+        ...data
     };
 
-    // Configuration arrays for scroll directions
-    const scrollDirections: ScrollDirection[] = ['Vertical', 'Horizontal'];
-
-    // Handle configurations for node connections
-    const handles: HandleConfig[] = [
-        { id: "right", type: "source", position: Position.Right, offsetY: 50 },
-        { id: "left", type: "target", position: Position.Left, offsetY: 50 },
-    ];
-
-    // Event handler for duplicating the node
-    function handleDuplicate() {
+    // region Event Handlers
+    /**
+     * Handles the duplication of the current node
+     * TODO: Implement actual duplication logic
+     */
+    function handleDuplicate(): void {
         console.log("Duplicate action triggered");
     }
 
-    // Event handler for deleting the node
-    function handleDelete() {
+    /**
+     * Handles the deletion of the current node
+     * TODO: Implement actual deletion logic
+     */
+    function handleDelete(): void {
         console.log("Delete action triggered");
     }
 
-    // Toggle scroll direction selection
-    function toggleDirection(direction: ScrollDirection) {
+    /**
+     * Toggles a scroll direction in the configuration
+     * @param direction - The scroll direction to toggle
+     */
+    function toggleDirection(direction: ScrollDirection): void {
         data.scrollDirection = data.scrollDirection.includes(direction)
             ? data.scrollDirection.filter(d => d !== direction)
             : [...data.scrollDirection, direction];
     }
+
+    /**
+     * Updates the button type in the configuration
+     * @param newType - The new button type to set
+     */
+    function updateButtonType(newType: ButtonType): void {
+        data.buttonType = newType;
+    }
+
+    /**
+     * Toggles the advanced options visibility
+     */
+    function toggleAdvancedOptions(): void {
+        data.showAdvanced = !data.showAdvanced;
+    }
+    // endregion
 </script>
 
 <!-- Template -->
@@ -111,7 +165,7 @@
     {title}
     {color}
     type="Click"
-    {handles}
+    handles={NODE_HANDLES}
     bind:data
     on:duplicate={handleDuplicate}
     on:delete={handleDelete}
@@ -119,69 +173,60 @@
     <div class="grid gap-6">
         <!-- Button Type Selection -->
         <div class="flex border rounded-lg overflow-hidden">
-            <button
-                class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                    {data.buttonType === 'Left' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                    first:rounded-l-lg"
-                on:click={() => data.buttonType = 'Left'}
-            >
-                Left
-            </button>
-            <button 
-                class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                    {data.buttonType === 'Middle' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                    border-l"
-                on:click={() => data.buttonType = 'Middle'}
-            >
-                Middle
-            </button>
-            <button
-                class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                    {data.buttonType === 'Right' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                    border-l last:rounded-r-lg"
-                on:click={() => data.buttonType = 'Right'}
-            >
-                Right
-            </button>
+            {#each BUTTON_TYPES as buttonType}
+                <button
+                    class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
+                        {data.buttonType === buttonType 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
+                        {buttonType !== 'Left' ? 'border-l' : ''}
+                        {buttonType === 'Left' ? 'first:rounded-l-lg' : ''}
+                        {buttonType === 'Right' ? 'last:rounded-r-lg' : ''}"
+                    on:click={() => updateButtonType(buttonType)}
+                >
+                    {buttonType}
+                </button>
+            {/each}
         </div>
 
+        <!-- Click Configuration -->
         <div class="grid gap-6 auto-rows-min">
-            <!-- First Row: Clicks and Delay -->
+            <!-- Click Count and Delay Configuration -->
             <div class="flex justify-between items-center gap-2">
                 <NumberInput
                     label="Clicks"
                     bind:value={data.numberOfClicks}
-                    minValue={MIN_CLICKS}
-                    maxValue={MAX_CLICKS}
+                    minValue={CLICK_CONSTRAINTS.MIN}
+                    maxValue={CLICK_CONSTRAINTS.MAX}
                 />
                 {#if data.numberOfClicks > 1}
-                    <TimeInput label="delay" defaultValue={data.clickDelay} />
+                    <TimeInput 
+                        label="delay" 
+                        defaultValue={data.clickDelay} 
+                    />
                 {/if}
             </div>
         
-            <!-- Second Row: Release and After -->
+            <!-- Release Configuration -->
             <div class="flex justify-between items-center gap-2">
                 <Checkbox
                     label="Release"
                     bind:checked={data.releaseAfterPress}
                 />
                 {#if data.releaseAfterPress}
-                    <TimeInput label="after" defaultValue={data.pressReleaseDelay} />
-                {/if} <!-- TODO: should read "Release {[check] [input](s/ms/min)} after press" -->
+                    <TimeInput 
+                        label="after" 
+                        defaultValue={data.pressReleaseDelay} 
+                    />
+                {/if}
             </div>
         </div>
 
-        <!-- Advanced Options -->
+        <!-- Advanced Options Section -->
         <div class="border-t pt-4">
             <button
                 class="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                on:click={() => data.showAdvanced = !data.showAdvanced}
+                on:click={toggleAdvancedOptions}
                 aria-expanded={data.showAdvanced}
             >
                 <span>Scroll Options</span>
@@ -193,9 +238,9 @@
 
             {#if data.showAdvanced}
                 <div class="mt-4 grid gap-6">
-                    <!-- Scroll Direction Configuration -->
+                    <!-- Scroll Direction Selection -->
                     <div class="flex border rounded-lg overflow-hidden">
-                        {#each scrollDirections as direction, index}
+                        {#each AVAILABLE_SCROLL_DIRECTIONS as direction, index}
                             <button
                                 class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
                                     {data.scrollDirection.includes(direction)
@@ -210,12 +255,12 @@
                         {/each}
                     </div>
 
-                    <!-- Scroll Lines Configuration -->
+                    <!-- Scroll Lines Input -->
                     <NumberInput
                         label="Number of Lines"
                         bind:value={data.scrollLines}
-                        minValue={MIN_SCROLL_LINES}
-                        maxValue={MAX_SCROLL_LINES}
+                        minValue={SCROLL_CONSTRAINTS.MIN_LINES}
+                        maxValue={SCROLL_CONSTRAINTS.MAX_LINES}
                     />
                 </div>
             {/if}
