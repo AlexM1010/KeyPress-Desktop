@@ -9,6 +9,7 @@
  * @exports {Data} data - Configuration data for the mouse click behavior
 -->
 <script lang="ts">
+    //TODO: implement in app.go
     // Core Svelte imports
     import { onMount } from 'svelte';
     import { Position } from "@xyflow/svelte";
@@ -27,9 +28,9 @@
     // Default configuration constants
     const DEFAULT_CLICK_DELAY = 0.1;
     const DEFAULT_PRESS_DURATION = 0.1;
-    const MIN_CLICKS = 1;
+    const MIN_CLICKS = 0; //TODO allow MIN and add DEFAULT_CLICKS 
     const MAX_CLICKS = 1000;
-    const MIN_SCROLL_LINES = 1;
+    const MIN_SCROLL_LINES = 0;
     const MAX_SCROLL_LINES = 1000;
 
     // Scroll slider step
@@ -107,18 +108,6 @@
             ? data.scrollDirection.filter(d => d !== direction)
             : [...data.scrollDirection, direction];
     }
-
-    // Update the number of clicks with validation
-    function updateNumberOfClicks(event: Event) {
-        const target = event.target as HTMLInputElement;
-        data.numberOfClicks = Math.max(MIN_CLICKS, Math.min(MAX_CLICKS, Number(target.value)));
-    }
-
-    // Update the number of scroll lines with validation
-    function updateScrollLines(event: Event) {
-        const target = event.target as HTMLInputElement;
-        data.scrollLines = Math.max(MIN_SCROLL_LINES, Math.min(MAX_SCROLL_LINES, Number(target.value)));
-    }
 </script>
 
 <!-- Template -->
@@ -133,7 +122,7 @@
     on:duplicate={handleDuplicate}
     on:delete={handleDelete}
 >
-    <div class="grid gap-4">
+    <div class="grid gap-6">
         <!-- Button Type Selection -->
         <div class="flex border rounded-lg overflow-hidden">
             <button
@@ -168,7 +157,7 @@
             </button>
         </div>
 
-        <div class="grid gap-4 auto-rows-min">
+        <div class="grid gap-6 auto-rows-min">
             <!-- First Row: Clicks and Delay -->
             <div class="flex justify-between items-center gap-2">
                 <NumberInput
@@ -190,7 +179,7 @@
                 />
                 {#if data.releaseAfterPress}
                     <TimeInput label="after" defaultValue={data.pressReleaseDelay} />
-                {/if}
+                {/if} <!-- TODO: should read "Release {[check] [input](s/ms/min)} after press" -->
             </div>
         </div>
 
@@ -209,7 +198,7 @@
             </button>
 
             {#if data.showAdvanced}
-                <div class="mt-4 grid gap-4">
+                <div class="mt-4 grid gap-6">
                     <!-- Scroll Direction Configuration -->
                     <div class="flex border rounded-lg overflow-hidden">
                         {#each scrollDirections as direction, index}

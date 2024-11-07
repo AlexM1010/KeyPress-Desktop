@@ -113,7 +113,7 @@
             value={displayValue}
             on:input={handleInputChange}
             id="time-input" 
-            class="h-8 px-2 bg-gray-100 text-right border-r border-gray-300
+            class="h-8 px-2 bg-gray-100 text-right
                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
                    {isInvalid ? 'border-red-500' : ''} {showArrows ? 'rounded-l-md' : 'rounded-l-lg'}"
             style="width: {inputWidth}"
