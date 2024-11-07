@@ -23,7 +23,7 @@
     const MIN_VARIANCE = 0;
     const MAX_VARIANCE = 100;
 
-    type PositionType = 'Current Cursor' | 'Fixed Position';
+    type PositionType = 'Mouse' | 'Fixed';
     type PathType = 'Straight Line' | 'Human-like' | 'Custom Recorded';
     type SpeedType = 'Instant' | 'Human-like';
 
@@ -61,11 +61,11 @@
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
     export let data: Data = {
         startPosition: {
-            type: 'Current Cursor',
+            type: 'Mouse',
             coordinates: { x: 0, y: 0 }
         },
         endPosition: {
-            type: 'Fixed Position',
+            type: 'Fixed',
             coordinates: { x: 0, y: 0 }
         },
         showMovementSettings: false,
@@ -95,11 +95,11 @@
     function initializeDefaultValues() {
         // Set any missing values to defaults
         data.startPosition ||= {
-            type: 'Current Cursor',
+            type: 'Mouse',
             coordinates: { x: 0, y: 0 }
         };
         data.endPosition ||= {
-            type: 'Fixed Position',
+            type: 'Fixed',
             coordinates: { x: 0, y: 0 }
         };
         data.speed ||= {
@@ -148,38 +148,40 @@
         <div class="grid gap-4">
             <h3 class="text-sm font-medium text-gray-700">Start Position</h3>
             <div class="flex border rounded-lg overflow-hidden">
-                <button
-                    class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                        {data?.startPosition?.type === 'Current Cursor' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                        first:rounded-l-lg"
-                    on:click={() => data.startPosition.type = 'Current Cursor'}
-                >
-                    Current Cursor
-                </button>
                 <button 
                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                        {data?.startPosition?.type === 'Fixed Position' 
+                        {data?.startPosition?.type === 'Fixed' 
                             ? 'bg-blue-500 text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                         border-l last:rounded-r-lg"
-                    on:click={() => data.startPosition.type = 'Fixed Position'}
+                    on:click={() => data.startPosition.type = 'Fixed'}
                 >
-                    Fixed Position
+                    Fixed
+                </button>
+                <button
+                    class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
+                        {data?.startPosition?.type === 'Mouse' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
+                        first:rounded-l-lg
+                        disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-gray-100"
+                    disabled={data?.endPosition?.type === 'Mouse'}
+                    on:click={() => data.startPosition.type = 'Mouse'}
+                >
+                    Mouse
                 </button>
             </div>
             
-            {#if data?.startPosition?.type === 'Fixed Position'}
+            {#if data?.startPosition?.type === 'Fixed'}
                 <div class="grid grid-cols-2 gap-4">
                     <NumberInput
-                        label="X Coordinate"
+                        label="X"
                         bind:value={data.startPosition.coordinates.x}
                         minValue={MIN_COORDINATE}
                         maxValue={MAX_COORDINATE}
                     />
                     <NumberInput
-                        label="Y Coordinate"
+                        label="Y"
                         bind:value={data.startPosition.coordinates.y}
                         minValue={MIN_COORDINATE}
                         maxValue={MAX_COORDINATE}
@@ -194,37 +196,38 @@
             <div class="flex border rounded-lg overflow-hidden">
                 <button
                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                        {data?.endPosition?.type === 'Fixed Position' 
+                        {data?.endPosition?.type === 'Fixed' 
                             ? 'bg-blue-500 text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                         first:rounded-l-lg"
-                    on:click={() => data.endPosition.type = 'Fixed Position'}
+                    on:click={() => data.endPosition.type = 'Fixed'}
                 >
-                    Fixed Position
+                    Fixed
                 </button>
                 <button 
                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                        {data?.endPosition?.type === 'Current Cursor' 
+                        {data?.endPosition?.type === 'Mouse' 
                             ? 'bg-blue-500 text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                        border-l last:rounded-r-lg"
-                    disabled={data?.startPosition?.type === 'Current Cursor'}
-                    on:click={() => data.endPosition.type = 'Current Cursor'}
+                        border-l last:rounded-r-lg
+                        disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-gray-100"
+                    disabled={data?.startPosition?.type === 'Mouse'}
+                    on:click={() => data.endPosition.type = 'Mouse'}
                 >
-                    Current Cursor
+                    Mouse
                 </button>
             </div>
             
-            {#if data?.endPosition?.type === 'Fixed Position'}
+            {#if data?.endPosition?.type === 'Fixed'}
                 <div class="grid grid-cols-2 gap-4">
                     <NumberInput
-                        label="X Coordinate"
+                        label="X"
                         bind:value={data.endPosition.coordinates.x}
                         minValue={MIN_COORDINATE}
                         maxValue={MAX_COORDINATE}
                     />
                     <NumberInput
-                        label="Y Coordinate"
+                        label="Y"
                         bind:value={data.endPosition.coordinates.y}
                         minValue={MIN_COORDINATE}
                         maxValue={MAX_COORDINATE}
