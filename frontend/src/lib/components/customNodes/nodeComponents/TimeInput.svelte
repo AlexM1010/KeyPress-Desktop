@@ -1,6 +1,5 @@
 <!-- frontend\src\lib\components\customNodes\TimeInput.svelte -->
 <script lang="ts">
-    import { writable, type Writable, derived } from 'svelte/store';
     import { ChevronUp, ChevronDown } from 'lucide-svelte';
 
     type TimeUnit = 'ms' | 's' | 'min';
@@ -27,8 +26,8 @@
 
     export let label = '';
     export let defaultValue = 1;
-    export let value = writable(defaultValue * 1000);
-    export let unit: Writable<TimeUnit> = writable('s');
+    export let value = defaultValue * 1000; // Export the value prop
+    let unit: TimeUnit = 's';
 
     // Arrow controls
     export let showArrows: boolean = true;
@@ -39,66 +38,61 @@
     const UNITS: TimeUnit[] = ['ms', 's', 'min'];
     let significantDigits = 2;
 
-    // Derived store for the next unit in sequence
-    const nextUnit = derived(unit, $unit => 
-        UNITS[(UNITS.indexOf($unit) + 1) % UNITS.length]
-    );
+    let displayValue: number;
+    let inputWidth: string;
+    let isInvalid: boolean = false;
 
-    // Derived store for display value
-    const displayValue = derived([value, unit], ([$value, $unit]) => {
-        const conversionFactor = TO_MS[$unit];
-        const converted = $value / conversionFactor;
+    // Derived value for the next unit in sequence
+    $: nextUnit = UNITS[(UNITS.indexOf(unit) + 1) % UNITS.length];
+
+    // Derived display value
+    $: {
+        const conversionFactor = TO_MS[unit];
+        const converted = value / conversionFactor;
         const precision = significantDigits > 0 ? significantDigits : 2;
-        return Number(converted.toFixed(precision));
-    });
+        displayValue = Number(converted.toFixed(precision));
+    }
 
     function handleInputChange(event: Event) {
         const input = event.target as HTMLInputElement;
         const inputValue = input.value;
-        
+
         // Update significant digits based on decimal places
         significantDigits = inputValue.split('.')[1]?.length ?? 0;
-        
+
         // Convert input value to milliseconds
         const numericValue = Number(inputValue);
         if (!isNaN(numericValue)) {
-            const valueInMs = numericValue * TO_MS[$unit];
-            value.set(valueInMs);
+            const valueInMs = numericValue * TO_MS[unit];
+            value = valueInMs;
         }
     }
 
     function handleUnitChange() {
-        unit.update(currentUnit => 
-            UNITS[(UNITS.indexOf(currentUnit) + 1) % UNITS.length]
-        );
+        unit = UNITS[(UNITS.indexOf(unit) + 1) % UNITS.length];
     }
 
-    function increment() { //TODO update these methods to work when holding down up/down buttons - NumberInput also needs 
-        let newValue = $displayValue + step;
+    function increment() {
+        let newValue = displayValue + step;
         if (maxValue === null || newValue <= maxValue) {
-            const valueInMs = newValue * TO_MS[$unit];
-            value.set(valueInMs);
+            const valueInMs = newValue * TO_MS[unit];
+            value = valueInMs;
         }
     }
 
     function decrement() {
-        let newValue = $displayValue - step;
+        let newValue = displayValue - step;
         const min = minValue !== null ? minValue : 0;
         if (newValue >= min) {
-            const valueInMs = newValue * TO_MS[$unit];
-            value.set(valueInMs);
+            const valueInMs = newValue * TO_MS[unit];
+            value = valueInMs;
         }
     }
 
-    $: inputWidth = `${Math.max(String($displayValue).length * 0.6 + 1.2, 3)}em`;
+    $: inputWidth = `${Math.max(String(displayValue).length * 0.6 + 1.2, 3)}em`;
 
     // Handle invalid input
-    let isInvalid: boolean = false;
-    $: if (maxValue !== null && $displayValue > maxValue) {
-        isInvalid = true;
-    } else {
-        isInvalid = false;
-    }
+    $: isInvalid = maxValue !== null && displayValue > maxValue;
 
     //TODO: reduce spacing at start of input field
 </script>
@@ -116,7 +110,7 @@
     <div class="flex items-center">
         <input 
             type="number"
-            value={$displayValue}
+            value={displayValue}
             on:input={handleInputChange}
             id="time-input" 
             class="h-8 px-2 bg-gray-100 text-right border-r border-gray-300
@@ -154,11 +148,11 @@
                    focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
                    {showArrows ? 'rounded-r-md' : 'rounded-r-lg'}"
         >
-            {$unit}
+            {unit}
             <div class="absolute hidden group-hover:block bg-gray-800 text-white text-xs 
                       rounded py-1 px-2 bottom-full mb-1 left-1/2 transform -translate-x-1/2 
                       whitespace-nowrap z-10">
-                Click to convert to {UNIT_DISPLAY_NAMES[$nextUnit]}
+                Click to convert to {UNIT_DISPLAY_NAMES[nextUnit]}
                 <div class="absolute top-full left-1/2 transform -translate-x-1/2 
                           border-4 border-transparent border-t-gray-800">
                 </div>
