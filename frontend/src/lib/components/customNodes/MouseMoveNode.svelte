@@ -5,7 +5,7 @@
     import type { ComponentType } from 'svelte';
 
     // UI Component imports
-    import { MousePointer2, ChevronDown } from 'lucide-svelte';
+    import { Mouse, ChevronDown } from 'lucide-svelte';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import Checkbox from "./nodeComponents/Checkbox.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
@@ -24,7 +24,7 @@
     const MAX_VARIANCE = 100;
 
     type PositionType = 'Mouse' | 'Fixed';
-    type PathType = 'Straight Line' | 'Human-like' | 'Custom Recorded';
+    type PathType = 'Straight' | 'Human-like'; //| 'Recorded Path'
     type SpeedType = 'Instant' | 'Human-like';
 
     interface Coordinates {
@@ -57,7 +57,7 @@
     // Component props
     export let id: string;
     export let title: string = 'Mouse Move';
-    export let icon: ComponentType = MousePointer2;
+    export let icon: ComponentType = Mouse;
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
     export let data: Data = {
         startPosition: {
@@ -76,7 +76,7 @@
             randomize: false,
             variance: DEFAULT_VARIANCE
         },
-        pathType: 'Straight Line',
+        pathType: 'Straight',
         customPath: [],
         isRecording: false
     };
@@ -108,7 +108,7 @@
             randomize: false,
             variance: DEFAULT_VARIANCE
         };
-        data.pathType ||= 'Straight Line';
+        data.pathType ||= 'Straight';
         data.customPath ||= [];
     }
 
@@ -120,15 +120,7 @@
         console.log("Delete action triggered");
     }
 
-    function toggleRecording() {
-        if (!data.isRecording) {
-            data.customPath = [];
-            data.pathType = 'Custom Recorded';
-        }
-        data.isRecording = !data.isRecording;
-    }
-
-    const pathTypes: PathType[] = ['Straight Line', 'Human-like', 'Custom Recorded'];
+    const pathTypes: PathType[] = ['Straight', 'Human-like'];
     const speedTypes: SpeedType[] = ['Instant', 'Human-like'];
 </script>
 
@@ -254,7 +246,7 @@
                 <div class="mt-4 grid gap-6">
                     <!-- Drag Option -->
                     <Checkbox
-                        label="Drag while moving"
+                        label="Drag"
                         bind:checked={data.dragWhileMoving}
                     />
 
@@ -321,22 +313,6 @@
                                 </button>
                             {/each}
                         </div>
-                        
-                        {#if data.pathType === 'Custom Recorded'}
-                            <button
-                                class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                                class:bg-red-500={data.isRecording}
-                                class:hover:bg-red-600={data.isRecording}
-                                on:click={toggleRecording}
-                            >
-                                {data.isRecording ? 'Stop Recording' : 'Start Recording'}
-                            </button>
-                            {#if data.customPath.length > 0}
-                                <p class="text-sm text-gray-600">
-                                    Recorded points: {data.customPath.length}
-                                </p>
-                            {/if}
-                        {/if}
                     </div>
                 </div>
             {/if}
