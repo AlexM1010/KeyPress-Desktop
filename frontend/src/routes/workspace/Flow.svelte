@@ -100,7 +100,7 @@
   // Handle drop event to add new nodes to the flow
   const onDrop = (event: DragEvent) => {
     event.preventDefault();
-    const type = event.dataTransfer?.getData("application/reactflow");
+    const type = event.dataTransfer?.getData("application/svelteflow");
     if (!type) return;
 
     // Convert screen coordinates to flow coordinates

@@ -333,15 +333,7 @@ func executeTask(task Task, app *App) {
 		}
 
 		// Map buttonType to robotgo button
-		var button string
-		switch buttonType {
-		case "Left Click":
-			button = "left"
-		case "Right Click":
-			button = "right"
-		case "Middle Click":
-			button = "middle"
-		default:
+		if buttonType != "left" && buttonType != "right" && buttonType != "middle" {
 			err := fmt.Sprintf("Unsupported buttonType: %s", buttonType)
 			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
@@ -351,10 +343,10 @@ func executeTask(task Task, app *App) {
 			return
 		}
 
-		// Get actionType
-		actionType, ok := task.Data["actionType"].(string)
+		// Get numberOfClicks
+		numberOfClicks, ok := task.Data["numberOfClicks"].(float64)
 		if !ok {
-			err := fmt.Sprintf("Invalid actionType value: %v", task.Data["actionType"])
+			err := fmt.Sprintf("Invalid numberOfClicks value: %v", task.Data["numberOfClicks"])
 			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -363,50 +355,68 @@ func executeTask(task Task, app *App) {
 			return
 		}
 
-		// Get clickDuration
-		clickDurationFloat, ok := task.Data["clickDuration"].(float64)
+		// Get clickDelay
+		clickDelay, ok := task.Data["clickDelay"].(float64)
 		if !ok {
-			err := fmt.Sprintf("Invalid clickDuration value: %v", task.Data["clickDuration"])
-			log.Printf("Click error: %s for task %s", err, task.ID)
-			app.emitEvent("task-error", map[string]interface{}{
-				"taskID": task.ID,
-				"error":  err,
-			})
-			return
+			clickDelay = 0.1 // Default delay of 100ms
 		}
-		clickDuration := time.Duration(clickDurationFloat) * time.Millisecond
+		clickDuration := time.Duration(clickDelay*1000) * time.Millisecond
 
-		// Perform the click action
-		switch actionType {
-		case "Single":
-			log.Printf("Performing single %s click with duration %v", buttonType, clickDuration)
-			robotgo.Click(button)
-			time.Sleep(clickDuration)
-		case "Double":
-			log.Printf("Performing double %s click with duration %v", buttonType, clickDuration)
-			for i := 0; i < 2; i++ {
-				robotgo.Click(button)
-				time.Sleep(clickDuration)
+		// Get pressReleaseDelay and releaseAfterPress
+		pressReleaseDelay, ok := task.Data["pressReleaseDelay"].(float64)
+		if !ok {
+			pressReleaseDelay = 0.1 // Default press duration of 100ms
+		}
+		pressDuration := time.Duration(pressReleaseDelay) * time.Millisecond
+
+		releaseAfterPress, _ := task.Data["releaseAfterPress"].(bool)
+
+		// Get scroll options
+		scrollDirections, _ := task.Data["scrollDirection"].([]interface{})
+		scrollLines, hasScrollLines := task.Data["scrollLines"].(float64)
+
+		// Handle scrolling if configured
+		if len(scrollDirections) > 0 && hasScrollLines && scrollLines > 0 {
+			for _, dir := range scrollDirections {
+				direction, ok := dir.(string)
+				if !ok {
+					continue
+				}
+
+				scrollAmount := int(scrollLines)
+				log.Printf("Scrolling %s with %v lines", direction, scrollAmount)
+
+				switch direction {
+				case "Vertical":
+					// For vertical scrolling, positive is down, negative is up
+					robotgo.ScrollDir(scrollAmount, "down")
+				case "Horizontal":
+					// For horizontal scrolling, we use the x,y coordinates method
+					// Positive scrollAmount moves right, negative moves left
+					robotgo.Scroll(scrollAmount, 0)
+				}
+				time.Sleep(100 * time.Millisecond)
 			}
-		case "Triple":
-			log.Printf("Performing triple %s click with duration %v", buttonType, clickDuration)
-			for i := 0; i < 3; i++ {
-				robotgo.Click(button)
-				time.Sleep(clickDuration)
+		}
+
+		// Perform the click actions
+		if numberOfClicks > 0 {
+			log.Printf("Performing %v clicks with %v delay and %v press duration",
+				numberOfClicks, clickDuration, pressDuration)
+
+			for i := 0; i < int(numberOfClicks); i++ {
+				if releaseAfterPress {
+					robotgo.MouseDown(buttonType)
+					time.Sleep(pressDuration)
+					robotgo.MouseUp(buttonType)
+				} else {
+					robotgo.Click(buttonType)
+				}
+
+				if i < int(numberOfClicks)-1 {
+					time.Sleep(clickDuration)
+				}
 			}
-		case "Hold":
-			log.Printf("Performing %s hold with duration %v", buttonType, clickDuration)
-			robotgo.MouseDown(button)
-			time.Sleep(clickDuration)
-			robotgo.MouseUp(button)
-		default:
-			err := fmt.Sprintf("Unsupported actionType: %s", actionType)
-			log.Printf("Click error: %s for task %s", err, task.ID)
-			app.emitEvent("task-error", map[string]interface{}{
-				"taskID": task.ID,
-				"error":  err,
-			})
-			return
 		}
 
 		app.emitEvent("task-success", map[string]interface{}{

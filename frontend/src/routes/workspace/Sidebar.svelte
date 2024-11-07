@@ -24,7 +24,7 @@
       
       // Set both the type store and the transfer data
       type.set(nodeData.type);
-      event.dataTransfer.setData('application/reactflow', nodeData.type);
+      event.dataTransfer.setData('application/svelteflow', nodeData.type);
       event.dataTransfer.setData('application/json', JSON.stringify(nodeData));
       event.dataTransfer.effectAllowed = 'move';
     };
