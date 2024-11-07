@@ -1,4 +1,4 @@
-<!-- Button.svelte -->
+<!-- ButtonGroup.svelte -->
 <script lang="ts">
     export let active: boolean = false;
     export let first: boolean = false;

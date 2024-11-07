@@ -54,29 +54,6 @@
         isRecording: boolean;
     }
 
-    // Default data structure
-    const defaultData: Data = {
-        startPosition: {
-            type: 'Current Cursor' as PositionType,
-            coordinates: { x: 0, y: 0 }
-        },
-        endPosition: {
-            type: 'Fixed Position' as PositionType,
-            coordinates: { x: 0, y: 0 }
-        },
-        showMovementSettings: false,
-        dragWhileMoving: false,
-        speed: {
-            type: 'Human-like' as SpeedType,
-            value: DEFAULT_MOVE_SPEED,
-            randomize: false,
-            variance: DEFAULT_VARIANCE
-        },
-        pathType: 'Straight Line' as PathType,
-        customPath: [],
-        isRecording: false
-    };
-
     // Component props
     export let id: string;
     export let title: string = 'Mouse Move';
@@ -110,6 +87,31 @@
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
 
+    // Initialize default values
+    onMount(() => {
+        initializeDefaultValues();
+    });
+
+    function initializeDefaultValues() {
+        // Set any missing values to defaults
+        data.startPosition ||= {
+            type: 'Current Cursor',
+            coordinates: { x: 0, y: 0 }
+        };
+        data.endPosition ||= {
+            type: 'Fixed Position',
+            coordinates: { x: 0, y: 0 }
+        };
+        data.speed ||= {
+            type: 'Human-like',
+            value: DEFAULT_MOVE_SPEED,
+            randomize: false,
+            variance: DEFAULT_VARIANCE
+        };
+        data.pathType ||= 'Straight Line';
+        data.customPath ||= [];
+    }
+
     function handleDuplicate() {
         console.log("Duplicate action triggered");
     }
@@ -119,11 +121,11 @@
     }
 
     function toggleRecording() {
-        if (!data?.isRecording) {
+        if (!data.isRecording) {
             data.customPath = [];
             data.pathType = 'Custom Recorded';
         }
-        data.isRecording = !data?.isRecording;
+        data.isRecording = !data.isRecording;
     }
 
     const pathTypes: PathType[] = ['Straight Line', 'Human-like', 'Custom Recorded'];
@@ -131,7 +133,7 @@
 </script>
 
 <NodeWrapper
-    id={id}
+    {id}
     {icon}
     {title}
     {color}
@@ -235,17 +237,17 @@
         <div class="border-t pt-4">
             <button
                 class="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                on:click={() => data.showMovementSettings = !data?.showMovementSettings}
-                aria-expanded={data?.showMovementSettings}
+                on:click={() => data.showMovementSettings = !data.showMovementSettings}
+                aria-expanded={data.showMovementSettings}
             >
                 <span>Movement Settings</span>
                 <ChevronDown
                     class="w-4 h-4 transition-transform duration-200"
-                    style={data?.showMovementSettings ? "transform: rotate(180deg)" : ""}
+                    style={data.showMovementSettings ? "transform: rotate(180deg)" : ""}
                 />
             </button>
 
-            {#if data?.showMovementSettings}
+            {#if data.showMovementSettings}
                 <div class="mt-4 grid gap-6">
                     <!-- Drag Option -->
                     <Checkbox
@@ -260,7 +262,7 @@
                             {#each speedTypes as type}
                                 <button
                                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                                        {data?.speed?.type === type 
+                                        {data.speed.type === type 
                                             ? 'bg-blue-500 text-white' 
                                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                                         {type !== speedTypes[0] ? 'border-l' : ''}
@@ -272,7 +274,7 @@
                             {/each}
                         </div>
 
-                        {#if data?.speed?.type === 'Human-like'}
+                        {#if data.speed.type === 'Human-like'}
                             <NumberInput
                                 label="Speed (ms)"
                                 bind:value={data.speed.value}
@@ -284,7 +286,7 @@
                                     label="Randomize Speed"
                                     bind:checked={data.speed.randomize}
                                 />
-                                {#if data?.speed.randomize}
+                                {#if data.speed.randomize}
                                     <div class="pl-6">
                                         <NumberInput
                                             label="Variance %"
@@ -305,7 +307,7 @@
                             {#each pathTypes as type}
                                 <button
                                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                                        {data?.pathType === type 
+                                        {data.pathType === type 
                                             ? 'bg-blue-500 text-white' 
                                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                                         {type !== pathTypes[0] ? 'border-l' : ''}
@@ -317,18 +319,18 @@
                             {/each}
                         </div>
                         
-                        {#if data?.pathType === 'Custom Recorded'}
+                        {#if data.pathType === 'Custom Recorded'}
                             <button
                                 class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
-                                class:bg-red-500={data?.isRecording}
-                                class:hover:bg-red-600={data?.isRecording}
+                                class:bg-red-500={data.isRecording}
+                                class:hover:bg-red-600={data.isRecording}
                                 on:click={toggleRecording}
                             >
-                                {data?.isRecording ? 'Stop Recording' : 'Start Recording'}
+                                {data.isRecording ? 'Stop Recording' : 'Start Recording'}
                             </button>
-                            {#if data?.customPath.length > 0}
+                            {#if data.customPath.length > 0}
                                 <p class="text-sm text-gray-600">
-                                    Recorded points: {data?.customPath.length}
+                                    Recorded points: {data.customPath.length}
                                 </p>
                             {/if}
                         {/if}
