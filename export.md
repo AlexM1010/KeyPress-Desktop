@@ -1,3 +1,318 @@
+# Project Structure
+
+```
+backend/
+  tagui_scripts/
+    sample.tag
+frontend/
+  .svelte-kit/
+    generated/
+      client/
+        nodes/
+          0.js
+          1.js
+          2.js
+          3.js
+          4.js
+          5.js
+          6.js
+          7.js
+          8.js
+          9.js
+        app.js
+        matchers.js
+      client-optimized/
+        nodes/
+          0.js
+          1.js
+          2.js
+          3.js
+          4.js
+          5.js
+        app.js
+        matchers.js
+      server/
+        internal.js
+      root.js
+      root.svelte
+    output/
+      client/
+        _app/
+          immutable/
+            assets/
+              _layout.BV1eDtrG.css
+              _page.BJBHtx96.css
+              _page.DaQuEYxn.css
+              0.BV1eDtrG.css
+              3.BJBHtx96.css
+              5.Cs6M6ujV.css
+              app.BTluaUof.css
+            chunks/
+              app.Q1xerR2v.js
+              authStore.DTqfI7D6.js
+              entry.6jmqBCzA.js
+              index.C79tyDXt.js
+              index.CgJ4Vtcs.js
+              index.fj6TnTDp.js
+              scheduler.DWEMLbLY.js
+              spread.CgU5AtxT.js
+              themeStore.CaMUHd6Z.js
+            entry/
+              app.DxIk16P2.js
+              start.DBJXlKPd.js
+            nodes/
+              0.4fMiI712.js
+              1.Cf7hLTaq.js
+              2.BFDTnsxr.js
+              3.BP9jKv59.js
+              4.CYfhxk-s.js
+              5.Vj3NDM0P.js
+          version.json
+        .vite/
+          manifest.json
+        favicon.png
+      prerendered/
+        dependencies/
+          _app/
+            env.js
+        pages/
+          index.html
+          login.html
+          profile.html
+          workspace.html
+      server/
+        _app/
+          immutable/
+            assets/
+              _layout.BV1eDtrG.css
+              _page.BJBHtx96.css
+              _page.DaQuEYxn.css
+              app.BTluaUof.css
+        .vite/
+          manifest.json
+        chunks/
+          authStore.js
+          client.js
+          exports.js
+          index.js
+          index2.js
+          internal.js
+          names.js
+          ssr.js
+          themeStore.js
+        entries/
+          fallbacks/
+            error.svelte.js
+          pages/
+            login/
+              _page.svelte.js
+            profile/
+              _page.svelte.js
+            workspace/
+              _page.svelte.js
+            _layout.svelte.js
+            _layout.ts.js
+            _page.svelte.js
+        nodes/
+          0.js
+          1.js
+          2.js
+          3.js
+          4.js
+          5.js
+        stylesheets/
+        index.js
+        internal.js
+        manifest-full.js
+        manifest.js
+    types/
+      src/
+        routes/
+          (workspace)/
+            [userId]/
+          [email]/
+          [userId]/
+          auth/
+            confirm/
+            error/
+          design/
+          login/
+            $types.d.ts
+          private/
+            [userId]/
+          profile/
+            $types.d.ts
+          register/
+          workspace/
+            [userId]/
+            $types.d.ts
+          $types.d.ts
+      route_meta_data.json
+    ambient.d.ts
+    non-ambient.d.ts
+    tsconfig.json
+  src/
+    Data/
+    lib/
+      assets/
+        logo-no-background.png
+      components/
+        customNodes/
+          nodeComponents/
+            Button.svelte
+            ButtonGroup.svelte
+            Checkbox.svelte
+            ContextMenu.svelte
+            Input.svelte
+            NodeWrapper.svelte
+            NumberInput.svelte
+            Select.svelte
+            Slider.svelte
+            TimeInput.svelte
+          ColorPickerNode.svelte
+          DelayNode.svelte
+          KeyPressNode.svelte
+          MouseClickNode.svelte
+          MouseMoveNode.svelte
+          nodes-and-edges.ts
+          NodeSVGStore.ts
+          nodeTypes.ts
+          StartNode.svelte
+          SVGNode.svelte
+          types.ts
+        ui/
+          button/
+            button.svelte
+            index.ts
+          checkbox/
+            checkbox.svelte
+            index.ts
+          form/
+            form-button.svelte
+            form-description.svelte
+            form-element-field.svelte
+            form-field-errors.svelte
+            form-field.svelte
+            form-fieldset.svelte
+            form-label.svelte
+            form-legend.svelte
+            index.ts
+          input/
+            index.ts
+            input.svelte
+          label/
+            index.ts
+            label.svelte
+          slider/
+            index.ts
+            slider.svelte
+      stores/
+        authStore.ts
+        nodesStore.ts
+        themeStore.ts
+      theme/
+      types/
+        block.ts
+        edge.ts
+        manifest.ts
+        nodeProps.ts
+        tailwind.ts
+      utils/
+        tailwind.ts
+        textWrap.ts
+        util.ts
+      wailsjs/
+        go/
+          main/
+            App.d.ts
+            App.js
+          models.ts
+        runtime/
+          package.json
+          runtime.d.ts
+          runtime.js
+      index.ts
+      utils.ts
+    routes/
+      login/
+        +page.svelte
+        login.scss
+        Login.svelte
+        schema.ts
+      profile/
+        +page.svelte
+      workspace/
+        +page.svelte
+        ConnectionLine.svelte
+        CustomEdge.svelte
+        DnDProvider.svelte
+        Flow.svelte
+        Sidebar.svelte
+        utils.ts
+      +layout.svelte
+      +layout.ts
+      +page.svelte
+      ThemeToggle.svelte
+    app.css
+    app.html
+    global.d.ts
+    hooks.client.ts
+    routes.ts
+    wails.d.ts
+  static/
+    favicon.png
+  supabase/
+    .branches/
+      _current_branch
+    .temp/
+      cli-latest
+    migrations/
+      init.sql
+    .gitignore
+    config.toml
+  wailsjs/
+    go/
+      main/
+        App.d.ts
+        App.js
+    runtime/
+      package.json
+      runtime.d.ts
+      runtime.js
+  .env
+  .env.local
+  .gitignore
+  .npmrc
+  components.json
+  package-lock.json
+  package.json
+  package.json.md5
+  postcss.config.cjs
+  postcss.config.js
+  README.md
+  svelte.config.js
+  tailwind.config.js
+  tsconfig.json
+  vite.config.ts
+  vite.config.ts.timestamp-1730831269469-9ff243167fcad.mjs
+.gitignore
+app.go
+go.mod
+go.sum
+main.go
+package-lock.json
+package.json
+README.md
+wails.json
+```
+
+
+# Active Tabs Content
+
+
+## frontend\src\lib\components\customNodes\MouseMoveNode.svelte
+
+```svelte
 <!-- MouseMoveNode.svelte -->
 <script lang="ts">
     import { onMount } from 'svelte';
@@ -338,3 +653,95 @@
         </div>
     </div>
 </NodeWrapper>
+```
+
+
+## frontend\src\lib\components\customNodes\nodeComponents\ButtonGroup.svelte
+
+```svelte
+<!-- Button.svelte -->
+<script lang="ts">
+    export let active: boolean = false;
+    export let first: boolean = false;
+    export let last: boolean = false;
+    export let borderLeft: boolean = false;
+    export let disabled: boolean = false;
+    export let fullWidth: boolean = true;
+    export let variant: 'default' | 'danger' = 'default';
+    
+    $: buttonClass = [
+        'py-2 px-4 transition-colors duration-200 text-sm',
+        fullWidth ? 'flex-1' : '',
+        active ? getActiveClass() : getInactiveClass(),
+        borderLeft ? 'border-l' : '',
+        first ? 'rounded-l-lg' : '',
+        last ? 'rounded-r-lg' : '',
+        disabled ? 'opacity-50 cursor-not-allowed' : '',
+    ].filter(Boolean).join(' ');
+
+    function getActiveClass(): string {
+        if (variant === 'danger') {
+            return 'bg-red-500 text-white hover:bg-red-600';
+        }
+        return 'bg-blue-500 text-white';
+    }
+
+    function getInactiveClass(): string {
+        return 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+    }
+</script>
+
+<button
+    class={buttonClass}
+    on:click
+    {disabled}
+>
+    <slot />
+</button>
+```
+
+
+## frontend\src\lib\components\customNodes\nodeComponents\Button.svelte
+
+```svelte
+<!-- Button.svelte -->
+<script lang="ts">
+    export let active: boolean = false;
+    export let first: boolean = false;
+    export let last: boolean = false;
+    export let borderLeft: boolean = false;
+    export let disabled: boolean = false;
+    export let fullWidth: boolean = true;
+    export let variant: 'default' | 'danger' = 'default';
+    
+    $: buttonClass = [
+        'py-2 px-4 transition-colors duration-200 text-sm',
+        fullWidth ? 'flex-1' : '',
+        active ? getActiveClass() : getInactiveClass(),
+        borderLeft ? 'border-l' : '',
+        first ? 'rounded-l-lg' : '',
+        last ? 'rounded-r-lg' : '',
+        disabled ? 'opacity-50 cursor-not-allowed' : '',
+    ].filter(Boolean).join(' ');
+
+    function getActiveClass(): string {
+        if (variant === 'danger') {
+            return 'bg-red-500 text-white hover:bg-red-600';
+        }
+        return 'bg-blue-500 text-white';
+    }
+
+    function getInactiveClass(): string {
+        return 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+    }
+</script>
+
+<button
+    class={buttonClass}
+    on:click
+    {disabled}
+>
+    <slot />
+</button>
+```
+

@@ -14,15 +14,13 @@
     import { onMount } from 'svelte';
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
-
+    
     // UI Component imports
     import { MousePointer, ChevronDown } from 'lucide-svelte';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import Checkbox from "./nodeComponents/Checkbox.svelte";
     import TimeInput from "./nodeComponents/TimeInput.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
-
-    // Type imports
     import type { HandleConfig } from './types';
 
     // Default configuration constants
