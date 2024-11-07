@@ -11,7 +11,6 @@
 <script lang="ts">
     //TODO: implement in app.go
     // Core Svelte imports
-    import { onMount } from 'svelte';
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
     
@@ -66,6 +65,18 @@
         scrollLines: MIN_SCROLL_LINES
     };
 
+    // Add reactive declaration to handle undefined values
+    $: data = {
+        buttonType: data?.buttonType || 'Left',
+        numberOfClicks: data?.numberOfClicks ?? DEFAULT_CLICKS,
+        clickDelay: data?.clickDelay ?? DEFAULT_CLICK_DELAY,
+        pressReleaseDelay: data?.pressReleaseDelay ?? DEFAULT_PRESS_DURATION,
+        releaseAfterPress: data?.releaseAfterPress ?? true,
+        showAdvanced: data?.showAdvanced ?? false,
+        scrollDirection: data?.scrollDirection || ['Vertical'],
+        scrollLines: data?.scrollLines ?? MIN_SCROLL_LINES
+    };
+
     // Configuration arrays for scroll directions
     const scrollDirections: ScrollDirection[] = ['Vertical', 'Horizontal'];
 
@@ -74,23 +85,6 @@
         { id: "right", type: "source", position: Position.Right, offsetY: 50 },
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
-
-        
-    // Lifecycle hook to initialize default values
-    onMount(() => {
-        initializeDefaultValues();
-    });
-
-    // Initialize default data values if not provided
-    function initializeDefaultValues() {
-        data.buttonType ||= 'Left';
-        data.numberOfClicks ||= DEFAULT_CLICKS;
-        data.clickDelay ??= DEFAULT_CLICK_DELAY;
-        data.pressReleaseDelay ??= DEFAULT_PRESS_DURATION;
-        data.releaseAfterPress ??= true;
-        data.scrollDirection ||= ['Vertical'];
-        data.scrollLines ||= MIN_SCROLL_LINES;
-    }
 
     // Event handler for duplicating the node
     function handleDuplicate() {

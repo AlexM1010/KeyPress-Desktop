@@ -1,6 +1,5 @@
 <!-- MouseMoveNode.svelte -->
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
 
@@ -55,6 +54,7 @@
         customPath: Coordinates[];
         isRecording: boolean;
     }
+    
 
     // Component props
     export let id: string;
@@ -83,36 +83,40 @@
         isRecording: false
     };
 
+    // Add reactive declaration
+    $: data = {
+        startPosition: {
+            type: data?.startPosition?.type || 'Mouse',
+            coordinates: {
+                x: data?.startPosition?.coordinates?.x ?? 0,
+                y: data?.startPosition?.coordinates?.y ?? 0
+            }
+        },
+        endPosition: {
+            type: data?.endPosition?.type || 'Fixed',
+            coordinates: {
+                x: data?.endPosition?.coordinates?.x ?? 0,
+                y: data?.endPosition?.coordinates?.y ?? 0
+            }
+        },
+        showMovementSettings: data?.showMovementSettings ?? false,
+        dragWhileMoving: data?.dragWhileMoving ?? false,
+        speed: {
+            type: data?.speed?.type || 'Instant',
+            value: data?.speed?.value ?? DEFAULT_MOVE_SPEED,
+            randomize: data?.speed?.randomize ?? false,
+            variance: data?.speed?.variance ?? DEFAULT_VARIANCE
+        },
+        pathType: data?.pathType || 'Straight',
+        customPath: data?.customPath || [],
+        isRecording: data?.isRecording ?? false
+    };
+
     // Handle configurations
     const handles: HandleConfig[] = [
         { id: "right", type: "source", position: Position.Right, offsetY: 50 },
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
-
-    // Initialize default values
-    onMount(() => {
-        initializeDefaultValues();
-    });
-
-    function initializeDefaultValues() {
-        // Set any missing values to defaults
-        data.startPosition ||= {
-            type: 'Mouse',
-            coordinates: { x: 0, y: 0 }
-        };
-        data.endPosition ||= {
-            type: 'Fixed',
-            coordinates: { x: 0, y: 0 }
-        };
-        data.speed ||= {
-            type: 'Instant',
-            value: DEFAULT_MOVE_SPEED,
-            randomize: false,
-            variance: DEFAULT_VARIANCE
-        };
-        data.pathType ||= 'Straight';
-        data.customPath ||= [];
-    }
 
     function handleDuplicate() {
         console.log("Duplicate action triggered");
