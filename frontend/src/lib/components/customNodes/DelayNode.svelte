@@ -1,6 +1,7 @@
 <!-- DelayNode.svelte -->
 <script lang="ts">
     import { Clock } from 'lucide-svelte';
+    import { onMount } from 'svelte';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import { Handle, Position } from "@xyflow/svelte";
@@ -12,9 +13,9 @@
     export let color: string = 'bg-gradient-to-r from-yellow-500 to-yellow-600';
 
     export let data = {
-        delayType: 'Fixed', // 'Fixed' or 'Random'
-        time: 1000,         // For Fixed delay in milliseconds
-        minTime: 500,       // For Random delay
+        delayType: 'Fixed',
+        time: 1000,
+        minTime: 500,
         maxTime: 1500
     };
 
@@ -22,6 +23,17 @@
         { id: "right", type: "source", position: Position.Right, offsetY: 50 },
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
+
+    // Add a reactive statement to ensure data consistency
+    $: {
+        if (data.delayType === 'Fixed' && !data.time) {
+            data.time = 1000;
+        }
+        if (data.delayType === 'Random') {
+            data.minTime = data.minTime || 500;
+            data.maxTime = data.maxTime || 1500;
+        }
+    }
 </script>
 
 <NodeWrapper
