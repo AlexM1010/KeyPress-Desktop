@@ -26,7 +26,7 @@
         }
     }
 
-    $: inputWidth = `${Math.max(String(value).length * 0.6 + 1, 1)}em`;
+    $: inputWidth = `${Math.max(String(value).length * 0.6 + 1, 1)}em`; //TODO: max value not working? 
     $: if (maxValue !== null && value > maxValue) {
         value = maxValue;
         isInvalid = true;

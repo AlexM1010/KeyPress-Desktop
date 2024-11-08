@@ -3,23 +3,6 @@ MouseClickNode.svelte
 A configurable node component for the XYFlow graph editor that handles mouse click operations.
 -->
 
-<script context="module" lang="ts">
-    // UI-specific types
-    export type ButtonType = 'left' | 'middle' | 'right';
-    export type ScrollDirection = 'Vertical' | 'Horizontal';
-
-    // Task data interface (this is what gets sent to the backend)
-    export interface MouseClickTaskData {
-        buttonType: ButtonType;           // Changed to ButtonType for type safety
-        numberOfClicks: number;
-        clickDelay: number;
-        pressReleaseDelay: number;
-        releaseAfterPress: boolean;
-        scrollDirection: ScrollDirection[];    // Changed to ScrollDirection[] for type safety
-        scrollLines: number;
-    }
-</script>
-
 <script lang="ts">
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
@@ -30,25 +13,49 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
     import NumberInput from './nodeComponents/NumberInput.svelte';
     import type { HandleConfig } from './types';
 
-    // region Props
+    // Move types inside main script
+    type ButtonType = 'left' | 'middle' | 'right';
+    type ScrollDirection = 'Vertical' | 'Horizontal';
+
+    interface MouseClickTaskData {
+        buttonType: ButtonType;
+        numberOfClicks: number;
+        clickDelay: number;
+        pressReleaseDelay: number;
+        releaseAfterPress: boolean;
+        scrollDirection: ScrollDirection[];
+        scrollLines: number;
+    }
+
     export let id: string;
     export let title: string = 'Mouse Click';
     export let icon: ComponentType = MousePointer;
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
-    
+
     const BUTTON_TYPES: ButtonType[] = ['left', 'middle', 'right'];
     const SCROLL_DIRECTIONS: ScrollDirection[] = ['Vertical', 'Horizontal'];
-    
-    // Initialize data with required values
+
+    // Simplified data initialization
     export let data: MouseClickTaskData = {
         buttonType: 'left',
         numberOfClicks: 1,
         clickDelay: 0.1,
-        pressReleaseDelay: 0.1,
+        pressReleaseDelay: 100,
         releaseAfterPress: true,
         scrollDirection: ['Vertical'],
         scrollLines: 0
     };
+
+    // Add reactive statement for data consistency
+    $: {
+        if (!data?.buttonType) data.buttonType = 'left';
+        if (!data?.numberOfClicks) data.numberOfClicks = 1;
+        if (!data?.clickDelay) data.clickDelay = 0.1;
+        if (!data?.pressReleaseDelay) data.pressReleaseDelay = 100;
+        if (!data?.releaseAfterPress) data.releaseAfterPress = true;
+        if (!data?.scrollDirection) {data.scrollDirection = ['Vertical'];}
+        if (!data?.scrollLines) data.scrollLines = 0;
+    }
 
     // Local UI state
     let showAdvanced = false;
@@ -75,9 +82,9 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
      * @param direction - The scroll direction to toggle
      */
     function toggleDirection(direction: ScrollDirection): void {
-        data.scrollDirection = data.scrollDirection.includes(direction)
-            ? data.scrollDirection.filter(d => d !== direction) as ScrollDirection[]
-            : [...data.scrollDirection, direction];
+        data.scrollDirection = data?.scrollDirection.includes(direction)
+            ? data?.scrollDirection.filter(d => d !== direction) as ScrollDirection[]
+            : [...data?.scrollDirection, direction];
     }
 
     /**
@@ -113,7 +120,7 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
             {#each BUTTON_TYPES as buttonType}
                 <button
                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                        {data.buttonType === buttonType 
+                        {data?.buttonType === buttonType 
                             ? 'bg-blue-500 text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                         {buttonType !== 'left' ? 'border-l' : ''}
@@ -128,15 +135,15 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
 
         <!-- Click Configuration -->
         <div class="grid gap-6 auto-rows-min">
-            <!-- Click Count and Delay Configuration -->
+            <!-- Click Count and Delay Configuration TODO: Minvalue is 1 in numberinput? why won't it go below 1? -->
             <div class="flex justify-between items-center gap-2">
                 <NumberInput
                     label="Clicks"
                     bind:value={data.numberOfClicks}
-                    minValue={0}
+                    minValue={-1} 
                     maxValue={1000}
                 />
-                {#if data.numberOfClicks > 1}
+                {#if data?.numberOfClicks > 1}
                     <TimeInput 
                         label="delay" 
                         bind:value={data.clickDelay}
@@ -150,7 +157,7 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
                     label="Release"
                     bind:checked={data.releaseAfterPress}
                 />
-                {#if data.releaseAfterPress}
+                {#if data?.releaseAfterPress}
                     <TimeInput 
                         label="after" 
                         bind:value={data.pressReleaseDelay}
@@ -181,7 +188,7 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
                         {#each SCROLL_DIRECTIONS as direction, index}
                             <button
                                 class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
-                                    {data.scrollDirection.includes(direction)
+                                    {data?.scrollDirection.includes(direction)
                                         ? 'bg-blue-500 text-white'
                                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
                                     {index > 0 ? 'border-l' : ''}
@@ -195,10 +202,10 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
 
                     <!-- Scroll Lines Input -->
                     <NumberInput
-                        label="Number of Lines"
+                        label="Lines"
                         bind:value={data.scrollLines}
-                        minValue={0}
-                        maxValue={1000}
+                        minValue={-100000}
+                        maxValue={100000}
                     />
                 </div>
             {/if}

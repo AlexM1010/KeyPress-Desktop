@@ -66,15 +66,9 @@ export const initialNodes: Node[] = [
     id: 'MoveMouse-node',
     type: 'MoveMouse',
     position: { x: baseX + xSpacing * 4, y: baseY + xSpacing }, // Adjust position as needed
-    data: {
-      x: 300.0,
-      y: 400.0
-    },
-    targetPosition: 'right' as Position,
-    sourcePosition: 'left' as Position,
-    measured: { width: 100, height: 50 }
+    data: {}
   },
-  {
+  /*{
     id: 'MoveMouse-node1',
     type: 'MoveMouse',
     position: { x: baseX + xSpacing * 4, y: baseY + xSpacing }, // Adjust position as needed
@@ -85,7 +79,7 @@ export const initialNodes: Node[] = [
     targetPosition: 'right' as Position,
     sourcePosition: 'left' as Position,
     measured: { width: 100, height: 50 }
-  },
+  },*/
 ];
 
 export const initialEdges: Edge[] = [

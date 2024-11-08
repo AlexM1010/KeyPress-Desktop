@@ -360,7 +360,7 @@ func executeTask(task Task, app *App) {
 		if !ok {
 			clickDelay = 0.1 // Default delay of 100ms
 		}
-		clickDuration := time.Duration(clickDelay*1000) * time.Millisecond
+		clickDuration := time.Duration(clickDelay) * time.Millisecond
 
 		// Get pressReleaseDelay and releaseAfterPress
 		pressReleaseDelay, ok := task.Data["pressReleaseDelay"].(float64)
@@ -370,6 +370,27 @@ func executeTask(task Task, app *App) {
 		pressDuration := time.Duration(pressReleaseDelay) * time.Millisecond
 
 		releaseAfterPress, _ := task.Data["releaseAfterPress"].(bool)
+
+		//TODO: standardise execution in order for all blcoks by how the block is displayed e.g clicks first then scroll
+		// Perform the click actions
+		if numberOfClicks > 0 {
+			log.Printf("Performing %v clicks with %v delay and %v press duration", //TODO: use this kind of scentence to summarise blocks on mininmise and log to console
+				numberOfClicks, clickDuration, pressDuration)
+
+			for i := 0; i < int(numberOfClicks); i++ {
+				if releaseAfterPress {
+					robotgo.MouseDown(buttonType)
+					time.Sleep(pressDuration)
+					robotgo.MouseUp(buttonType)
+				} else {
+					robotgo.Click(buttonType)
+				}
+
+				if i < int(numberOfClicks)-1 {
+					time.Sleep(clickDuration)
+				}
+			}
+		}
 
 		// Get scroll options
 		scrollDirections, _ := task.Data["scrollDirection"].([]interface{})
@@ -396,26 +417,6 @@ func executeTask(task Task, app *App) {
 					robotgo.Scroll(scrollAmount, 0)
 				}
 				time.Sleep(100 * time.Millisecond)
-			}
-		}
-
-		// Perform the click actions
-		if numberOfClicks > 0 {
-			log.Printf("Performing %v clicks with %v delay and %v press duration",
-				numberOfClicks, clickDuration, pressDuration)
-
-			for i := 0; i < int(numberOfClicks); i++ {
-				if releaseAfterPress {
-					robotgo.MouseDown(buttonType)
-					time.Sleep(pressDuration)
-					robotgo.MouseUp(buttonType)
-				} else {
-					robotgo.Click(buttonType)
-				}
-
-				if i < int(numberOfClicks)-1 {
-					time.Sleep(clickDuration)
-				}
 			}
 		}
 
