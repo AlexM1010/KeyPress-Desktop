@@ -130,7 +130,6 @@
 
       // Get the current flow data as an object
       const currentFlowData = toObject();
-      console.log(JSON.stringify(currentFlowData));
 
       // Check if the flow contains a Start node
       const hasStartNode = currentFlowData.nodes.some(

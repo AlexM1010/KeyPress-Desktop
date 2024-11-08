@@ -28,10 +28,102 @@ Features:
     import NumberInput from './nodeComponents/NumberInput.svelte';
     import Slider from './nodeComponents/Slider.svelte';
     import TimeInput from './nodeComponents/TimeInput.svelte';
+    import type { HandleConfig } from './types';
+
+    // Type definitions
+    type PositionType = 'Mouse' | 'Fixed';
+    type PathType = 'Straight' | 'Human';
+    type SpeedType = 'Instant' | 'Human';
+
+    interface Coordinates {
+        x: number;
+        y: number;
+    }
+
+    interface MouseMoveTaskData {
+        startPosition: {
+            type: PositionType;
+            coordinates: Coordinates;
+        };
+        endPosition: {
+            type: PositionType;
+            coordinates: Coordinates;
+        };
+        dragWhileMoving: boolean;
+        speed: {
+            type: SpeedType;
+            value: number;
+            randomize: boolean;
+            variance: number;
+        };
+        pathType: PathType;
+        customPath: Coordinates[];
+    }
+
+    // Props
+    export let id: string;
+    export let title: string = 'Mouse Move';
+    export let icon: ComponentType = Mouse;
+    export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
+    
+    // Data initialization with default values
+    export let data: MouseMoveTaskData = {
+        startPosition: {
+            type: 'Mouse',
+            coordinates: { x: 0, y: 0 }
+        },
+        endPosition: {
+            type: 'Fixed',
+            coordinates: { x: 0, y: 0 }
+        },
+        dragWhileMoving: false,
+        speed: {
+            type: 'Instant',
+            value: 500,
+            randomize: false,
+            variance: 20
+        },
+        pathType: 'Straight',
+        customPath: []
+    };
+
+    // Reactive statement for data consistency
+    $: {
+        if (data?.startPosition == null) data.startPosition = { type: 'Mouse', coordinates: { x: 0, y: 0 } };
+        if (data?.endPosition == null) data.endPosition = { type: 'Fixed', coordinates: { x: 0, y: 0 } };
+        if (data?.dragWhileMoving == null) data.dragWhileMoving = false;
+        if (data?.speed == null) {
+            data.speed = {
+                type: 'Instant',
+                value: 500,
+                randomize: false,
+                variance: 20
+            };
+        }
+        if (data?.pathType == null) data.pathType = 'Straight';
+        if (data?.customPath == null) data.customPath = [];
+    }
+
+    // Local UI state
+    let showMovementSettings = false;
+
+    // Debug logging
+    $: console.log('MouseMoveNode data:', JSON.stringify(data));
 
     /**
-     * Constants for configuration boundaries and defaults
+     * Node connection handle configuration
      */
+    const handles: HandleConfig[] = [
+        { id: "right", type: "source", position: Position.Right, offsetY: 50 },
+        { id: "left", type: "target", position: Position.Left, offsetY: 50 },
+    ];
+
+    // Available options
+    const PATH_TYPES: PathType[] = ['Straight', 'Human'];
+    const SPEED_TYPES: SpeedType[] = ['Instant', 'Human'];
+    const POSITION_TYPES: PositionType[] = ['Fixed', 'Mouse'];
+
+    // Constants
     const CONFIG = {
         POSITION: {
             MIN: -10000,
@@ -49,136 +141,13 @@ Features:
         }
     } as const;
 
-    /**
-     * Type definitions for component configuration
-     */
-    type PositionType = 'Mouse' | 'Fixed';
-    type PathType = 'Straight' | 'Human';
-    type SpeedType = 'Instant' | 'Human';
-
-    interface Coordinates {
-        x: number;
-        y: number;
-    }
-
-    interface PositionConfig {
-        type: PositionType;
-        coordinates: Coordinates;
-    }
-
-    interface SpeedConfig {
-        type: SpeedType;
-        value: number;
-        randomize: boolean;
-        variance: number;
-    }
-
-    interface NodeData {
-        startPosition: PositionConfig;
-        endPosition: PositionConfig;
-        showMovementSettings: boolean;
-        dragWhileMoving: boolean;
-        speed: SpeedConfig;
-        pathType: PathType;
-        customPath: Coordinates[];
-        isRecording: boolean;
-    }
-
-    interface HandleConfig {
-        id: string;
-        type: "source" | "target";
-        position: Position;
-        offsetY: number;
-    }
-
-    /**
-     * Component Props
-     */
-    export let id: string;
-    export let title: string = 'Mouse Move';
-    export let icon: ComponentType = Mouse;
-    export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
-    export let data: NodeData;
-
-    /**
-     * Initialize default data configuration
-     */
-    const DEFAULT_DATA: NodeData = {
-        startPosition: {
-            type: 'Mouse',
-            coordinates: { x: 0, y: 0 }
-        },
-        endPosition: {
-            type: 'Fixed',
-            coordinates: { x: 0, y: 0 }
-        },
-        showMovementSettings: false,
-        dragWhileMoving: false,
-        speed: {
-            type: 'Instant',
-            value: CONFIG.SPEED.DEFAULT,
-            randomize: false,
-            variance: CONFIG.VARIANCE.DEFAULT
-        },
-        pathType: 'Straight',
-        customPath: [],
-        isRecording: false
-    };
-
-    /**
-     * Reactive data initialization with fallback to defaults
-     */
-    $: data = {
-        startPosition: {
-            type: data?.startPosition?.type || DEFAULT_DATA.startPosition.type,
-            coordinates: {
-                x: data?.startPosition?.coordinates?.x ?? DEFAULT_DATA.startPosition.coordinates.x,
-                y: data?.startPosition?.coordinates?.y ?? DEFAULT_DATA.startPosition.coordinates.y
-            }
-        },
-        endPosition: {
-            type: data?.endPosition?.type || DEFAULT_DATA.endPosition.type,
-            coordinates: {
-                x: data?.endPosition?.coordinates?.x ?? DEFAULT_DATA.endPosition.coordinates.x,
-                y: data?.endPosition?.coordinates?.y ?? DEFAULT_DATA.endPosition.coordinates.y
-            }
-        },
-        showMovementSettings: data?.showMovementSettings ?? DEFAULT_DATA.showMovementSettings,
-        dragWhileMoving: data?.dragWhileMoving ?? DEFAULT_DATA.dragWhileMoving,
-        speed: {
-            type: data?.speed?.type || DEFAULT_DATA.speed.type,
-            value: data?.speed?.value ?? DEFAULT_DATA.speed.value,
-            randomize: data?.speed?.randomize ?? DEFAULT_DATA.speed.randomize,
-            variance: data?.speed?.variance ?? DEFAULT_DATA.speed.variance
-        },
-        pathType: data?.pathType || DEFAULT_DATA.pathType,
-        customPath: data?.customPath || DEFAULT_DATA.customPath,
-        isRecording: data?.isRecording ?? DEFAULT_DATA.isRecording
-    };
-
-    /**
-     * Node connection handle configuration
-     */
-    const handles: HandleConfig[] = [
-        { id: "right", type: "source", position: Position.Right, offsetY: 50 },
-        { id: "left", type: "target", position: Position.Left, offsetY: 50 },
-    ];
-
-    /**
-     * Available configuration options
-     */
-    const pathTypes: PathType[] = ['Straight', 'Human'];
-    const speedTypes: SpeedType[] = ['Instant', 'Human'];
-
-    /**
-     * Event Handlers
-     */
+    // Event handlers
     function handleDuplicate(): void {
-        console.log("Duplicate action triggered");
+        console.log("Duplicate action triggered", JSON.stringify(data));
     }
 
     function handleDelete(): void {
-        console.log("Delete action triggered");
+        console.log("Delete action triggered", JSON.stringify(data));
     }
 
     /**
@@ -286,17 +255,17 @@ Features:
         <div class="border-t pt-4">
             <button
                 class="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                on:click={() => data.showMovementSettings = !data.showMovementSettings}
-                aria-expanded={data.showMovementSettings}
+                on:click={() => showMovementSettings = !showMovementSettings}
+                aria-expanded={showMovementSettings}
             >
                 <span>Movement Settings</span>
                 <ChevronDown
                     class="w-4 h-4 transition-transform duration-200"
-                    style={data.showMovementSettings ? "transform: rotate(180deg)" : ""}
+                    style={showMovementSettings ? "transform: rotate(180deg)" : ""}
                 />
             </button>
 
-            {#if data.showMovementSettings}
+            {#if showMovementSettings}
                 <div class="mt-4 grid gap-6">
                     <!-- Drag Option -->
                     <Checkbox
@@ -308,12 +277,12 @@ Features:
                     <div class="grid gap-4">
                         <h4 class="text-sm font-medium text-gray-700">Move Speed</h4>
                         <div class="flex border rounded-lg overflow-hidden">
-                            {#each speedTypes as type, index}
+                            {#each SPEED_TYPES as type, index}
                                 <button
                                     class={getButtonClasses(
                                         data.speed.type === type,
                                         index === 0,
-                                        index === speedTypes.length - 1
+                                        index === SPEED_TYPES.length - 1
                                     )}
                                     on:click={() => data.speed.type = type}
                                 >
@@ -327,6 +296,7 @@ Features:
                                 label="Speed"
                                 bind:value={data.speed.value}
                                 defaultValue={CONFIG.SPEED.DEFAULT}
+                                startingUnit="ms"
                             />
                             <div class="flex items-center gap-4">
                                 <Checkbox
@@ -353,12 +323,12 @@ Features:
                     <div class="grid gap-4">
                         <h4 class="text-sm font-medium text-gray-700">Path Type</h4>
                         <div class="flex border rounded-lg overflow-hidden">
-                            {#each pathTypes as type, index}
+                            {#each PATH_TYPES as type, index}
                                 <button
                                     class={getButtonClasses(
                                         data.pathType === type,
                                         index === 0,
-                                        index === pathTypes.length - 1
+                                        index === PATH_TYPES.length - 1
                                     )}
                                     on:click={() => data.pathType = type}
                                 >

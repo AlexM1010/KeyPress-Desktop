@@ -274,6 +274,10 @@ func (q *TaskQueue) Stop() {
 	log.Println("TaskQueue has been stopped")
 }
 
+type Point struct {
+	X, Y float64
+}
+
 // executeTask performs the action based on the task type.
 func executeTask(task Task, app *App) {
 	log.Printf("Starting execution of task ID: %s, Type: %s", task.ID, task.Type)
@@ -298,10 +302,12 @@ func executeTask(task Task, app *App) {
 
 	case "MoveMouse":
 		log.Printf("MoveMouse task starting - Data: %+v", task.Data)
-		x, ok1 := task.Data["x"].(float64)
-		y, ok2 := task.Data["y"].(float64)
+
+		// Extract and validate position configurations
+		startPos, ok1 := task.Data["startPosition"].(map[string]interface{})
+		endPos, ok2 := task.Data["endPosition"].(map[string]interface{})
 		if !ok1 || !ok2 {
-			err := fmt.Sprintf("Invalid coordinates - x: %v, y: %v", task.Data["x"], task.Data["y"])
+			err := "Invalid or missing position configurations"
 			log.Printf("MoveMouse error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -309,9 +315,122 @@ func executeTask(task Task, app *App) {
 			})
 			return
 		}
-		log.Printf("Moving mouse to x: %v, y: %v", x, y)
-		robotgo.Move(int(x), int(y))
-		time.Sleep(100 * time.Millisecond)
+
+		// Get current mouse position for 'Mouse' type positions
+		currentX, currentY := robotgo.Location()
+
+		// Resolve start position
+		var startX, startY float64
+		if startPos["type"] == "Mouse" {
+			startX, startY = float64(currentX), float64(currentY)
+		} else {
+			coords, ok := startPos["coordinates"].(map[string]interface{})
+			if !ok {
+				err := "Invalid start coordinates"
+				log.Printf("MoveMouse error: %s for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  err,
+				})
+				return
+			}
+			startX = coords["x"].(float64)
+			startY = coords["y"].(float64)
+		}
+
+		// Move to start position if not already there
+		robotgo.Move(int(startX), int(startY))
+
+		// Resolve end position
+		var endX, endY float64
+		if endPos["type"] == "Mouse" {
+			endX, endY = float64(currentX), float64(currentY)
+		} else {
+			coords, ok := endPos["coordinates"].(map[string]interface{})
+			if !ok {
+				err := "Invalid end coordinates"
+				log.Printf("MoveMouse error: %s for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  err,
+				})
+				return
+			}
+			endX = coords["x"].(float64)
+			endY = coords["y"].(float64)
+		}
+
+		// Extract movement settings
+		speed := task.Data["speed"].(map[string]interface{})
+		speedType := speed["type"].(string)
+		speedValue := speed["value"].(float64)
+		randomize := speed["randomize"].(bool)
+		variance := speed["variance"].(float64)
+		pathType := task.Data["pathType"].(string)
+		dragWhileMoving := task.Data["dragWhileMoving"].(bool)
+
+		// Calculate final speed with randomization if enabled
+		finalSpeed := speedValue
+		if randomize {
+			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			varianceAmount := speedValue * (variance / 100.0)
+			finalSpeed += (r.Float64()*2 - 1) * varianceAmount
+		}
+
+		// Set mouse movement speed based on configuration
+		robotgo.MouseSleep = int(finalSpeed) // Convert to appropriate sleep value
+
+		// Start drag if required
+		if dragWhileMoving {
+			if err := robotgo.MouseDown("left"); err != nil {
+				log.Printf("MouseDown error: %v for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  fmt.Sprintf("MouseDown failed: %v", err),
+				})
+				return
+			}
+		}
+
+		// Execute movement based on configuration
+		if speedType == "Instant" {
+			robotgo.Move(int(endX), int(endY))
+		} else {
+			mouseDelay := int(finalSpeed)
+			if pathType == "Straight" {
+				// Use MoveSmooth with minimal randomization for straight path TODO: use relative?
+				success := robotgo.MoveSmooth(int(endX), int(endY), 1.0, 1.2, mouseDelay)
+				if !success {
+					log.Printf("MoveSmooth failed for task %s", task.ID)
+					// Fallback to regular move
+					robotgo.Move(int(endX), int(endY))
+				}
+			} else {
+				// Use MoveSmooth with more randomization for human-like movement
+				success := robotgo.MoveSmooth(int(endX), int(endY), 1.0, 2.0, mouseDelay)
+				if !success {
+					log.Printf("MoveSmooth failed for task %s", task.ID)
+					// Fallback to regular move
+					robotgo.Move(int(endX), int(endY))
+				}
+			}
+		}
+
+		// Release drag if active
+		if dragWhileMoving {
+			if err := robotgo.MouseUp("left"); err != nil {
+				log.Printf("MouseUp error: %v for task %s", err, task.ID)
+				app.emitEvent("task-error", map[string]interface{}{
+					"taskID": task.ID,
+					"error":  fmt.Sprintf("MouseUp failed: %v", err),
+				})
+				return
+			}
+		}
+
+		// Reset mouse sleep to default
+		robotgo.MouseSleep = 100
+
 		app.emitEvent("task-success", map[string]interface{}{
 			"taskID": task.ID,
 			"type":   "MoveMouse",

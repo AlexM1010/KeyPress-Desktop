@@ -27,7 +27,8 @@
     export let label = '';
     export let defaultValue = 1;
     export let value = defaultValue * 1000; // Export the value prop
-    let unit: TimeUnit = 's';
+    export let startingUnit: TimeUnit = 's'; // Allow setting a starting unit
+    let unit: TimeUnit = startingUnit; // Initialize unit with startingUnit
 
     // Arrow controls
     export let showArrows: boolean = true;
