@@ -48,13 +48,13 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
 
     // Add reactive statement for data consistency
     $: {
-        if (!data?.buttonType) data.buttonType = 'left';
-        if (!data?.numberOfClicks) data.numberOfClicks = 1;
-        if (!data?.clickDelay) data.clickDelay = 0.1;
-        if (!data?.pressReleaseDelay) data.pressReleaseDelay = 100;
-        if (!data?.releaseAfterPress) data.releaseAfterPress = true;
-        if (!data?.scrollDirection) {data.scrollDirection = ['Vertical'];}
-        if (!data?.scrollLines) data.scrollLines = 0;
+        if (data?.buttonType == null) data.buttonType = 'left';
+        if (data?.numberOfClicks == null) data.numberOfClicks = 1;
+        if (data?.clickDelay == null) data.clickDelay = 0.1;
+        if (data?.pressReleaseDelay == null) data.pressReleaseDelay = 100;
+        if (data?.releaseAfterPress == null) data.releaseAfterPress = true;
+        if (data?.scrollDirection == null) {data.scrollDirection = ['Vertical'];}
+        if (data?.scrollLines == null) data.scrollLines = 0;
     }
 
     // Local UI state
@@ -135,12 +135,12 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
 
         <!-- Click Configuration -->
         <div class="grid gap-6 auto-rows-min">
-            <!-- Click Count and Delay Configuration TODO: Minvalue is 1 in numberinput? why won't it go below 1? -->
+            <!-- Click Count and Delay Configuration -->
             <div class="flex justify-between items-center gap-2">
                 <NumberInput
                     label="Clicks"
                     bind:value={data.numberOfClicks}
-                    minValue={-1} 
+                    minValue={0} 
                     maxValue={1000}
                 />
                 {#if data?.numberOfClicks > 1}
