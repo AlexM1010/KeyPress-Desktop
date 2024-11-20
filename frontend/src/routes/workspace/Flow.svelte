@@ -217,7 +217,7 @@
   // Computed property to determine if the status panel should be shown
   $: hasStatusPanel = isStatusPanelExpanded || statusMessages.length > 0;
 
-  // Function to add a status message with automatic removal after 10 seconds
+  // Function to add a status message with automatic removal after 10 seconds TODO: update to only dissapear when tab is opened and closed or next run is started (pause timeout?)
   function addStatusMessage(msg: {
     id: string;
     type: string;
