@@ -116,7 +116,7 @@
 
 <style lang="scss">
 	.nav-menu {
-		display: flex;
+		display: inline-flex;
 		justify-content: center;
 		position: sticky;
 		top: 0px;

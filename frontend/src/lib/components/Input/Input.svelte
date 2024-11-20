@@ -14,7 +14,7 @@
 	bind:this={inputElement}
 	bind:value
 	{placeholder}
-	class="text-[inherit] bg-transparent border-[1px] border-solid border-[var(--border)] px-[20px] py-[10px] rounded-[15px] flex-1 text-[1.15em] "
+	class="w-full text-[inherit] bg-transparent border-[1px] border-solid border-[var(--border)] px-[20px] py-[10px] rounded-[15px] flex-1 text-[1.15em] "
 />
 
 <style lang="scss">

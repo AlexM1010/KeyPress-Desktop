@@ -79,7 +79,7 @@
 		{/each}
 	</div>
 	{#if displayed.length === 0}
-		<div class="p-5 col-center gap-3 m-y-auto text-[var(--accent-text)] flex-1">
+		<div class="p-5 col-center gap-3 my-auto text-[var(--accent-text)] flex-1">
 			<UIcon icon="i-carbon-cube" classes="text-3.5em" />
 			<p class="font-300">Could not find anything...</p>
 		</div>

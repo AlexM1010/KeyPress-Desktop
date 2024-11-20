@@ -8,11 +8,7 @@
 	export let classes = '';
 	export let href = '';
 
-	$: className = `row-center cursor-pointer py-[5px] px-[15px] m-[2.5px] decoration-none inline-block border-[1px] border-solid border-[var(--border)] rounded-[20px] tracking-wider text-[0.9em] text-[var(--tertiary-text)] duration-[150ms] font-light  ${
-		active
-			? 'bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
-			: 'bg-transparent hover:bg-[var(--main-hover)]'
-	} ${classes}`;
+	$: className = `chip ${active ? 'chip--active' : ''} ${classes}`;
 
 	onMount(() => {
 		el.style.setProperty('--size', size);
@@ -32,3 +28,35 @@
 >
 	<slot />
 </svelte:element>
+
+<style>
+    .chip {
+        display: inline-block;
+        padding: 5px 15px;
+        margin: 3px;
+		margin-top: 10px;
+		border-width: 1px;
+		border-style: solid;
+		border-radius: 15px;
+		border-color: var(--border);
+        text-align: center;
+        text-decoration: none;
+        font-size: 0.9em;
+        font-weight: 300;
+        color: var(--tertiary-text);
+        transition: background-color 150ms;
+        cursor: pointer;
+    }
+
+    .chip:hover {
+        background-color: var(--main-hover);
+    }
+
+    .chip--active {
+        background-color: var(--accent);
+    }
+
+    .chip--active:hover {
+        background-color: var(--accent-hover);
+    }
+</style>

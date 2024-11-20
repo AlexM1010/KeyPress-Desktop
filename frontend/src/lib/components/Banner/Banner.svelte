@@ -12,7 +12,7 @@
 			: ''
 	} items-center skill-cover  ${classes}`}
 >
-	<div class="p-x-2 col flex-1">
+	<div class="px-2 col flex-1">
 		<slot />
 	</div>
 </div>

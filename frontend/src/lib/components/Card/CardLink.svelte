@@ -1,5 +1,5 @@
 <script lang="ts">
-	import UIcon from '../Icon/UIcon.svelte';
+	import { Store } from 'lucide-svelte';
 
 	export let label: string;
 	export let to: string;
@@ -13,11 +13,13 @@
 	rel="noreferrer"
 	data-help={label}
 >
-	<UIcon icon="i-carbon-link" classes="text-[var(--secondary-text)]" />
+	<Store/>
 </a>
 
 <style lang="scss">
 	.card-link {
+		display: inline-flex;
+
 		&:hover {
 			border-color: var(--border-hover);
 

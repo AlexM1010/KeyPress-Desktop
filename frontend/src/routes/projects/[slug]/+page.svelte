@@ -33,7 +33,7 @@
 
 <div class="pb-10 overflow-x-hidden col flex-1">
 	{#if data.project === undefined}
-		<div class="p-5 col-center gap-3 m-y-auto text-[var(--accent-text)]">
+		<div class="p-5 col-center gap-3 my-auto text-[var(--accent-text)]">
 			<UIcon icon="i-carbon-cube" classes="text-3.5em" />
 			<p class="font-300">Could not load project data...</p>
 		</div>
@@ -44,7 +44,7 @@
 					<div class="text-0.9em">
 						<MainTitle>{data.project.name}</MainTitle>
 					</div>
-					<p class="font-300 text-center text-[var(--tertiary-text)] m-y-2">{data.project.type}</p>
+					<p class="font-300 text-center text-[var(--tertiary-text)] my-2">{data.project.type}</p>
 					<div class="w-75%">
 						<CardDivider />
 					</div>
@@ -78,11 +78,11 @@
 				</div>
 			</Banner>
 			<div class="pt-3 pb-1 overflow-x-hidden w-full">
-				<div class="px-[10px] m-y-5">
+				<div class="px-[10px] my-5">
 					{#if data.project.description}
 						<Markdown content={data.project.description} />
 					{:else}
-						<div class="p-5 col-center gap-3 m-y-auto text-[var(--border)]">
+						<div class="p-5 col-center gap-3 my-auto text-[var(--border)]">
 							<UIcon icon="i-carbon-text-font" classes="text-3.5em" />
 							<p class="font-300">No description</p>
 						</div>
@@ -114,7 +114,7 @@
 						{/each}
 					</div>
 				{:else}
-					<div class="p-5 col-center gap-3 m-y-auto text-[var(--border)]">
+					<div class="p-5 col-center gap-3 my-auto text-[var(--border)]">
 						<UIcon icon="i-carbon-image" classes="text-3.5em" />
 						<p class="font-300">No screenshots</p>
 					</div>

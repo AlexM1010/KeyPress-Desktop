@@ -12,7 +12,7 @@
 <svelte:element
 	this={href ? 'a' : 'div'}
 	{href}
-	class={`chip-icon row-center relative text-inherit decoration-none p-10px m-r-5px m-b-5px border-1px border-solid border-[var(--border)] hover:border-[var(--border-hover)] rounded-10px hover:z-5 ${
+	class={`chip-icon row-center relative text-inherit decoration-none p-[8px] border-[1px] m-1 border-solid border-[var(--border)] hover:border-[var(--border-hover)] rounded-[10px] hover:z-5 ${
 		href ? 'cursor-pointer' : 'cursor-help'
 	} ${grayscale ? 'grayscale-65 hover:grayscale-0' : ''}`}
 	data-help={name}
@@ -21,7 +21,7 @@
 		<slot />
 	{:else}
 		<img
-			class={`w-15px h-15px ${inverted ? 'invert-100' : ''}`}
+			class={`w-[15px] h-[15px] ${inverted ? 'invert-100' : ''}`}
 			class:chip-icon-logo-inverted={$theme && inverted}
 			src={logo}
 			alt={name}
@@ -31,6 +31,8 @@
 
 <style lang="scss">
 	.chip-icon {
+		display: inline-flex;
+
 		&:hover {
 			border-color: var(--border-hover);
 

@@ -9,7 +9,7 @@
 	export let color = '#ffffff00';
 
 	export let margin = '0px';
-	export let tiltDegree = 5;
+	export let tiltDegree = 2;
 	export let classes: Array<string> = [];
 	export let href: undefined | string = undefined;
 	export let bgImg: string | undefined = undefined;
@@ -79,6 +79,11 @@
 
 <style lang="scss">
 	.card {
+		//Added by me
+		display: inline-flex;
+		overflow: hidden;
+
+		//Standard:
 		--border-color: transparent;
 		--bg-color: transparent;
 		--drop-color: transparent;
