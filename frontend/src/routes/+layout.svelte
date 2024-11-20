@@ -68,6 +68,9 @@
                 <Button on:click={() => goto('/workspace')} variant="ghost">
                     Workspace
                 </Button>
+                <Button on:click={() => goto('/projects')} variant="ghost">
+                    Projects
+                </Button>
             {/if}
         </div>
         <!-- Right side of navbar -->
