@@ -67,13 +67,15 @@
   $: executionStatus = (() => {
     const hasError = statusMessages.some((msg) => msg.type === "error");
     const hasWarning = statusMessages.some((msg) => msg.type === "warning");
-    const hasSuccess = statusMessages.some((msg) => msg.type === "success" && msg.message.includes("Flow execution completed"));
-    
-    if (isExecuting) return { icon: Loader, color: "text-blue-500" };
-    if (hasError) return { icon: X, color: "text-red-500" };
-    if (hasWarning) return { icon: TriangleAlert, color: "text-yellow-500" };
-    if (hasSuccess) return { icon: Play, color: "text-green-500" };
-    return { icon: Play, color: "text-foreground" };
+    const hasSuccess = statusMessages.some(
+      (msg) => msg.type === "success" && msg.message.includes("Flow execution completed")
+    );
+
+    if (isExecuting) return { icon: Loader, color: "var(--link)" };
+    if (hasError) return { icon: X, color: "var(--code-keyword)" };
+    if (hasWarning) return { icon: TriangleAlert, color: "var(--code-constant)" };
+    if (hasSuccess) return { icon: Play, color: "var(--code-string)" };
+    return { icon: Play, color: "var(--main-text)" };
   })();
 
   // Custom edge types
@@ -87,7 +89,7 @@
     animated: true,
     deletable: true,
     selectable: true,
-    data: { color: "#000000" },
+    data: { color: "var(--main-text)" },
     interactionWidth: 20,
   };
 
@@ -180,31 +182,30 @@
       isSaving = true;
       saveSuccess = false;
       saveError = false;
-      
+
       // TODO: Implement save functionality here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate save
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate save
+
       saveSuccess = true;
       addStatusMessage({
         id: `save-${Date.now()}`,
-        type: "success", 
-        message: "Flow saved successfully."
+        type: "success",
+        message: "Flow saved successfully.",
       });
 
       // Reset success state after 2 seconds
       setTimeout(() => {
         saveSuccess = false;
       }, 2000);
-
     } catch (error) {
       console.error("Failed to save flow:", error);
       saveError = true;
       addStatusMessage({
         id: `save-error-${Date.now()}`,
         type: "error",
-        message: "Failed to save flow."
+        message: "Failed to save flow.",
       });
-      
+
       // Reset error state after 2 seconds
       setTimeout(() => {
         saveError = false;
@@ -217,12 +218,8 @@
   // Computed property to determine if the status panel should be shown
   $: hasStatusPanel = isStatusPanelExpanded || statusMessages.length > 0;
 
-  // Function to add a status message with automatic removal after 10 seconds TODO: update to only dissapear when tab is opened and closed or next run is started (pause timeout?)
-  function addStatusMessage(msg: {
-    id: string;
-    type: string;
-    message: string;
-  }) {
+  // Function to add a status message with automatic removal after 10 seconds
+  function addStatusMessage(msg: { id: string; type: string; message: string }) {
     statusMessages = [...statusMessages, msg];
     setTimeout(() => {
       statusMessages = statusMessages.filter((m) => m.id !== msg.id);
@@ -230,7 +227,7 @@
   }
 
   // Set up event listeners for various execution events
-  function setupEventListeners() { //TODO fix infinite loading when nothing connects to the start node
+  function setupEventListeners() {
     window.runtime.EventsOn("task-started", (taskId: string) => {
       addStatusMessage({
         id: `task-started-${taskId}`,
@@ -290,13 +287,13 @@
       isExecuting = false;
       isSuccess = true;
       addStatusMessage({
-          id: `exec-completed-${Date.now()}`,
-          type: "success",
-          message: "Flow execution completed.",
+        id: `exec-completed-${Date.now()}`,
+        type: "success",
+        message: "Flow execution completed.",
       });
       // Reset success state after 3 seconds
       setTimeout(() => {
-          isSuccess = false;
+        isSuccess = false;
       }, 1000);
     });
   }
@@ -340,27 +337,50 @@
             >
               <!-- Run Flow Button -->
               <button
-                class="bg-background text-foreground px-4 py-2 rounded flex items-center space-x-1 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="bg-[var(--main)] text-[var(--main-text)] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[var(--main-hover)]"
                 on:click={handleRunFlow}
                 disabled={isExecuting}
               >
-                <svelte:component this={executionStatus.icon} class="w-5 h-5 {executionStatus.color}" style={isExecuting ? "animation: spin 1s linear infinite" : ""} />
+                <svelte:component
+                  this={executionStatus.icon}
+                  class="w-5 h-5"
+                  style="color: {executionStatus.color}; {isExecuting ? 'animation: spin 1s linear infinite;' : ''}"
+                />
               </button>
               <!-- Save Button -->
               <button
-                class="bg-background text-foreground px-4 py-2 rounded flex items-center space-x-1 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="bg-[var(--main)] text-[var(--main-text)] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[var(--main-hover)]"
                 on:click={handleSave}
                 disabled={isSaving}
               >
-                <svelte:component 
-                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
-                  class="w-5 h-5 {isSaving ? 'text-blue-500' : saveError ? 'text-red-500' : saveSuccess ? 'text-green-500' : ''}"
-                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                <svelte:component
+                  this={
+                    isSaving
+                      ? Loader
+                      : saveError
+                      ? X
+                      : saveSuccess
+                      ? Check
+                      : Save
+                  }
+                  class="w-5 h-5"
+                  style="
+                    color: {
+                      isSaving
+                        ? 'var(--link)'
+                        : saveError
+                        ? 'var(--code-keyword)'
+                        : saveSuccess
+                        ? 'var(--code-string)'
+                        : 'inherit'
+                    };
+                    {isSaving ? 'animation: spin 1s linear infinite;' : ''}
+                  "
                 />
               </button>
               <!-- Layout Button -->
               <button
-                class="bg-background text-foreground px-4 py-2 rounded flex items-center space-x-1 hover:bg-gray-100 dark:hover:bg-gray-700"
+                class="bg-[var(--main)] text-[var(--main-text)] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[var(--main-hover)]"
                 on:click={() => onLayout("TB")}
               >
                 <LayoutDashboard class="w-5 h-5" />
@@ -384,12 +404,10 @@
         class:opacity-0={!hasStatusPanel}
       >
         <button
-          class="absolute top-[15%] right-80 -translate-y-1/2 bg-background border border-border rounded-l-md p-1 cursor-pointer z-20 transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          class="absolute top-[15%] right-80 -translate-y-1/2 bg-[var(--main)] rounded-l-md p-1 cursor-pointer z-20 transition-all duration-300 hover:bg-[var(--main-hover)]"
           style="right: {isStatusPanelExpanded ? '320px' : '0'}"
           on:click={toggleStatusPanel}
-          aria-label={isStatusPanelExpanded
-            ? "Collapse status panel"
-            : "Expand status panel"}
+          aria-label={isStatusPanelExpanded ? "Collapse status panel" : "Expand status panel"}
         >
           <svelte:component
             this={isStatusPanelExpanded ? ChevronRight : ChevronLeft}
@@ -401,35 +419,35 @@
 
     <!-- Status Panel -->
     <div
-      class="absolute right-0 top-0 bottom-0 bg-gray-100 dark:bg-gray-800 border-l border-border overflow-y-auto transition-all duration-300"
-      style="width: 320px; transform: translateX({isStatusPanelExpanded
-        ? '0'
-        : '100%'})"
+      class="absolute right-0 top-0 bottom-0 bg-[var(--secondary)] overflow-y-auto transition-all duration-300"
+      style="width: 320px; transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
     >
       <div class="p-4">
         <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2">
           <svelte:component
             this={executionStatus.icon}
-            class="w-6 h-6 {executionStatus.color}"
+            class="w-6 h-6"
+            style="color: {executionStatus.color};"
           />
           <span>Execution Status</span>
         </h2>
         {#if statusMessages.length === 0}
-          <p class="text-gray-500 dark:text-gray-400">No status updates.</p>
+          <p class="text-[var(--secondary-text)]">No status updates.</p>
         {:else}
           <ul>
             {#each statusMessages as msg (msg.id)}
               <li class="flex items-center mb-3">
                 <!-- Status Icon -->
                 {#if msg.type === "success"}
-                  <Check class="w-5 h-5 text-green-500 mr-2" />
+                  <Check class="w-5 h-5 mr-2" style="color: var(--code-string);" />
                 {:else if msg.type === "error"}
-                  <X class="w-5 h-5 text-red-500 mr-2" />
+                  <X class="w-5 h-5 mr-2" style="color: var(--code-keyword);" />
                 {:else if msg.type === "warning"}
-                  <TriangleAlert class="w-5 h-5 text-yellow-500 mr-2" />
+                  <TriangleAlert class="w-5 h-5 mr-2" style="color: var(--code-constant);" />
                 {:else if msg.type === "info" || msg.type === "running"}
                   <Play
-                    class="w-5 h-5 text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
+                    class="w-5 h-5 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
+                    style="color: var(--link);"
                   />
                 {/if}
                 <span class="text-sm">{msg.message}</span>
