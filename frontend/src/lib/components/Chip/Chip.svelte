@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import '$lib/index.scss'
 
 	let el: HTMLElement;
 

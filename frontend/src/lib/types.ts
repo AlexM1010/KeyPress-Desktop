@@ -42,12 +42,13 @@ export interface IconLink extends Link {
 	icon: Asset;
 }
 
+//TODO: update to NodeType, NodeCategory, 
 export interface SkillCategory<S extends string = string> {
 	slug: S;
 	name: string;
 }
 
-export interface Skill<S extends string = string> extends Omit<Item<S>, 'shortDescription'> {
+export interface Skill<S extends string = string> extends Omit<Item<S>, 'shortDescription'> { 
 	color: string;
 	category?: SkillCategory;
 }

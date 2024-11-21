@@ -30,7 +30,6 @@
 			if (tech.slug === slug) {
 				tech.isSelected = !isSelected(slug);
 			}
-
 			return tech;
 		});
 	};
@@ -84,7 +83,7 @@
 			<p class="font-300">Could not find anything...</p>
 		</div>
 	{:else}
-		<div class="projects-list mt-5">
+		<div class="projects-list mt-2">
 			{#each displayed as project}
 				<ProjectCard {project} />
 			{/each}
@@ -94,15 +93,15 @@
 
 <style lang="scss">
 	.projects-list {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(325px, 100%), 1fr));
+        gap: var(--grid-gap, clamp(10px, 3vh, 25px));
+        width: 100%;
+        margin-top: 0.5rem;
 
-		@media (max-width: 1350px) {
-			grid-template-columns: repeat(2, 1fr);
-		}
-		@media (max-width: 850px) {
-			grid-template-columns: repeat(1, 1fr);
-		}
-	}
+        & > :global(*) {
+            min-width: 0;
+            max-width: 100%;
+        }
+    }
 </style>

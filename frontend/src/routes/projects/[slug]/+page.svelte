@@ -6,7 +6,6 @@
 	import type { Project } from '$lib/types';
 
 	import CardLogo from '$lib/components/Card/CardLogo.svelte';
-	import MainTitle from '$lib/components/MainTitle/MainTitle.svelte';
 	import Markdown from '$lib/components/Markdown.svelte';
 	import TabTitle from '$lib/components/TabTitle.svelte';
 	import Chip from '$lib/components/Chip/Chip.svelte';
@@ -41,9 +40,6 @@
 		<div class="flex flex-col items-center overflow-x-hidden">
 			<Banner img={getAssetURL(data.project.logo)}>
 				<div class="col-center p-y-20">
-					<div class="text-0.9em">
-						<MainTitle>{data.project.name}</MainTitle>
-					</div>
 					<p class="font-300 text-center text-[var(--tertiary-text)] my-2">{data.project.type}</p>
 					<div class="w-75%">
 						<CardDivider />

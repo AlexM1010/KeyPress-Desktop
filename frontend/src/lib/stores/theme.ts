@@ -2,14 +2,22 @@
 import { derived } from 'svelte/store';
 import { userPrefersMode, systemPrefersMode } from 'mode-watcher';
 import type { ColorMode } from '@xyflow/svelte';
+import { browser } from '$app/environment'; // Add this import
+
+function updateThemeAttribute(theme: boolean): void {
+  if (browser) {
+    document.documentElement.setAttribute('data-theme', theme ? 'dark' : 'light');
+  }
+}
 
 // Create a derived store that combines mode-watcher states
 export const theme = derived(
     [userPrefersMode, systemPrefersMode],
     ([$userPrefersMode, $systemPrefersMode]) => {
-        if ($userPrefersMode === 'dark') return true;
-        if ($userPrefersMode === 'light') return false;
-        return $systemPrefersMode === 'dark';
+        const theme = $userPrefersMode === 'dark' || 
+        ($userPrefersMode === 'light' ? false : $systemPrefersMode === 'dark');
+        updateThemeAttribute(theme);
+        return theme;
     }
 );
 
