@@ -94,14 +94,17 @@
 <style lang="scss">
 	.projects-list {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(325px, 100%), 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: var(--grid-gap, clamp(10px, 3vh, 25px));
         width: 100%;
         margin-top: 0.5rem;
 
         & > :global(*) {
-            min-width: 0;
-            max-width: 100%;
+            min-width: 280px;
+			max-width: 400px;
+			width: 100%;
+			height: 100%;
+			justify-self: left;
         }
     }
 </style>

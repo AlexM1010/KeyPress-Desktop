@@ -150,7 +150,7 @@
 
     .node-wrapper:hover {
         box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
+        transform: scale(1.01);
     }
 
     /* Header styling */
