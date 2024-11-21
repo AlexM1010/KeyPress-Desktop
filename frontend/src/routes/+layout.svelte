@@ -51,7 +51,7 @@
 <ModeWatcher />
 
 <!-- Navbar -->
-<div class="bg-background border-b text-black dark:text-white">
+<div class="bg-background text-black dark:text-white">
     <div class="max-w-3xl mx-auto flex justify-between items-center py-4 px-4">
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4">
@@ -93,7 +93,7 @@
 
 {#if !($isInitialized && isReady)}
     <div class="flex items-center justify-center h-screen">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div class="animate-spin rounded-full h-8 w-8"></div>
     </div>
 {:else}
     <slot />

@@ -12,15 +12,6 @@ export enum Platform {
 
 export type Icon = `i-${string}-${string}`;
 
-export enum ContractType {
-	FullTime = 'Full-time',
-	PartTime = 'Part-time',
-	SelfEmployed = 'Self-employed',
-	Freelance = 'Freelance',
-	Contract = 'Contract',
-	Internship = 'Internship'
-}
-
 export type Asset = string | { light: string; dark: string };
 
 export interface Item<S extends string = string> {
@@ -42,7 +33,7 @@ export interface IconLink extends Link {
 	icon: Asset;
 }
 
-//TODO: update to NodeType, NodeCategory, 
+//TODO: update below
 export interface SkillCategory<S extends string = string> {
 	slug: S;
 	name: string;
@@ -64,19 +55,52 @@ export interface Project<S extends string = string> extends Item<S> {
 	skills: Array<Skill<S>>;
 }
 
-export interface Experience<S extends string = string> extends Project<S> {
-	company: string;
-	location: string;
-	contract: ContractType;
+// TODO: Finish new types
+export enum NodeType {
+    Start = 'start',
+	Click = 'click',
+	Move = 'move',
+	Wait = 'wait'
 }
 
-export interface Education<S extends string = string> extends Item<S> {
-	organization: string;
-	location: string;
+export enum NodeCategory {
+    Input = 'input',
+    Process = 'process', 
+    Output = 'output',
+    Decision = 'decision',
+    Storage = 'storage',
+    Connector = 'connector'
+}
+
+export enum NodePremium {
+	Free = 'free',
+	Premium = 'premium',
+	AI = 'ai'
+}
+
+export interface Node<S extends string = string> extends Omit<Item<S>, 'shortDescription'> {
+    nodeType: NodeType;
+    category?: NodeCategory;
+	premium?: NodePremium;
+}
+
+export interface FlowReview<S extends string = string> extends Omit<Item<S>, 'shortDescription'> {
+    FlowRating?: 1 | 2 | 3 | 4 | 5; // 1-5 star average user rating
+    FlowReviewSummary?: string; // LLM review summary - Periodically updated
+    FlowVerified?: boolean; // Verified safe to use by Me/Team/LLM
+    FlowVersionsVerified?: Array<number>; // Which versions have been verified 
+}
+
+export interface Flow<S extends string = string> extends Item<S> {
+	links: Array<Link>;
+	color: Color;
 	period: {
 		from: Date;
 		to?: Date;
 	};
-	subjects: Array<string>;
-	degree: string;
+	type: string;
+	nodes?: Array<Node<S>>;
+	reviews?: FlowReview<S>;
+	downloads?: number;
+	price?: number;
 }
