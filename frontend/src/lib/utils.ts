@@ -2,7 +2,6 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { cubicOut } from "svelte/easing";
 import type { TransitionConfig } from "svelte/transition";
-import CryptoJS from 'crypto-js';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -72,14 +71,3 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
-
-
-/**
- * Generates a unique user ID based on the provided email.
- *
- * @param email - The email address to generate the user ID from.
- * @returns A unique user ID as a hexadecimal string.
- */
-export function generateUserId(email: string): string {
-	return CryptoJS.SHA256(email).toString(CryptoJS.enc.Hex);
-}

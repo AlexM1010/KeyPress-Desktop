@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Trash2, Copy } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
-    import { isDarkMode } from "$lib/stores/themeStore";
+    import { theme } from "$lib/stores/theme";
 
     const dispatch = createEventDispatcher();
 
@@ -15,7 +15,7 @@
 </script>
 
 <div class="context-menu-wrapper">
-    <div class={`context-menu ${$isDarkMode ? "dark" : ""}`}>
+    <div class={`context-menu ${$theme ? "dark" : ""}`}>
         <div class="button-container">
             <button
                 on:click={handleDuplicate}

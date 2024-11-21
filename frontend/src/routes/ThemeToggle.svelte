@@ -4,12 +4,12 @@
     import Moon from 'lucide-svelte/icons/moon';
     import { setMode } from "mode-watcher";
     import { Button } from '$lib/components/ui/button';
-    import { isDarkMode } from '$lib/stores/themeStore';
+    import { theme } from '$lib/stores/theme';
 
     let spin = false;
 
     function toggleColorScheme() {
-        setMode($isDarkMode ? 'light' : 'dark');
+        setMode($theme ? 'light' : 'dark');
         triggerSpin(300);
     }
 

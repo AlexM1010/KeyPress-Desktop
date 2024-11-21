@@ -1,40 +1,20 @@
-import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+// src/lib/stores/themeStore.ts
+import { derived } from 'svelte/store';
+import { userPrefersMode, systemPrefersMode } from 'mode-watcher';
+import type { ColorMode } from '@xyflow/svelte';
 
-const key = '@riadh-adrani-theme';
+// Create a derived store that combines mode-watcher states
+export const theme = derived(
+    [userPrefersMode, systemPrefersMode],
+    ([$userPrefersMode, $systemPrefersMode]) => {
+        if ($userPrefersMode === 'dark') return true;
+        if ($userPrefersMode === 'light') return false;
+        return $systemPrefersMode === 'dark';
+    }
+);
 
-const updateLocalStorage = (value: boolean) => {
-	if (browser) {
-		localStorage.setItem(key, JSON.stringify(value));
-	}
-};
-
-export const theme = writable<boolean>(false);
-
-export const toggleTheme = (value?: boolean) =>
-	theme.update((it) => {
-		const $v = typeof value === 'boolean' ? value : !it;
-
-		updateLocalStorage($v);
-
-		document.querySelector(':root')?.setAttribute('data-theme', $v ? 'dark' : 'light');
-
-		return $v;
-	});
-
-export const onHydrated = () => {
-	const fromStore = localStorage.getItem(key);
-
-	if (!fromStore) {
-		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			// dark mode
-			toggleTheme(true);
-		}
-		else {
-			// light mode
-			toggleTheme(false);
-		}
-	} else {
-		toggleTheme(JSON.parse(fromStore));
-	}
-};
+// More efficient store for Svelte Flow - directly derives from userPrefersMode
+export const flowTheme = derived<typeof userPrefersMode, ColorMode>(
+    userPrefersMode,
+    ($userPrefersMode) => $userPrefersMode || 'system'
+);

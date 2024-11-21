@@ -2,11 +2,9 @@
     import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button';
     import { ModeWatcher } from "mode-watcher";
-    import { generateUserId } from '$lib/utils';
     import ThemeToggle from './ThemeToggle.svelte';
     import { onMount } from 'svelte';
-    import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/authStore';
-    import type { User } from '../global';
+    import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import "../app.css";
 
     // No need for manual store subscriptions since we're using the derived stores

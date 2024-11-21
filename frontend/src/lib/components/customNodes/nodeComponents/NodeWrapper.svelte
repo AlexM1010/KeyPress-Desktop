@@ -7,7 +7,7 @@
     import type { HandleConfig } from "../types";
     import ContextMenu from "./ContextMenu.svelte";
     import { cubicOut } from "svelte/easing";
-    import nodesStore from '../../../stores/nodesStore';
+    import nodes from '$lib/stores/nodes';
     import { createEventDispatcher } from 'svelte';
 
     // Component Props
@@ -42,9 +42,9 @@
         }
     }
 
-    // Reactive statement to update nodesStore when data changes
+    // Reactive statement to update nodes when data changes
     $: {
-        nodesStore.update(nodes => {
+        nodes.update(nodes => {
             const nodeIndex = nodes.findIndex(node => node.id === id);
             if (nodeIndex !== -1) {
                 nodes[nodeIndex] = { id, type, data };

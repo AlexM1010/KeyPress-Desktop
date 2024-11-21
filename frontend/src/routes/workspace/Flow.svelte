@@ -16,8 +16,8 @@
   import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils";
   import CustomEdge from "./CustomEdge.svelte";
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
-  import { flowTheme } from "$lib/stores/themeStore";
-  import { user, isAuthenticated } from "$lib/stores/authStore";
+  import { flowTheme } from "$lib/stores/theme";
+  import { user, isAuthenticated } from "$lib/stores/auth";
   import Sidebar from "./Sidebar.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
   import { goto } from "$app/navigation";

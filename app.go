@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/go-vgo/robotgo"
-	"github.com/supabase-community/auth-go"
+	supa "github.com/supabase-community/auth-go"
 	"github.com/supabase-community/auth-go/types"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -25,11 +25,11 @@ type AuthStore struct {
 	isInitialized bool
 }
 
-// App represents the Wails application.
+// Update the App struct
 type App struct {
 	ctx          context.Context
-	authClient   auth.Client
-	authStore    *AuthStore
+	authClient   supa.Client // Change type to *supa.Client
+	auth         *AuthStore
 	taskQueue    *TaskQueue
 	isExecuting  bool
 	execMutex    sync.Mutex
@@ -79,15 +79,15 @@ type TaskQueue struct {
 	app     *App
 }
 
-// NewApp creates a new App application struct with AuthStore
+// NewApp creates a new App application struct with auth
 func NewApp() *App {
-	authClient := auth.New(
+	authClient := supa.New(
 		"fuobfyypdlixgvwzrvoy", // Supabase URL
 		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
 	)
 	return &App{
 		authClient:   authClient,
-		authStore:    &AuthStore{},
+		auth:         &AuthStore{},
 		taskQueue:    NewTaskQueue(nil, 100),
 		completed:    make(map[string]bool),
 		notifyCh:     make(chan string, 100),
@@ -97,12 +97,12 @@ func NewApp() *App {
 
 // EmitAuthState sends the current auth state to frontend
 func (a *App) emitAuthState() {
-	a.authStore.mu.RLock()
-	defer a.authStore.mu.RUnlock()
+	a.auth.mu.RLock()
+	defer a.auth.mu.RUnlock()
 
 	authState := map[string]interface{}{
-		"user":          a.authStore.currentUser,
-		"isInitialized": a.authStore.isInitialized,
+		"user":          a.auth.currentUser,
+		"isInitialized": a.auth.isInitialized,
 	}
 
 	// Emit the auth state change event to frontend
@@ -112,7 +112,7 @@ func (a *App) emitAuthState() {
 // Initialize auth state on startup
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.authStore.isInitialized = true
+	a.auth.isInitialized = true
 	a.emitAuthState()
 	a.taskQueue.app = a  // Set the app reference in TaskQueue
 	a.taskQueue.Start(3) // Start 3 workers by default
@@ -133,9 +133,9 @@ func (a *App) SignIn(email, password string) (*types.TokenResponse, error) {
 	}
 
 	// Update store
-	a.authStore.mu.Lock()
-	a.authStore.currentUser = user
-	a.authStore.mu.Unlock()
+	a.auth.mu.Lock()
+	a.auth.currentUser = user
+	a.auth.mu.Unlock()
 
 	// Emit state change
 	a.emitAuthState()
@@ -153,9 +153,9 @@ func (a *App) SignOut(token string) error {
 	}
 
 	// Clear store
-	a.authStore.mu.Lock()
-	a.authStore.currentUser = nil
-	a.authStore.mu.Unlock()
+	a.auth.mu.Lock()
+	a.auth.currentUser = nil
+	a.auth.mu.Unlock()
 
 	// Emit state change
 	a.emitAuthState()
@@ -165,21 +165,21 @@ func (a *App) SignOut(token string) error {
 
 // GetAuthState returns current auth state
 func (a *App) GetAuthState() map[string]interface{} {
-	a.authStore.mu.RLock()
-	defer a.authStore.mu.RUnlock()
+	a.auth.mu.RLock()
+	defer a.auth.mu.RUnlock()
 
 	return map[string]interface{}{
-		"user":          a.authStore.currentUser,
-		"isInitialized": a.authStore.isInitialized,
+		"user":          a.auth.currentUser,
+		"isInitialized": a.auth.isInitialized,
 	}
 }
 
 // InitializeFromToken initializes the auth state from a stored token
 func (a *App) InitializeFromToken(token string) error {
 	if token == "" {
-		a.authStore.mu.Lock()
-		a.authStore.currentUser = nil
-		a.authStore.mu.Unlock()
+		a.auth.mu.Lock()
+		a.auth.currentUser = nil
+		a.auth.mu.Unlock()
 		a.emitAuthState()
 		return nil
 	}
@@ -190,9 +190,9 @@ func (a *App) InitializeFromToken(token string) error {
 		return fmt.Errorf("initialize from token failed: %w", err)
 	}
 
-	a.authStore.mu.Lock()
-	a.authStore.currentUser = user
-	a.authStore.mu.Unlock()
+	a.auth.mu.Lock()
+	a.auth.currentUser = user
+	a.auth.mu.Unlock()
 
 	a.emitAuthState()
 	return nil

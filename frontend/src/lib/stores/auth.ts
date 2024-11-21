@@ -1,8 +1,8 @@
 // src/lib/stores/auth.ts
 import { writable, derived } from 'svelte/store';
-import type { AuthState } from '../../global.d.ts';
+import type { AuthState } from '../../global.js';
 
-function createAuthStore() {
+function createauth() {
     const { subscribe, set, update } = writable<AuthState>({
         user: null,
         isInitialized: false
@@ -61,7 +61,7 @@ function createAuthStore() {
 }
 
 // Create the main auth store
-export const auth = createAuthStore();
+export const auth = createauth();
 
 // Derived stores for convenience
 export const user = derived(auth, $auth => $auth.user);

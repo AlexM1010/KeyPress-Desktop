@@ -5,7 +5,7 @@
     import { CircleX } from "lucide-svelte";
     import { onMount } from "svelte";
     import { writable, get } from "svelte/store";
-    import { auth, isAuthenticated } from '$lib/stores/authStore';
+    import { auth, isAuthenticated } from '$lib/stores/auth';
     import { goto } from '$app/navigation';
     
     // Form Schema

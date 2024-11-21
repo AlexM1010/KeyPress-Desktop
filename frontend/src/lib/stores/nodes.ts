@@ -1,4 +1,4 @@
-// src/stores/nodesStore.ts
+// src/stores/nodes.ts
 import { writable } from 'svelte/store';
 
 export interface NodeData {
@@ -7,6 +7,6 @@ export interface NodeData {
     data: any; // Replace `any` with a more specific type if possible
 }
 
-const nodesStore = writable<NodeData[]>([]);
+const nodes = writable<NodeData[]>([]);
 
-export default nodesStore;
+export default nodes;
