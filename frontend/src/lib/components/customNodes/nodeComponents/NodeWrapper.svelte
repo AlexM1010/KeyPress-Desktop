@@ -9,6 +9,7 @@
     import { cubicOut } from "svelte/easing";
     import nodes from '$lib/stores/nodes';
     import { createEventDispatcher } from 'svelte';
+    import '$lib/index.scss';
 
     // Component Props
     export let icon: ComponentType;
@@ -171,6 +172,26 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    :global(.svelte-flow__handle) {
+        background: var(--accent);
+        width: 8px;
+        height: 8px;
+        border: 2px solid var(--main-text);
+        position: absolute;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        transform-origin: center center;
+    }
+
+    :global(.svelte-flow__handle:hover) {
+        background: var(--link);
+        width: 10px;
+        height: 10px;
+        margin: -1px;
+        box-shadow: 0 2px 4px var(--main-60);
+    }
+
+    /* Keep the existing animations */
     .expand-animation {
         animation: expand 0.5s ease-out forwards;
     }
@@ -180,12 +201,8 @@
     }
 
     @keyframes expand {
-        from {
-            max-height: 0;
-        }
-        to {
-            max-height: 500px;
-        }
+        from { max-height: 0; }
+        to { max-height: 500px; }
     }
 
     @keyframes retract {
@@ -202,34 +219,4 @@
             padding: 0;
         }
     }
-
-    /* Connection handle styling */
-    :global(.svelte-flow__handle) {
-        background: #9ca3af;
-        width: 8px;
-        height: 8px;
-        border: 2px solid white;
-        position: absolute;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-        transform-origin: center center;
-    }
-
-    :global(.svelte-flow__handle::before) {
-        content: "";
-        position: absolute;
-        top: -12px;
-        left: -12px;
-        right: -12px;
-        bottom: -12px;
-    }
-
-    :global(.svelte-flow__handle:hover) {
-        background: #3b82f6;
-        width: 10px;
-        height: 10px;
-        margin: -1px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-    
 </style>
