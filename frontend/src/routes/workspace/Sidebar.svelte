@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { useDnD } from './utils';
+    import { useDnD } from './utils/utils';
     import type { Node } from '@xyflow/svelte';
     
     const type = useDnD();

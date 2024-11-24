@@ -30,7 +30,8 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
     export let id: string;
     export let title: string = 'Mouse Click';
     export let icon: ComponentType = MousePointer;
-    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
+    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600 bg-opacity-75'; //Custom header color 
+    export let highlightColor: string = 'bg-blue-500 bg-opacity-75'; //Custom highlight color with partial transparency
 
     const BUTTON_TYPES: ButtonType[] = ['left', 'middle', 'right'];
     const SCROLL_DIRECTIONS: ScrollDirection[] = ['Vertical', 'Horizontal'];
@@ -53,13 +54,13 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
         if (data?.clickDelay == null) data.clickDelay = 0.1;
         if (data?.pressReleaseDelay == null) data.pressReleaseDelay = 100;
         if (data?.releaseAfterPress == null) data.releaseAfterPress = true;
-        if (data?.scrollDirection == null) {data.scrollDirection = ['Vertical'];}
+        if (data?.scrollDirection == null) { data.scrollDirection = ['Vertical']; }
         if (data?.scrollLines == null) data.scrollLines = 0;
     }
 
     // Local UI state
     let showAdvanced = false;
-    
+
     // Debug logging for data changes
     $: console.log('MouseClickNode data:', JSON.stringify(data));
 
@@ -116,16 +117,14 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
 >
     <div class="grid gap-6">
         <!-- Button Type Selection -->
-        <div class="flex border rounded-lg overflow-hidden">
-            {#each BUTTON_TYPES as buttonType}
+        <div class="flex rounded-lg overflow-hidden">
+            {#each BUTTON_TYPES as buttonType, index}
                 <button
                     class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
                         {data?.buttonType === buttonType 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                        {buttonType !== 'left' ? 'border-l' : ''}
-                        {buttonType === 'left' ? 'first:rounded-l-lg' : ''}
-                        {buttonType === 'right' ? 'last:rounded-r-lg' : ''}"
+                            ? highlightColor + ' text-[--main-text]'
+                            : 'bg-[--tertiary] hover:bg-[--tertiary-hover] text-[--secondary-text]'}
+                        first:rounded-l-lg last:rounded-r-lg"
                     on:click={() => updateButtonType(buttonType)}
                 >
                     {buttonType}
@@ -168,9 +167,9 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
         </div>
 
         <!-- Advanced Options Section -->
-        <div class="border-t pt-4">
+        <div class="pt-4">
             <button
-                class="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                class="flex items-center justify-between w-full text-sm text-[--secondary-text] hover:text-[--secondary-text-hover] transition-colors"
                 on:click={toggleAdvancedOptions}
                 aria-expanded={showAdvanced}
             >
@@ -184,14 +183,13 @@ A configurable node component for the XYFlow graph editor that handles mouse cli
             {#if showAdvanced}
                 <div class="mt-4 grid gap-6">
                     <!-- Scroll Direction Selection -->
-                    <div class="flex border rounded-lg overflow-hidden">
+                    <div class="flex rounded-lg overflow-hidden">
                         {#each SCROLL_DIRECTIONS as direction, index}
                             <button
                                 class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
                                     {data?.scrollDirection.includes(direction)
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-                                    {index > 0 ? 'border-l' : ''}
+                                        ? highlightColor + ' text-[--main-text]'
+                                        : 'bg-[--tertiary] hover:bg-[--tertiary-hover] text-[--tertiary-text]'}
                                     first:rounded-l-lg last:rounded-r-lg"
                                 on:click={() => toggleDirection(direction)}
                             >

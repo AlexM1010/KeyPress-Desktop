@@ -1,6 +1,6 @@
 <!-- frontend\src\lib\components\customNodes\NodeWrapper.svelte -->
 <script lang="ts">
-    import { slide, fly } from 'svelte/transition';
+    import { slide } from 'svelte/transition';
     import { ChevronDown } from "lucide-svelte";
     import type { ComponentType } from "svelte";
     import { Handle, Position } from "@xyflow/svelte";
@@ -115,13 +115,13 @@
         tabindex="0"
     >
         <div class="flex items-center gap-3">
-            <div class="p-2 bg-white/20 rounded-lg transform hover:scale-105">
-                <svelte:component this={icon} class="w-5 h-5 text-white" />
+            <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+                <svelte:component this={icon} class="w-5 h-5 text-[--secondary-text]" />
             </div>
-            <h3 class="text-sm font-semibold text-white">{title}</h3>
+            <h3 class="text-sm font-semibold text-[--secondary-text]">{title}</h3>
         </div>
         <button
-            class="text-white/80 hover:text-white p-2"
+            class="text-[--secondary-text] hover:text-[--secondary-text-hover] p-2"
             aria-expanded={isExpanded}
         >
             <ChevronDown class={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
@@ -201,8 +201,18 @@
     }
 
     @keyframes expand {
-        from { max-height: 0; }
-        to { max-height: 500px; }
+        0% {
+            max-height: 0;
+            padding: 1rem;
+        }
+        99% {
+            max-height: 500px;
+            padding: 1rem;
+        }
+        100% {
+            max-height: 500px;
+            padding: 0;
+        }
     }
 
     @keyframes retract {

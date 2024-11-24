@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
 	--dark-0: #000;
@@ -45,14 +45,15 @@
 	--link-dark: #2563eb;
 	--link-light: #3b82f6;
 
+	--error-color-light: #dc2626; /* red-600 */
+    --error-color-dark: #f87171; /* red-400 */
+
 	--dark-0-60: rgba(0, 0, 0, 0.6);
 	--light-0-60: rgba(255, 255, 255, 0.6);
 
 	// fonts
 	--text-f: 'Inter';
 	--title-f: 'Inter';
-
-	overflow-y: scroll;
 }
 
 body {
@@ -98,6 +99,7 @@ body {
 	--code-constant: var(--code-constant-dark);
 	--code-operator: var(--code-operator-dark);
 	--link: var(--link-light);
+	--error: var(--error-color-light);
 }
 
 :root[data-theme='light'] {
@@ -133,6 +135,7 @@ body {
 	--code-constant: var(--code-constant-light);
 	--code-operator: var(--code-operator-light);
 	--link: var(--link-dark);
+	--error: var(--error-color-dark);
 }
 
 .container {

@@ -6,6 +6,7 @@
     import { onMount } from 'svelte';
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import "../app.css";
+    import '$lib/index.scss';
 
     // No need for manual store subscriptions since we're using the derived stores
     let isReady = false;

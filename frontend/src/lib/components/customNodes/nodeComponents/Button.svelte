@@ -9,7 +9,7 @@
     export let variant: 'default' | 'danger' = 'default';
     
     $: buttonClass = [
-        'py-2 px-4 transition-colors duration-200 text-sm',
+        'py-2 px-4 transition-all duration-200 text-sm',
         fullWidth ? 'flex-1' : '',
         active ? getActiveClass() : getInactiveClass(),
         borderLeft ? 'border-l' : '',
@@ -20,13 +20,13 @@
 
     function getActiveClass(): string {
         if (variant === 'danger') {
-            return 'bg-red-500 text-white hover:bg-red-600';
+            return 'bg-[--error] text-[--main-text] hover:bg-[--error-hover]';
         }
-        return 'bg-blue-500 text-white';
+        return 'bg-[--primary] text-[--main-text] hover:bg-[--primary-hover]';
     }
 
     function getInactiveClass(): string {
-        return 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+        return 'bg-[--secondary] text-[--secondary-text] hover:bg-[--secondary-hover]';
     }
 </script>
 

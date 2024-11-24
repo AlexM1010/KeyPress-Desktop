@@ -18,6 +18,7 @@
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import type { HandleConfig } from './types';
+    import '$lib/index.scss';
 
     // Type definitions for OS-specific key mappings
     type OperatingSystem = 'windows' | 'macos' | 'linux';
@@ -168,13 +169,13 @@
         <!-- OS Selection -->
         {#if osDetectionFailed}
             <div class="flex flex-col" transition:slide|local={{duration: 300}}>
-                <label for="os-select" class="text-sm font-medium text-gray-700">
+                <label for="os-select" class="text-sm font-medium text-[--secondary-text]">
                     Select Operating System:
                 </label>
                 <select
                     id="os-select"
                     bind:value={currentOS}
-                    class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    class="mt-1 block w-full px-3 py-2 bg-[--secondary-hover] rounded-md shadow-sm focus:outline-none focus:ring-blue-500 transition-all duration-200"
                 >
                     <option value="windows">Windows</option>
                     <option value="macos">macOS</option>
@@ -185,7 +186,7 @@
 
         <!-- Special Keys Selection -->
         <div class="flex flex-col">
-            <label for="special-keys-group" class="text-sm font-medium text-gray-700 mb-2">
+            <label for="special-keys-group" class="text-sm font-medium text-[--secondary-text] mb-2">
                 Special Keys:
             </label>
             <div id="special-keys-group" role="group" class="flex flex-wrap gap-2">
@@ -193,11 +194,11 @@
                     <button
                         type="button"
                         on:click={() => toggleSpecialKey(specialKey.key)}
-                        class={`px-3 py-1 border rounded-md transition-all duration-200
+                        class={`px-3 py-1 rounded-md transition-all duration-200
                             ${selectedSpecialKeys.has(specialKey.key)
-                            ? 'bg-gray-300 border-gray-400 text-gray-800 transform scale-105'
-                            : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700 hover:scale-105'}
-                            active:bg-gray-400 focus:outline-none`}
+                            ? 'bg-[--secondary] text-[--secondary-text] transform scale-105'
+                            : 'bg-[--secondary] hover:bg-[--secondary-hover] text-[--secondary-text] hover:scale-105'}
+                            active:bg-[--accent] focus:outline-none`}
                     >
                         {specialKey.label}
                     </button>
@@ -207,22 +208,22 @@
 
         <!-- Macro Recording Controls -->
         <div class="flex flex-col">
-            <label for="macro-controls" class="text-sm font-medium text-gray-700 mb-2">
+            <label for="macro-controls" class="text-sm font-medium text-[--secondary-text] mb-2">
                 Macro Keys:
             </label>
             <div id="macro-controls" class="flex items-center space-x-2">
                 <button
                     on:click={isRecording ? stopRecording : startRecording}
-                    class={`px-3 py-2 border rounded-md shadow-sm focus:outline-none transition-all duration-300 ${
+                    class={`px-3 py-2 rounded-md shadow-sm focus:outline-none transition-all duration-300 ${
                         isRecording 
-                            ? 'bg-red-500 text-white animate-pulse' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            ? 'bg-red-500 text-[--main-text] animate-pulse' 
+                            : 'bg-[--secondary] text-[--secondary-text] hover:bg-[--secondary-hover]'
                     }`}
                 >
                     {isRecording ? 'Recording...' : 'Record Macro'}
                 </button>
                 <span 
-                    class="px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm transition-all duration-200"
+                    class="px-3 py-2 bg-[--secondary-hover] rounded-md shadow-sm transition-all duration-200"
                     in:fade={{duration: 200}}
                 >
                     {macroKeys.length ? macroDisplay : 'No macro'}

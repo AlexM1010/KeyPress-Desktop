@@ -13,7 +13,7 @@
   } from "@xyflow/svelte";
 
   // Import custom nodes, edges, and utilities
-  import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils";
+  import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils/utils";
   import CustomEdge from "./CustomEdge.svelte";
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
   import { flowTheme } from "$lib/stores/theme";
@@ -338,26 +338,22 @@
         <!-- Control Panel -->
         <Panel position="top-right">
           <div class="flex items-center">
-            <div
-              class="button-container flex items-center space-x-2 transition-transform duration-300"
-            >
+            <div class="button-container flex-center flex-gap transition-transform duration-300">
               <!-- Run Flow Button -->
               <button
-                class="bg-[--secondary] text-[--main-text] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[--secondary-hover]"
+                class="flow-button"
                 on:click={handleRunFlow}
                 disabled={isExecuting}
               >
                 <svelte:component
                   this={executionStatus.icon}
-                  class="w-5 h-5 {executionStatus.color}"
-                  style={
-                    isExecuting ? "animation: spin 1s linear infinite" : ""
-                  }
+                  class="flow-icon {executionStatus.color}"
+                  style={isExecuting ? "animation: spin 1s linear infinite" : ""}
                 />
               </button>
               <!-- Save Button -->
               <button
-                class="bg-[--secondary] text-[--main-text] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[--secondary-hover]"
+                class="flow-button"
                 on:click={handleSave}
                 disabled={isSaving}
               >
@@ -371,18 +367,16 @@
                       ? Check
                       : Save
                   }
-                  class="w-5 h-5"
-                  style={
-                    isSaving ? "animation: spin 1s linear infinite" : ""
-                  }
+                  class="flow-icon"
+                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
                 />
               </button>
               <!-- Layout Button -->
               <button
-                class="bg-[--secondary] text-[--main-text] px-4 py-2 rounded flex items-center space-x-1 hover:bg-[--secondary-hover]"
+                class="flow-button"
                 on:click={() => onLayout("TB")}
               >
-                <LayoutDashboard class="w-5 h-5" />
+                <LayoutDashboard class="flow-icon" />
                 <span>Layout</span>
               </button>
             </div>
@@ -403,7 +397,7 @@
         class:opacity-0={!hasStatusPanel}
       >
         <button
-          class="absolute top-[15%] right-80 -translate-y-1/2 bg-[--secondary] rounded-l-md p-1 cursor-pointer z-20 transition-all duration-300 hover:bg-[--secondary-hover]"
+          class="status-toggle-button-inner"
           style="right: {isStatusPanelExpanded ? '320px' : '0'}"
           on:click={toggleStatusPanel}
           aria-label={
@@ -414,7 +408,7 @@
         >
           <svelte:component
             this={isStatusPanelExpanded ? ChevronRight : ChevronLeft}
-            class="w-4 h-4"
+            class="flow-icon"
           />
         </button>
       </div>
@@ -422,14 +416,14 @@
 
     <!-- Status Panel -->
     <div
-      class="absolute right-0 top-0 bottom-0 bg-[--secondary] overflow-y-auto transition-all duration-300"
-      style="width: 320px; transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
+      class="status-panel"
+      style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
     >
-      <div class="p-4">
-        <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+      <div class="panel-spacing">
+        <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
           <svelte:component
             this={executionStatus.icon}
-            class="w-6 h-6 {executionStatus.color}"
+            class="flow-icon {executionStatus.color}"
           />
           <span>Execution Status</span>
         </h2>
@@ -438,17 +432,17 @@
         {:else}
           <ul>
             {#each statusMessages as msg (msg.id)}
-              <li class="flex items-center mb-3">
+              <li class="flex-center mb-3">
                 <!-- Status Icon -->
                 {#if msg.type === "success"}
-                  <Check class="w-5 h-5 text-green-500 mr-2" />
+                  <Check class="flow-icon text-green-500 mr-2" />
                 {:else if msg.type === "error"}
-                  <X class="w-5 h-5 text-red-500 mr-2" />
+                  <X class="flow-icon text-red-500 mr-2" />
                 {:else if msg.type === "warning"}
-                  <TriangleAlert class="w-5 h-5 text-yellow-500 mr-2" />
+                  <TriangleAlert class="flow-icon text-yellow-500 mr-2" />
                 {:else if msg.type === "info" || msg.type === "running"}
                   <Play
-                    class="w-5 h-5 text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
+                    class="flow-icon text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
                   />
                 {/if}
                 <span class="text-sm">{msg.message}</span>
@@ -509,5 +503,71 @@
     to {
       transform: rotate(360deg);
     }
+  }
+
+  /* Common button styles */
+  .flow-button {
+    background-color: var(--secondary);
+    color: var(--main-text);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0.8;
+  }
+
+  .flow-button:hover {
+    background-color: var(--secondary-hover);
+  }
+
+  /* Common icon styles */
+  :global(.flow-icon) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Status panel transitions */
+  .status-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    background-color: var(--secondary);
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+  }
+
+  /* Common spacing */
+  .panel-spacing {
+    padding: 1rem;
+  }
+
+  /* Common flex layouts */
+  .flex-center {
+    display: flex;
+    align-items: center;
+  }
+
+  .flex-gap {
+    gap: 0.5rem;
+  }
+
+  .status-toggle-button-inner {
+    position: absolute;
+    top: 15%;
+    right: 80px;
+    transform: translateY(-50%);
+    background-color: var(--tertiary);
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+  }
+
+  .status-toggle-button-inner:hover {
+    background-color: var(--tertiary-hover);
   }
 </style>
