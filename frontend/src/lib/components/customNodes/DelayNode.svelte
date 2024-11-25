@@ -1,16 +1,19 @@
 <!-- DelayNode.svelte -->
 <script lang="ts">
     import { Clock } from 'lucide-svelte';
-    import { onMount } from 'svelte';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import { Handle, Position } from "@xyflow/svelte";
     import type { HandleConfig } from "./types";
+    import TimeInput from './nodeComponents/TimeInput.svelte';
+    import ButtonGroup from "./nodeComponents/ButtonGroup.svelte";
+    import ButtonGroupItem from "./nodeComponents/ButtonGroupItem.svelte";
 
     export let id: string;
     export let title: string = 'Delay';
     export let icon: ComponentType = Clock;
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
+    export let highlightColor: string = 'bg-blue-500';
 
     export let data = {
         delayType: 'Fixed',
@@ -24,7 +27,12 @@
         { id: "left", type: "target", position: Position.Left, offsetY: 50 },
     ];
 
-    // Add a reactive statement to ensure data consistency
+    const DELAY_TYPES = ['Fixed', 'Random'];
+
+    function updateDelayType(newType: string) {
+        data.delayType = newType;
+    }
+
     $: {
         if (data.delayType === 'Fixed' && !data.time) {
             data.time = 1000;
@@ -43,70 +51,53 @@
     {color}
     type="Delay"
     {handles}
-    bind:data 
+    bind:data
     on:duplicate
     on:delete
 >
-    <!-- Node Content for configuring Delay options -->
     <div class="space-y-4">
         <!-- Delay Type Selection -->
-        <div class="flex flex-col">
-            <label for="delayType" class="text-sm font-medium --main-text">Delay Type:</label>
-            <select
-                id="delayType"
-                bind:value={data.delayType}
-                class="mt-1 block w-full px-3 py-2 bg-gray-50 border 
-                       border-gray-300 rounded-md shadow-sm focus:outline-none 
-                       focus:ring-blue-500 focus:border-blue-500"
-            >
-                <option value="Fixed">Fixed Delay</option>
-                <option value="Random">Random Delay</option>
-            </select>
-        </div>
+        <ButtonGroup variant="default">
+            {#each DELAY_TYPES as type}
+                <ButtonGroupItem 
+                    value={type}
+                    on:click={() => updateDelayType(type)}
+                    active={data.delayType === type}
+                    itemHighlightColor={highlightColor}
+                >
+                    {type}
+                </ButtonGroupItem>
+            {/each}
+        </ButtonGroup>
 
         <!-- Fixed Delay Input -->
         {#if data.delayType === 'Fixed'}
-            <div class="flex flex-col">
-                <label for="fixedTime" class="text-sm font-medium --main-text">Time (ms):</label>
-                <input
-                    id="fixedTime"
-                    type="number"
-                    min="0"
-                    step="1"
-                    bind:value={data.time}
-                    class="mt-1 block w-full px-3 py-2 bg-gray-50 border 
-                           border-gray-300 rounded-md shadow-sm focus:outline-none 
-                           focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
+            <TimeInput
+                label="Time"
+                bind:value={data.time}
+                defaultValue={1000}
+                startingUnit="ms"
+                minValue={0}
+                highlightColor={highlightColor}
+            />
         <!-- Random Delay Inputs -->
         {:else if data.delayType === 'Random'}
-            <div class="flex flex-col">
-                <label for="minTime" class="text-sm font-medium --main-text">Minimum Time (ms):</label>
-                <input
-                    id="minTime"
-                    type="number"
-                    min="0"
-                    step="1"
-                    bind:value={data.minTime}
-                    class="mt-1 block w-full px-3 py-2 bg-gray-50 border 
-                           border-gray-300 rounded-md shadow-sm focus:outline-none 
-                           focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-            <div class="flex flex-col">
-                <label for="maxTime" class="text-sm font-medium --main-text">Maximum Time (ms):</label>
-                <input
-                    id="maxTime"
-                    type="number"
-                    min="0"
-                    step="1"
-                    bind:value={data.maxTime}
-                    class="mt-1 block w-full px-3 py-2 bg-gray-50 border 
-                           border-gray-300 rounded-md shadow-sm focus:outline-none 
-                           focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
+            <TimeInput
+                label="Minimum Time"
+                bind:value={data.minTime}
+                defaultValue={500}
+                startingUnit="ms"
+                minValue={0}
+                highlightColor={highlightColor}
+            />
+            <TimeInput
+                label="Maximum Time"
+                bind:value={data.maxTime}
+                defaultValue={1500}
+                startingUnit="ms"
+                minValue={0}
+                highlightColor={highlightColor}
+            />
         {/if}
     </div>
 </NodeWrapper>

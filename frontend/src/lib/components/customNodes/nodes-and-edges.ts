@@ -21,7 +21,7 @@ export const initialNodes: Node[] = [
       styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
     }
   }, */
-  {
+  /*{
     id: 'colorpicker-1',
     type: 'ColorPicker',
     position: { x: baseX + xSpacing * 3, y: baseY + xSpacing * 2 },
@@ -33,7 +33,7 @@ export const initialNodes: Node[] = [
     },
     targetPosition: 'left' as Position,
     sourcePosition: 'right' as Position
-  },
+  },*/
   {
     id: 'Click',
     type: 'Click',
@@ -62,12 +62,13 @@ export const initialNodes: Node[] = [
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
     }
   },
+  /*
   {
     id: 'MoveMouse-node',
     type: 'MoveMouse',
     position: { x: baseX + xSpacing * 4, y: baseY + xSpacing }, // Adjust position as needed
     data: {}
-  },
+  },*/
   /*{
     id: 'MoveMouse-node1',
     type: 'MoveMouse',
