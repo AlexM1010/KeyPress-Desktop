@@ -56,7 +56,7 @@
 <NodeWrapper
     icon={Palette}
     title="Color Picker"
-    color="bg-gradient-to-r from-violet-500 to-purple-500"
+    color="bg-gradient-to-r from-indigo-400 to-indigo-500"
     {handles}
     {isConnectable}
     id={id}

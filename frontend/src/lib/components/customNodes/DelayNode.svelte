@@ -10,7 +10,7 @@
     export let id: string;
     export let title: string = 'Delay';
     export let icon: ComponentType = Clock;
-    export let color: string = 'bg-gradient-to-r from-yellow-500 to-yellow-600';
+    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
 
     export let data = {
         delayType: 'Fixed',
