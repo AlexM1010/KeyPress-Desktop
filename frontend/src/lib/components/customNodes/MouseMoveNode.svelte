@@ -231,8 +231,8 @@
             {/if}
         </div>
 
-        <!-- Movement Settings -->
-        <div class="border-t pt-4">
+        <!-- Advanced Movement Settings -->
+        <div class="border-t pt-2" style="border-color: var(--secondary-text);">
             <button
                 class="flex items-center justify-between w-full text-sm --main-text hover:--main-text transition-colors"
                 on:click={() => showMovementSettings = !showMovementSettings}

@@ -62,7 +62,7 @@
                     alt="Keypress Logo" 
                     class="h-10 w-auto max-w-full object-contain" 
                 />
-                <span class="text-foreground font-bold text-xl">Keypress</span>
+                <span class="h1 --text-main font-bold text-xl">eypress</span>
             </button>
             {#if $isAuthenticated && $user}
                 <Button on:click={() => goto('/workspace')} variant="ghost">
