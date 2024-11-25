@@ -1,4 +1,4 @@
-<!-- Button.svelte -->
+<!-- frontend\src\lib\components\customNodes\nodeComponents\Button.svelte -->
 <script lang="ts">
     export let active: boolean = false;
     export let first: boolean = false;
@@ -7,7 +7,8 @@
     export let disabled: boolean = false;
     export let fullWidth: boolean = true;
     export let variant: 'default' | 'danger' = 'default';
-    
+    export let highlightColor: string = 'bg-blue-500'; // New Prop
+        
     $: buttonClass = [
         'py-2 px-4 transition-all duration-200 text-sm',
         fullWidth ? 'flex-1' : '',
@@ -22,7 +23,7 @@
         if (variant === 'danger') {
             return 'bg-[--error] text-[--main-text] hover:bg-[--error-hover]';
         }
-        return 'bg-[--primary] text-[--main-text] hover:bg-[--primary-hover]';
+        return `${highlightColor} text-[--main-text] hover:bg-primary-hover`;
     }
 
     function getInactiveClass(): string {
@@ -33,7 +34,7 @@
 <button
     class={buttonClass}
     on:click
-    {disabled}
+    disabled={disabled}
 >
     <slot />
 </button>
