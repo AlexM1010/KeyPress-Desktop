@@ -1,33 +1,17 @@
-<!--
-MouseMoveNode.svelte
-A configurable node component for the XYFlow graph editor that handles mouse movement operations.
-
-Features:
-- Configurable start and end positions (Fixed coordinates or Mouse position)
-- Movement settings including:
-  - Drag while moving option
-  - Speed control (Instant or Human-like with randomization)
-  - Path type selection (Straight or Human-like)
-- Interactive UI with collapsible settings panel
-- Input validation and bounds checking
-- Node connection handles for graph integration
-
-@component
-@requires @xyflow/svelte
-@requires lucide-svelte
--->
-
+<!-- MouseMoveNode.svelte -->
 <script lang="ts">
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
     import { Mouse, ChevronDown } from 'lucide-svelte';
-    
+
     // Component Imports
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import Checkbox from "./nodeComponents/Checkbox.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
     import Slider from './nodeComponents/Slider.svelte';
     import TimeInput from './nodeComponents/TimeInput.svelte';
+    import ButtonGroup from "./nodeComponents/ButtonGroup.svelte";
+    import ButtonGroupItem from "./nodeComponents/ButtonGroupItem.svelte";
     import type { HandleConfig } from './types';
 
     // Type definitions
@@ -65,7 +49,8 @@ Features:
     export let title: string = 'Mouse Move';
     export let icon: ComponentType = Mouse;
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
-    
+    export let highlightColor: string = 'bg-green-500';
+
     // Data initialization with default values
     export let data: MouseMoveTaskData = {
         startPosition: {
@@ -149,20 +134,6 @@ Features:
     function handleDelete(): void {
         console.log("Delete action triggered", JSON.stringify(data));
     }
-
-    /**
-     * Helper function to generate button classes
-     */
-    function getButtonClasses(isActive: boolean, isFirst: boolean = false, isLast: boolean = false, isDisabled: boolean = false): string {
-        return `
-            flex-1 py-2 px-4 transition-colors duration-200 text-sm
-            ${isActive ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'}
-            ${!isFirst ? 'border-l' : ''}
-            ${isFirst ? 'first:rounded-l-lg' : ''}
-            ${isLast ? 'last:rounded-r-lg' : ''}
-            ${isDisabled ? 'disabled:opacity-75 disabled:cursor-not-allowed disabled:hover:bg-gray-100' : ''}
-        `;
-    }
 </script>
 
 <NodeWrapper
@@ -180,21 +151,25 @@ Features:
         <!-- Start Position Configuration -->
         <div class="grid gap-4">
             <h3 class="text-sm font-medium text-gray-700">Start Position</h3>
-            <div class="flex border rounded-lg overflow-hidden">
-                <button 
-                    class={getButtonClasses(data.startPosition.type === 'Fixed', true)}
+            <ButtonGroup variant="default">
+                <ButtonGroupItem 
+                    value="Fixed"
                     on:click={() => data.startPosition.type = 'Fixed'}
+                    active={data.startPosition.type === 'Fixed'}
+                    itemHighlightColor={highlightColor}
                 >
                     Fixed
-                </button>
-                <button
-                    class={getButtonClasses(data.startPosition.type === 'Mouse', false, true, data.endPosition.type === 'Mouse')}
-                    disabled={data.endPosition.type === 'Mouse'}
+                </ButtonGroupItem>
+                <ButtonGroupItem 
+                    value="Mouse"
                     on:click={() => data.startPosition.type = 'Mouse'}
+                    active={data.startPosition.type === 'Mouse'}
+                    disabled={data.endPosition.type === 'Mouse'}
+                    itemHighlightColor={highlightColor}
                 >
                     Mouse
-                </button>
-            </div>
+                </ButtonGroupItem>
+            </ButtonGroup>
             
             {#if data.startPosition.type === 'Fixed'}
                 <div class="grid grid-cols-2 gap-4">
@@ -217,21 +192,25 @@ Features:
         <!-- End Position Configuration -->
         <div class="grid gap-4">
             <h3 class="text-sm font-medium text-gray-700">End Position</h3>
-            <div class="flex border rounded-lg overflow-hidden">
-                <button
-                    class={getButtonClasses(data.endPosition.type === 'Fixed', true)}
+            <ButtonGroup variant="default">
+                <ButtonGroupItem 
+                    value="Fixed"
                     on:click={() => data.endPosition.type = 'Fixed'}
+                    active={data.endPosition.type === 'Fixed'}
+                    itemHighlightColor={highlightColor}
                 >
                     Fixed
-                </button>
-                <button 
-                    class={getButtonClasses(data.endPosition.type === 'Mouse', false, true, data.startPosition.type === 'Mouse')}
-                    disabled={data.startPosition.type === 'Mouse'}
+                </ButtonGroupItem>
+                <ButtonGroupItem 
+                    value="Mouse"
                     on:click={() => data.endPosition.type = 'Mouse'}
+                    active={data.endPosition.type === 'Mouse'}
+                    disabled={data.startPosition.type === 'Mouse'}
+                    itemHighlightColor={highlightColor}
                 >
                     Mouse
-                </button>
-            </div>
+                </ButtonGroupItem>
+            </ButtonGroup>
             
             {#if data.endPosition.type === 'Fixed'}
                 <div class="grid grid-cols-2 gap-4">
@@ -276,20 +255,18 @@ Features:
                     <!-- Move Speed Configuration -->
                     <div class="grid gap-4">
                         <h4 class="text-sm font-medium text-gray-700">Move Speed</h4>
-                        <div class="flex border rounded-lg overflow-hidden">
-                            {#each SPEED_TYPES as type, index}
-                                <button
-                                    class={getButtonClasses(
-                                        data.speed.type === type,
-                                        index === 0,
-                                        index === SPEED_TYPES.length - 1
-                                    )}
+                        <ButtonGroup variant="default">
+                            {#each SPEED_TYPES as type}
+                                <ButtonGroupItem 
+                                    value={type}
                                     on:click={() => data.speed.type = type}
+                                    active={data.speed.type === type}
+                                    itemHighlightColor={highlightColor}
                                 >
                                     {type}
-                                </button>
+                                </ButtonGroupItem>
                             {/each}
-                        </div>
+                        </ButtonGroup>
 
                         {#if data.speed.type === 'Human'}
                             <TimeInput
@@ -322,20 +299,18 @@ Features:
                     <!-- Path Type Configuration -->
                     <div class="grid gap-4">
                         <h4 class="text-sm font-medium text-gray-700">Path Type</h4>
-                        <div class="flex border rounded-lg overflow-hidden">
-                            {#each PATH_TYPES as type, index}
-                                <button
-                                    class={getButtonClasses(
-                                        data.pathType === type,
-                                        index === 0,
-                                        index === PATH_TYPES.length - 1
-                                    )}
+                        <ButtonGroup variant="default">
+                            {#each PATH_TYPES as type}
+                                <ButtonGroupItem 
+                                    value={type}
                                     on:click={() => data.pathType = type}
+                                    active={data.pathType === type}
+                                    itemHighlightColor={highlightColor}
                                 >
                                     {type}
-                                </button>
+                                </ButtonGroupItem>
                             {/each}
-                        </div>
+                        </ButtonGroup>
                     </div>
                 </div>
             {/if}

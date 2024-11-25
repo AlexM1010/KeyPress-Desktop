@@ -1,14 +1,4 @@
-<!--StartNode.svelte - A customizable macro recording node component for flow-based interfaces -->
-<!--
- * 
- * This component provides a UI for recording keyboard macros with support for:
- * - OS-specific special key detection and display
- * - Real-time macro recording
- * - Visual feedback during recording
- * - Customizable node appearance
- * 
- * @component
--->
+<!-- StartNode.svelte -->
 <script lang="ts">
     import { Play } from 'lucide-svelte';
     import { Position } from '@xyflow/svelte';
@@ -16,6 +6,8 @@
     import { slide, fade } from 'svelte/transition';
     import { cubicOut } from 'svelte/easing';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
+    import ButtonGroup from './nodeComponents/ButtonGroup.svelte';
+    import ButtonGroupItem from './nodeComponents/ButtonGroupItem.svelte';
     import type { ComponentType } from 'svelte';
     import type { HandleConfig } from './types';
     import '$lib/index.scss';
@@ -56,6 +48,7 @@
     export let title: string = 'Start';
     export let icon: ComponentType = Play;
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
+    export let highlightColor: string = 'bg-blue-500';
     export let isConnectable: boolean = true;
 
     // Component state
@@ -129,7 +122,7 @@
      */
     function handleKeyUp(event: KeyboardEvent) {
         if (!isRecording) return;
-        
+
         if (!event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
             stopRecording();
         }
@@ -152,7 +145,6 @@
     $$restProps
 </script>
 
-<!-- Template remains unchanged but with improved class organization TODO: Link up data to input fields -->
 <NodeWrapper 
     {icon} 
     {title} 
@@ -189,21 +181,18 @@
             <label for="special-keys-group" class="text-sm font-medium text-[--secondary-text] mb-2">
                 Special Keys:
             </label>
-            <div id="special-keys-group" role="group" class="flex flex-wrap gap-2">
+            <ButtonGroup variant="default">
                 {#each specialKeysByOS[currentOS] as specialKey}
-                    <button
-                        type="button"
+                    <ButtonGroupItem
+                        value={specialKey.key}
                         on:click={() => toggleSpecialKey(specialKey.key)}
-                        class={`px-3 py-1 rounded-md transition-all duration-200
-                            ${selectedSpecialKeys.has(specialKey.key)
-                            ? 'bg-[--secondary] text-[--secondary-text] transform scale-105'
-                            : 'bg-[--secondary] hover:bg-[--secondary-hover] text-[--secondary-text] hover:scale-105'}
-                            active:bg-[--accent] focus:outline-none`}
+                        active={selectedSpecialKeys.has(specialKey.key)}
+                        itemHighlightColor={highlightColor}
                     >
                         {specialKey.label}
-                    </button>
+                    </ButtonGroupItem>
                 {/each}
-            </div>
+            </ButtonGroup>
         </div>
 
         <!-- Macro Recording Controls -->

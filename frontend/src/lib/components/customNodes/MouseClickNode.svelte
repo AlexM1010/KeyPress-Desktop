@@ -27,8 +27,8 @@
     export let id: string;
     export let title: string = 'Mouse Click';
     export let icon: ComponentType = MousePointer;
-    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600 bg-opacity-75';
-    export let highlightColor: string = 'bg-blue-500 bg-opacity-75';
+    export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
+    export let highlightColor: string = 'bg-green-500';
 
     const BUTTON_TYPES: ButtonType[] = ['left', 'middle', 'right'];
     const SCROLL_DIRECTIONS: ScrollDirection[] = ['Vertical', 'Horizontal'];
@@ -107,19 +107,17 @@
 >
     <div class="grid gap-6">
         <!-- Button Type Selection -->
-        <ButtonGroup variant="default" highlightColor={highlightColor}>
-            <ButtonGroupItem value="left" 
-                on:click={() => handleClick('left')} 
-                active={data.buttonType === 'left'}
-            > Left </ButtonGroupItem>
-            <ButtonGroupItem value="middle" 
-                on:click={() => handleClick('middle')} 
-                active={data.buttonType === 'middle'}
-            > Middle </ButtonGroupItem>
-            <ButtonGroupItem value="right" 
-                on:click={() => handleClick('right')} 
-                active={data.buttonType === 'right'}
-            > Right </ButtonGroupItem>
+        <ButtonGroup variant="default">
+            {#each BUTTON_TYPES as type}
+                <ButtonGroupItem 
+                    value={type}
+                    on:click={() => handleClick(type)}
+                    active={data.buttonType === type}
+                    itemHighlightColor={highlightColor}
+                >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                </ButtonGroupItem>
+            {/each}
         </ButtonGroup>
 
         <!-- Click Configuration -->
@@ -171,21 +169,17 @@
 
             {#if showAdvanced}
                 <div class="mt-4 grid gap-6">
-                    <ButtonGroup variant="default" highlightColor={highlightColor} >
-                        <ButtonGroupItem 
-                            value="Vertical" 
-                            on:click={() => toggleDirection('Vertical')}
-                            active={data.scrollDirection.includes('Vertical')}
-                        >
-                            Vertical
-                        </ButtonGroupItem>
-                        <ButtonGroupItem 
-                            value="Horizontal" 
-                            on:click={() => toggleDirection('Horizontal')}
-                            active={data.scrollDirection.includes('Horizontal')}
-                        >
-                            Horizontal
-                        </ButtonGroupItem>
+                    <ButtonGroup variant="default">
+                        {#each SCROLL_DIRECTIONS as direction}
+                            <ButtonGroupItem 
+                                value={direction}
+                                on:click={() => toggleDirection(direction)}
+                                active={data.scrollDirection.includes(direction)}
+                                itemHighlightColor={highlightColor}
+                            >
+                                {direction}
+                            </ButtonGroupItem>
+                        {/each}
                     </ButtonGroup>
                     
                     <NumberInput

@@ -52,7 +52,7 @@
     });
 
     // Determine effective highlight color
-    $: effectiveHighlightColor = itemHighlightColor || 'bg-blue-500';
+    $: effectiveHighlightColor = itemHighlightColor || 'bg-gray-500';
 
     // Compute the button classes based on props and position
     $: buttonClass = [

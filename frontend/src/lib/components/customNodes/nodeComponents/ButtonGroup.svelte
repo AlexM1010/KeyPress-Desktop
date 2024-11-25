@@ -6,7 +6,6 @@
   
     export const variant: 'default' | 'danger' = 'default';
     export const size: 'sm' | 'md' | 'lg' = 'md';
-    export const highlightColor: string = 'bg-blue-500';
     export let className: string = '';
     export { className as class };
   
