@@ -1,39 +1,30 @@
 <!-- ButtonGroup.svelte -->
 <script lang="ts">
-    export let active: boolean = false;
-    export let first: boolean = false;
-    export let last: boolean = false;
-    export let borderLeft: boolean = false;
-    export let disabled: boolean = false;
-    export let fullWidth: boolean = true;
-    export let variant: 'default' | 'danger' = 'default';
-    
-    $: buttonClass = [
-        'py-2 px-4 transition-all duration-200 text-sm',
-        fullWidth ? 'flex-1' : '',
-        active ? getActiveClass() : getInactiveClass(),
-        borderLeft ? 'border-l' : '',
-        first ? 'rounded-l-lg' : '',
-        last ? 'rounded-r-lg' : '',
-        disabled ? 'opacity-50 cursor-not-allowed' : '',
-    ].filter(Boolean).join(' ');
-
-    function getActiveClass(): string {
-        if (variant === 'danger') {
-            return 'bg-[--danger] text-[--main-text] hover:bg-[--danger-hover]';
-        }
-        return 'bg-[--primary] text-[--main-text] hover:bg-[--primary-hover]';
-    }
-
-    function getInactiveClass(): string {
-        return 'bg-[--secondary] text-[--secondary-text] hover:bg-[--secondary-hover]';
-    }
+    import { setContext } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { cn } from '$lib/utils.js';
+  
+    export const variant: 'default' | 'danger' = 'default';
+    export const size: 'sm' | 'md' | 'lg' = 'md';
+    export const highlightColor: string = 'bg-blue-500';
+    export let className: string = '';
+    export { className as class };
+  
+    // Create a store to track the order of ButtonGroupItems
+    const items = writable<string[]>([]);
+  
+    // Provide context to child ButtonGroupItems
+    setContext('buttonGroupCtx', {
+        register: (id: string) => {
+            items.update(current => [...current, id]);
+        },
+        unregister: (id: string) => {
+            items.update(current => current.filter(item => item !== id));
+        },
+        items
+    });
 </script>
-
-<button
-    class={buttonClass}
-    on:click
-    {disabled}
->
+  
+<div class={cn("flex items-center justify-center button-group", className)}>
     <slot />
-</button>
+</div>

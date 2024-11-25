@@ -142,7 +142,6 @@ export function stopAutoSave(autoSaveInterval: any) {
 // =================================================================================================================
 
 import dagre from "@dagrejs/dagre";
-import "../../app.css";
 import {
     Position,
     type Node,
