@@ -1,40 +1,39 @@
-<!-- frontend\src\lib\components\customNodes\nodeComponents\ButtonGroup.svelte -->
+<!-- ButtonGroup.svelte -->
 <script lang="ts">
-    import Button from './Button.svelte';
-
-    export let labels: string[];
-    export let variant: 'default' | 'danger' | undefined;
-    export let highlightColor: string | undefined;
-    export let active: boolean | undefined;
-    export let disabled: boolean | undefined;
-    export let onClick: (() => void) | undefined;
-    
+    export let active: boolean = false;
+    export let first: boolean = false;
+    export let last: boolean = false;
+    export let borderLeft: boolean = false;
+    export let disabled: boolean = false;
     export let fullWidth: boolean = true;
+    export let variant: 'default' | 'danger' = 'default';
+    
+    $: buttonClass = [
+        'py-2 px-4 transition-all duration-200 text-sm',
+        fullWidth ? 'flex-1' : '',
+        active ? getActiveClass() : getInactiveClass(),
+        borderLeft ? 'border-l' : '',
+        first ? 'rounded-l-lg' : '',
+        last ? 'rounded-r-lg' : '',
+        disabled ? 'opacity-50 cursor-not-allowed' : '',
+    ].filter(Boolean).join(' ');
 
-    // Generate buttons array from labels and shared props
-    $: buttons = labels.map(label => ({
-        label,
-        variant,
-        highlightColor: active ? highlightColor : undefined,
-        active,
-        disabled,
-        onClick,
-    }));
+    function getActiveClass(): string {
+        if (variant === 'danger') {
+            return 'bg-[--danger] text-[--main-text] hover:bg-[--danger-hover]';
+        }
+        return 'bg-[--primary] text-[--main-text] hover:bg-[--primary-hover]';
+    }
+
+    function getInactiveClass(): string {
+        return 'bg-[--secondary] text-[--secondary-text] hover:bg-[--secondary-hover]';
+    }
 </script>
 
-<div class="flex rounded-lg overflow-hidden">
-    {#each buttons as btn, index}
-        <Button
-            active={btn.active}
-            variant={btn.variant || "default"}
-            highlightColor={btn.highlightColor || "bg-primary"}
-            first={index === 0}
-            last={index === buttons.length - 1}
-            disabled={btn.disabled}
-            {fullWidth}
-            on:click={btn.onClick}
-        >
-            {btn.label}
-        </Button>
-    {/each}
-</div>
+<button
+    class={buttonClass}
+    on:click
+    {disabled}
+>
+    <slot />
+</button>

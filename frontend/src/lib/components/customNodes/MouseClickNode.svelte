@@ -1,15 +1,17 @@
-<!-- MouseClickNode.svelte -->
+<!--
+MouseClickNode.svelte
+A configurable node component for the XYFlow graph editor that handles mouse click operations.
+-->
+
 <script lang="ts">
     import { Position } from "@xyflow/svelte";
     import type { ComponentType } from 'svelte';
     import { MousePointer, ChevronDown } from 'lucide-svelte';
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import Checkbox from "./nodeComponents/Checkbox.svelte";
-    import ButtonGroup from "./nodeComponents/ButtonGroup.svelte";
     import TimeInput from "./nodeComponents/TimeInput.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
     import type { HandleConfig } from './types';
-    import * as ToggleGroup from "$lib/components/ui/toggle-group/index.js";
 
     // Move types inside main script
     type ButtonType = 'left' | 'middle' | 'right';
@@ -28,8 +30,8 @@
     export let id: string;
     export let title: string = 'Mouse Click';
     export let icon: ComponentType = MousePointer;
-    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600 bg-opacity-75'; // Custom header color 
-    export let highlightColor: string = 'bg-blue-500 bg-opacity-75'; // Custom highlight color with partial transparency
+    export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600 bg-opacity-75'; //Custom header color 
+    export let highlightColor: string = 'bg-blue-500 bg-opacity-75'; //Custom highlight color with partial transparency
 
     const BUTTON_TYPES: ButtonType[] = ['left', 'middle', 'right'];
     const SCROLL_DIRECTIONS: ScrollDirection[] = ['Vertical', 'Horizontal'];
@@ -52,9 +54,7 @@
         if (data?.clickDelay == null) data.clickDelay = 0.1;
         if (data?.pressReleaseDelay == null) data.pressReleaseDelay = 100;
         if (data?.releaseAfterPress == null) data.releaseAfterPress = true;
-        if (data?.scrollDirection == null || !Array.isArray(data.scrollDirection)) {
-            data.scrollDirection = ['Vertical'];
-        }
+        if (data?.scrollDirection == null) { data.scrollDirection = ['Vertical']; }
         if (data?.scrollLines == null) data.scrollLines = 0;
     }
 
@@ -83,12 +83,9 @@
      * @param direction - The scroll direction to toggle
      */
     function toggleDirection(direction: ScrollDirection): void {
-        data.scrollDirection = data.scrollDirection ?? [];
-        if (data.scrollDirection.includes(direction)) {
-            data.scrollDirection = data.scrollDirection.filter(d => d !== direction);
-        } else {
-            data.scrollDirection.push(direction);
-        }
+        data.scrollDirection = data?.scrollDirection.includes(direction)
+            ? data?.scrollDirection.filter(d => d !== direction) as ScrollDirection[]
+            : [...data?.scrollDirection, direction];
     }
 
     /**
@@ -120,26 +117,20 @@
 >
     <div class="grid gap-6">
         <!-- Button Type Selection -->
-        <ToggleGroup.Root size="lg" type="multiple">
-            <ToggleGroup.Item value="bg-blue-500" aria-label="Toggle bold">
-              Left
-            </ToggleGroup.Item>
-            <ToggleGroup.Item value="italic" aria-label="Toggle italic">
-              Middle
-            </ToggleGroup.Item>
-            <ToggleGroup.Item value="strikethrough" aria-label="Toggle strikethrough">
-              Right
-            </ToggleGroup.Item>
-          </ToggleGroup.Root>
-    
-        <ButtonGroup 
-            labels={["left","middle","right"]}
-            variant="default"
-            highlightColor={highlightColor}
-            active={data.buttonType === data.buttonType}
-            onClick={() => updateButtonType(data.buttonType)}
-            disabled={false}
-        />
+        <div class="flex rounded-lg overflow-hidden">
+            {#each BUTTON_TYPES as buttonType, index}
+                <button
+                    class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
+                        {data?.buttonType === buttonType 
+                            ? highlightColor + ' text-[--main-text]'
+                            : 'bg-[--tertiary] hover:bg-[--tertiary-hover] text-[--secondary-text]'}
+                        first:rounded-l-lg last:rounded-r-lg"
+                    on:click={() => updateButtonType(buttonType)}
+                >
+                    {buttonType}
+                </button>
+            {/each}
+        </div>
 
         <!-- Click Configuration -->
         <div class="grid gap-6 auto-rows-min">
@@ -174,7 +165,7 @@
                 {/if}
             </div>
         </div>
-        
+
         <!-- Advanced Options Section -->
         <div class="pt-4">
             <button
@@ -191,16 +182,22 @@
 
             {#if showAdvanced}
                 <div class="mt-4 grid gap-6">
-                    <!-- Scroll Direction Selection add default={data.scrollDirection}}-->
-                    <ButtonGroup 
-                        labels={['Vertical','Horizontal']}
-                        variant="default"
-                        highlightColor={highlightColor}
-                        active={data.scrollDirection === data.scrollDirection}
-                        onClick={() => toggleDirection('Vertical')}
-                        disabled={false}
-                    />
-                    
+                    <!-- Scroll Direction Selection -->
+                    <div class="flex rounded-lg overflow-hidden">
+                        {#each SCROLL_DIRECTIONS as direction, index}
+                            <button
+                                class="flex-1 py-2 px-4 transition-colors duration-200 text-sm
+                                    {data?.scrollDirection.includes(direction)
+                                        ? highlightColor + ' text-[--main-text]'
+                                        : 'bg-[--tertiary] hover:bg-[--tertiary-hover] text-[--tertiary-text]'}
+                                    first:rounded-l-lg last:rounded-r-lg"
+                                on:click={() => toggleDirection(direction)}
+                            >
+                                {direction}
+                            </button>
+                        {/each}
+                    </div>
+
                     <!-- Scroll Lines Input -->
                     <NumberInput
                         label="Lines"
