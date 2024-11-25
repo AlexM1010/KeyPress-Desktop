@@ -10,6 +10,7 @@
     import TimeInput from "./nodeComponents/TimeInput.svelte";
     import NumberInput from './nodeComponents/NumberInput.svelte';
     import type { HandleConfig } from './types';
+    import "$lib/index.scss";
 
     type ButtonType = 'left' | 'middle' | 'right';
     type ScrollDirection = 'Vertical' | 'Horizontal';
@@ -134,6 +135,7 @@
                         label="delay" 
                         bind:value={data.clickDelay}
                         defaultValue={0.1}
+                        highlightColor={highlightColor}
                     />
                 {/if}
             </div>
@@ -142,19 +144,21 @@
                 <Checkbox
                     label="Release"
                     bind:checked={data.releaseAfterPress}
+                    highlightColor={highlightColor}
                 />
                 {#if data?.releaseAfterPress}
                     <TimeInput 
                         label="after" 
                         bind:value={data.pressReleaseDelay}
                         defaultValue={0.1}
+                        highlightColor={highlightColor}
                     />
                 {/if}
             </div>
         </div>
         
         <!-- Advanced Options Section -->
-        <div class="pt-4">
+        <div class="border-t pt-2" style="border-color: var(--secondary-text);">
             <button
                 class="flex items-center justify-between w-full text-sm text-[--secondary-text] hover:text-[--secondary-text-hover] transition-colors"
                 on:click={toggleAdvancedOptions}

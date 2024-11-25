@@ -51,6 +51,7 @@
     export let color: string = 'bg-gradient-to-r from-green-500 to-green-600';
     export let highlightColor: string = 'bg-green-500';
 
+
     // Data initialization with default values
     export let data: MouseMoveTaskData = {
         startPosition: {
@@ -150,7 +151,7 @@
     <div class="grid gap-6">
         <!-- Start Position Configuration -->
         <div class="grid gap-4">
-            <h3 class="text-sm font-medium text-gray-700">Start Position</h3>
+            <h3 class="text-sm font-medium --main-text">Start Position</h3>
             <ButtonGroup variant="default">
                 <ButtonGroupItem 
                     value="Fixed"
@@ -191,7 +192,7 @@
 
         <!-- End Position Configuration -->
         <div class="grid gap-4">
-            <h3 class="text-sm font-medium text-gray-700">End Position</h3>
+            <h3 class="text-sm font-medium --main-text">End Position</h3>
             <ButtonGroup variant="default">
                 <ButtonGroupItem 
                     value="Fixed"
@@ -233,7 +234,7 @@
         <!-- Movement Settings -->
         <div class="border-t pt-4">
             <button
-                class="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                class="flex items-center justify-between w-full text-sm --main-text hover:--main-text transition-colors"
                 on:click={() => showMovementSettings = !showMovementSettings}
                 aria-expanded={showMovementSettings}
             >
@@ -250,11 +251,12 @@
                     <Checkbox
                         label="Drag"
                         bind:checked={data.dragWhileMoving}
+                        highlightColor={highlightColor}
                     />
 
                     <!-- Move Speed Configuration -->
                     <div class="grid gap-4">
-                        <h4 class="text-sm font-medium text-gray-700">Move Speed</h4>
+                        <h4 class="text-sm font-medium --main-text">Move Speed</h4>
                         <ButtonGroup variant="default">
                             {#each SPEED_TYPES as type}
                                 <ButtonGroupItem 
@@ -274,11 +276,13 @@
                                 bind:value={data.speed.value}
                                 defaultValue={CONFIG.SPEED.DEFAULT}
                                 startingUnit="ms"
+                                highlightColor={highlightColor}
                             />
                             <div class="flex items-center gap-4">
                                 <Checkbox
                                     label="Randomize"
                                     bind:checked={data.speed.randomize}
+                                    highlightColor={highlightColor}
                                 />
                                 {#if data.speed.randomize}
                                     <div class="flex-1">
@@ -289,6 +293,7 @@
                                             min={CONFIG.VARIANCE.MIN}
                                             max={CONFIG.VARIANCE.MAX}
                                             defaultValue={CONFIG.VARIANCE.DEFAULT}
+                                            highlightColor={highlightColor}
                                         />
                                     </div>
                                 {/if}
@@ -298,7 +303,7 @@
 
                     <!-- Path Type Configuration -->
                     <div class="grid gap-4">
-                        <h4 class="text-sm font-medium text-gray-700">Path Type</h4>
+                        <h4 class="text-sm font-medium --main-text">Path Type</h4>
                         <ButtonGroup variant="default">
                             {#each PATH_TYPES as type}
                                 <ButtonGroupItem 

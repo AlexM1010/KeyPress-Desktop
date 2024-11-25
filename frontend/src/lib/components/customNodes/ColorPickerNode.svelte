@@ -66,7 +66,7 @@
 >
     <div class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-700">Selected Color:</span>
+            <span class="text-sm font-medium --main-text">Selected Color:</span>
             <span class="font-mono text-sm">{$colorStore}</span>
         </div>
         

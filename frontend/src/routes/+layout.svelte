@@ -58,10 +58,11 @@
         <div class="flex items-center space-x-4">
             <button on:click={() => goto('/')} class="flex items-center">
                 <img 
-                    src="/src/lib/assets/logo-no-background.png" 
-                    alt="KeyPress Logo" 
+                    src="/Keypress-Logo.svg" 
+                    alt="Keypress Logo" 
                     class="h-10 w-auto max-w-full object-contain" 
                 />
+                <span class="text-foreground font-bold text-xl">Keypress</span>
             </button>
             {#if $isAuthenticated && $user}
                 <Button on:click={() => goto('/workspace')} variant="ghost">

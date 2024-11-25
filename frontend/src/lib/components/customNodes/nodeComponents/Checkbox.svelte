@@ -2,15 +2,17 @@
     export let label: string;
     export let checked: boolean = false;
     export let disabled: boolean = false;
+    export let highlightColor: string = 'bg-gray-500';
     export let id = crypto.randomUUID();
+    import '$lib/index.scss'
 </script>
 
 <div class="checkbox-container select-none">
     <label 
         for={id} 
-        class="flex items-center cursor-pointer {disabled ? 'opacity-50 cursor-not-allowed' : ''}"
+        class="flex items-center {disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}"
     >
-        <span class="mr-2 text-sm text-gray-700">{label}</span>
+        <span class="mr-2 text-sm --main-text">{label}</span>
         <input
             {id}
             type="checkbox"
@@ -19,7 +21,7 @@
             class="sr-only absolute"
             aria-label={label}
         />
-        <div class="checkbox-custom relative">
+        <div class="checkbox-custom relative {checked ? highlightColor : 'bg-white'}">
             {#if checked}
                 <svg 
                     class="check-mark" 
@@ -43,19 +45,18 @@
 <style>
     .checkbox-container {
         display: inline-block;
-        margin: 0; /* Remove spacing around the component */
+        margin: 0;
     }
 
     .checkbox-custom {
         width: 18px;
         height: 18px;
-        border: 2px solid #d1d5db;
+        border: 2px solid var(--accent);
         border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
-        background-color: white;
     }
 
     .check-mark {
@@ -66,22 +67,5 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-    }
-
-    input[type="checkbox"]:checked + .checkbox-custom {
-        background-color: #3b82f6;
-        border-color: #3b82f6;
-    }
-
-    input[type="checkbox"]:focus + .checkbox-custom {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-    label:hover .checkbox-custom {
-        border-color: #3b82f6;
-    }
-
-    label.cursor-not-allowed:hover .checkbox-custom {
-        border-color: #d1d5db;
     }
 </style>

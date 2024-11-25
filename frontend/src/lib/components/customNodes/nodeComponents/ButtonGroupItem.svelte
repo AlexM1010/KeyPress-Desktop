@@ -3,6 +3,7 @@
     import { getContext, onMount, onDestroy } from 'svelte';
     import { cn } from '$lib/utils.js';
     import { derived } from 'svelte/store';
+    import "$lib/index.scss";
 
     interface ButtonGroupContext {
         register: (id: string) => void;
@@ -74,7 +75,7 @@
     }
 
     function getInactiveClass() {
-        return 'bg-gray-200 text-gray-700 hover:bg-gray-300';
+        return `bg-[var(--main)] hover:bg-[var(--main-hover)] --main-text`;
     }
 </script>
   
@@ -86,6 +87,3 @@
     <slot />
 </button>
   
-<style>
-    /* Optional: Additional styles if needed */
-</style>

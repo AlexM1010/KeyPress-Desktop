@@ -4,6 +4,7 @@
     //TODO: add more tooltips to properly explain controls, allows more vauge descriptions  Sv-tooltip
     //TODO: allow up and down arrows to be held not just clicked to change values quickly
     import { ChevronUp, ChevronDown } from 'lucide-svelte';
+    import "$lib/index.scss";
 
     export let label: string = '';
     export let value: number = 0;
@@ -46,15 +47,16 @@
         appearance: textfield;
         -moz-appearance: textfield;
         text-align: center;
-        background-color: #f3f3f3;
+        background-color: var(--main);
         transition: background-color 0.3s;
     }
 
     input[type="number"]:hover {
-        background-color: #e0e0e0;
+        background-color: var(--main-hover);
     }
 
     .input-error {
+        border-width: 2px;
         border-color: red;
     }
 
@@ -64,7 +66,7 @@
         justify-content: center;
         width: 1.5rem;
         height: 1rem;
-        background-color: #e5e7eb;
+        background-color: var(--tertiary);
         padding: 0;
         transition: background-color 0.2s;
     }
@@ -77,15 +79,15 @@
 <div class="flex flex-col">
     <div class="flex items-center">
         {#if label}
-            <label for="number-input" class="text-sm text-gray-700 mr-2">{label}</label>
+            <label for="number-input" class="text-sm --text-main mr-2">{label}</label>
         {/if}
         <div class="flex">
             <input 
                 type="number"
                 bind:value
                 id="number-input" 
-                class="h-8 px-2 bg-gray-100 text-right 
-                    {isInvalid ? 'border border-red-500 input-error' : ''} 
+                class="h-8 px-2 text-right 
+                    {isInvalid ? 'input-error' : ''} 
                     {showArrows ? 'rounded-l-md' : 'rounded-md'}"
                 style="width: {inputWidth}"
                 min={minValue}

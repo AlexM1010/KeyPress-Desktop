@@ -1,4 +1,4 @@
-module KeyPress
+module Keypress
 
 go 1.22.0
 

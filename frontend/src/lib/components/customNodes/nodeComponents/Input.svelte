@@ -8,10 +8,10 @@
   </script>
   
   <div class="space-y-1.5">
-<label for="inputField" class="block text-xs font-medium text-gray-500">{label}</label>
+<label for="inputField" class="block text-xs font-medium --main-text">{label}</label>
     <div class="relative">
       {#if icon}
-        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <div class="absolute left-3 top-1/2 transform -translate-y-1/2 --main-text">
           <svelte:component this={icon} class="w-4 h-4" />
         </div>
       {/if}

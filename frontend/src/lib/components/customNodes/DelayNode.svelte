@@ -51,7 +51,7 @@
     <div class="space-y-4">
         <!-- Delay Type Selection -->
         <div class="flex flex-col">
-            <label for="delayType" class="text-sm font-medium text-gray-700">Delay Type:</label>
+            <label for="delayType" class="text-sm font-medium --main-text">Delay Type:</label>
             <select
                 id="delayType"
                 bind:value={data.delayType}
@@ -67,7 +67,7 @@
         <!-- Fixed Delay Input -->
         {#if data.delayType === 'Fixed'}
             <div class="flex flex-col">
-                <label for="fixedTime" class="text-sm font-medium text-gray-700">Time (ms):</label>
+                <label for="fixedTime" class="text-sm font-medium --main-text">Time (ms):</label>
                 <input
                     id="fixedTime"
                     type="number"
@@ -82,7 +82,7 @@
         <!-- Random Delay Inputs -->
         {:else if data.delayType === 'Random'}
             <div class="flex flex-col">
-                <label for="minTime" class="text-sm font-medium text-gray-700">Minimum Time (ms):</label>
+                <label for="minTime" class="text-sm font-medium --main-text">Minimum Time (ms):</label>
                 <input
                     id="minTime"
                     type="number"
@@ -95,7 +95,7 @@
                 />
             </div>
             <div class="flex flex-col">
-                <label for="maxTime" class="text-sm font-medium text-gray-700">Maximum Time (ms):</label>
+                <label for="maxTime" class="text-sm font-medium --main-text">Maximum Time (ms):</label>
                 <input
                     id="maxTime"
                     type="number"

@@ -1,6 +1,7 @@
 <!-- frontend\src\lib\components\customNodes\TimeInput.svelte -->
 <script lang="ts">
     import { ChevronUp, ChevronDown } from 'lucide-svelte';
+    import "$lib/index.scss";
 
     type TimeUnit = 'ms' | 's' | 'min';
 
@@ -10,14 +11,12 @@
         min: number;
     }
 
-    // Conversion factors to milliseconds
     const TO_MS: ConversionFactors = {
         'ms': 1,
         's': 1000,
         'min': 60 * 1000
     };
 
-    // Display names for tooltip
     const UNIT_DISPLAY_NAMES: Record<TimeUnit, string> = {
         'ms': 'milliseconds',
         's': 'seconds',
@@ -26,11 +25,11 @@
 
     export let label = '';
     export let defaultValue = 1;
-    export let value = defaultValue * 1000; // Export the value prop
-    export let startingUnit: TimeUnit = 's'; // Allow setting a starting unit
-    let unit: TimeUnit = startingUnit; // Initialize unit with startingUnit
+    export let value = defaultValue * 1000;
+    export let highlightColor: string = 'bg-grey-500';
+    export let startingUnit: TimeUnit = 's';
+    let unit: TimeUnit = startingUnit;
 
-    // Arrow controls
     export let showArrows: boolean = true;
     export let step: number = 1;
     export let minValue: number | null = null;
@@ -43,10 +42,8 @@
     let inputWidth: string;
     let isInvalid: boolean = false;
 
-    // Derived value for the next unit in sequence
     $: nextUnit = UNITS[(UNITS.indexOf(unit) + 1) % UNITS.length];
 
-    // Derived display value
     $: {
         const conversionFactor = TO_MS[unit];
         const converted = value / conversionFactor;
@@ -58,10 +55,8 @@
         const input = event.target as HTMLInputElement;
         const inputValue = input.value;
 
-        // Update significant digits based on decimal places
         significantDigits = inputValue.split('.')[1]?.length ?? 0;
 
-        // Convert input value to milliseconds
         const numericValue = Number(inputValue);
         if (!isNaN(numericValue)) {
             const valueInMs = numericValue * TO_MS[unit];
@@ -92,7 +87,6 @@
 
     $: inputWidth = `${Math.max(String(displayValue).length * 0.6 + 1.2, 3)}em`;
 
-    // Handle invalid input
     $: isInvalid = maxValue !== null && displayValue > maxValue;
 
     //TODO: reduce spacing at start of input field
@@ -102,7 +96,7 @@
     {#if label}
         <label 
             for="time-input" 
-            class="text-sm text-gray-700"
+            class="text-sm --main-text"
         >
             {label}
         </label>
@@ -114,7 +108,7 @@
             value={displayValue}
             on:input={handleInputChange}
             id="time-input" 
-            class="h-8 px-2 bg-gray-100 text-right
+            class="h-8 px-2 text-right
                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
                    {isInvalid ? 'border-red-500' : ''} {showArrows ? 'rounded-l-md' : 'rounded-l-lg'}"
             style="width: {inputWidth}"
@@ -144,8 +138,8 @@
         <button 
             type="button"
             on:click={handleUnitChange} 
-            class="h-8 px-2 bg-blue-500 text-white w-[40px] text-center 
-                   relative group hover:bg-blue-600 focus:outline-none 
+            class="h-8 px-2 {highlightColor} text-white w-[40px] text-center 
+                   relative group hover:{highlightColor} focus:outline-none 
                    focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
                    {showArrows ? 'rounded-r-md' : 'rounded-r-lg'}"
         >
@@ -166,6 +160,12 @@
     input[type="number"] {
         -moz-appearance: textfield;
         appearance: textfield;
+        background-color: var(--main);
+        transition: background-color 0.3s;
+    }
+
+    input[type="number"]:hover {
+        background-color: var(--main-hover);
     }
 
     input[type="number"]::-webkit-outer-spin-button,
@@ -174,7 +174,6 @@
         margin: 0;
     }
 
-    /* Ensure input maintains its style when disabled */
     input[type="number"]:disabled {
         opacity: 0.7;
         cursor: not-allowed;
@@ -186,12 +185,12 @@
         justify-content: center;
         width: 1.5rem;
         height: 1rem;
-        background-color: #e5e7eb;
+        background-color: var(--tertiary);
         padding: 0;
         transition: background-color 0.2s;
     }
 
     .arrow-button:hover {
-        background-color: #d1d5db;
+        background-color: var(--tertiary-hover);
     }
 </style>

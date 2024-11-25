@@ -8,6 +8,9 @@
     export let max: number = 100;
     export let step: number = 1;
     export let id = crypto.randomUUID();
+    export let highlightColor: string = 'gray-500';
+
+    import '$lib/index.scss';
 
     // Validate and constrain value
     $: value = Math.min(Math.max(value, min), max);
@@ -22,10 +25,10 @@
     }
 </script>
 
-<div class="slider-container space-y-1.5 select-none"> 
+<div class="slider-container space-y-1.5 select-none" style="--highlight-color: {highlightColor};"> 
     <div class="flex justify-between min-w-[120px]">
-        <label for={id} class="text-xs font-medium text-gray-500">{label}</label>
-        <span class="text-xs text-gray-400 w-12 text-right">{value}{unit}</span>
+        <label for={id} class="text-xs font-medium --main-text">{label}</label>
+        <span class="text-xs --main-text w-12 text-right">{value}{unit}</span>
     </div>
     <input 
         {id}
@@ -40,11 +43,21 @@
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
-        class="w-full h-2 bg-gray-100 rounded-lg accent-blue-500 cursor-pointer touch-none"
+        class="{highlightColor}"
     />
 </div>
 
 <style>
+    input[type="range"] {
+        width: 100%;
+        height: 0.5rem;
+        background-color: var(--accent-text);
+        border-radius: 0.5rem;
+        accent-color: var(--highlight-color);
+        cursor: pointer;
+        touch-action: none;
+    }
+
     .slider-container {
         isolation: isolate;
     }
@@ -62,7 +75,7 @@
         appearance: none;
         width: 16px;
         height: 16px;
-        background: #3b82f6;
+        background: var(--highlight-color);
         border-radius: 50%;
         cursor: pointer;
         transition: transform 0.1s;

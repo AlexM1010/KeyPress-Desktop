@@ -4,7 +4,7 @@ import type { SvelteComponent } from 'svelte';
 import ColorPickerNode from './ColorPickerNode.svelte';
 import SVGNode from './SVGNode.svelte';
 import MouseClickNode from './MouseClickNode.svelte';
-import KeyPressNode from './KeypressNode.svelte';
+import KeypressNode from './KeypressNode.svelte';
 import StartNode from './StartNode.svelte';
 import MouseMoveNode from './MouseMoveNode.svelte';
 import DelayNode from './DelayNode.svelte';
@@ -13,7 +13,7 @@ export const nodeTypes: NodeTypes = {
   'ColorPicker': ColorPickerNode as unknown as typeof SvelteComponent,
   'svgNode': SVGNode as unknown as typeof SvelteComponent,
   'Click': MouseClickNode as unknown as typeof SvelteComponent,
-  'keypress-node': KeyPressNode as unknown as typeof SvelteComponent,
+  'keypress-node': KeypressNode as unknown as typeof SvelteComponent,
   'Start': StartNode as unknown as typeof SvelteComponent,
   'MoveMouse': MouseMoveNode as unknown as typeof SvelteComponent,
   'Delay': DelayNode as unknown as typeof SvelteComponent
