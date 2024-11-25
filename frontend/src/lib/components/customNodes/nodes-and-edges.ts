@@ -39,13 +39,13 @@ export const initialNodes: Node[] = [
     type: 'Click',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: { }
-  },
+  },/*
   {
     id: 'keypress',
     type: 'keypress-node',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: {}
-  },
+  },*/
   {
     id: 'DelayNode',
     type: 'Delay',
@@ -62,13 +62,12 @@ export const initialNodes: Node[] = [
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
     }
   },
-  /*
   {
     id: 'MoveMouse-node',
     type: 'MoveMouse',
     position: { x: baseX + xSpacing * 4, y: baseY + xSpacing }, // Adjust position as needed
     data: {}
-  },*/
+  },
   /*{
     id: 'MoveMouse-node1',
     type: 'MoveMouse',

@@ -53,6 +53,7 @@
 		"dompurify": "^3.2.1",
 		"dotenv": "^16.4.5",
 		"drizzle-orm": "^0.35.3",
+		"inter-ui": "^4.1.0",
 		"lucide-svelte": "^0.454.0",
 		"marked": "^15.0.1",
 		"marked-gfm-heading-id": "^4.1.1",

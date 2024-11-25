@@ -5,6 +5,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');
 
+html { font-family: "Inter", "system-ui"; }
+
+@supports (font-variation-settings: normal) {
+  html { font-family: "InterVariable", "system-ui"; }
+}
+
 :root {
 	--dark-0: #000;
 	--dark-00: #3b3b3b;
@@ -370,5 +376,5 @@ body {
 }
 
 body, h1, h2, h3, h4, h5, h6 {
-    font-family: 'Roboto', sans-serif;
+    font-family: "InterVariable", "system-ui";
 }

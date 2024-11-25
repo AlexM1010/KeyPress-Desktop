@@ -9,6 +9,7 @@
 	import ProjectCard from '$lib/components/ProjectCard/ProjectCard.svelte';
 	import SearchPage from '$lib/components/SearchPage.svelte';
 	import UIcon from '$lib/components/Icon/UIcon.svelte';
+	import "$lib/index.scss";
 
 	interface SkillFilter extends Skill {
 		isSelected?: boolean;

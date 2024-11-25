@@ -75,7 +75,7 @@
     }
 
     function getInactiveClass() {
-        return `bg-[var(--main)] hover:bg-[var(--main-hover)] --main-text`;
+        return `bg-[var(--main)] hover:bg-[var(--secondary-hover)] --main-text`;
     }
 </script>
   

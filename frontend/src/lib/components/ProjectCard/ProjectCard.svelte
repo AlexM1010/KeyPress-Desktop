@@ -11,14 +11,10 @@
 	import { getAssetURL } from '$lib/data/assets';
 	import { base } from '$app/paths';
 	import UIcon from '../Icon/UIcon.svelte';
+	import "$lib/index.scss";
 
 	export let project: Project;
 	$: months = countMonths(project.period.from, project.period.to);
-	// $: period = `${months} month${months > 1 ? 's' : ''}`;
-	// $: period = `${getTimeDiff(
-	// 	project.period.from,
-	// 	project.period.to ?? new Date(Date.now() + 1000 * 60 * 60 * 24)
-	// )}`;
 	$: period = computeExactDuration(project.period.from, project.period.to);
 	$: from = `${getMonthName(project.period.from.getMonth())} ${project.period.from.getFullYear()}`;
 	$: to = project.period.to
