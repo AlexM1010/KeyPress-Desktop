@@ -1,5 +1,7 @@
 name: Wails Build
 
+uses: dAppServer/wails-build-action@v2.2
+
 on:
   push:
     branches:
