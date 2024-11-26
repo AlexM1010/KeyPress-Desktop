@@ -21,7 +21,7 @@ export const initialNodes: Node[] = [
       styles: { fill: '#f0f9ff', stroke: '#3b82f6' }
     }
   }, */
-  /*{
+  {
     id: 'colorpicker-1',
     type: 'ColorPicker',
     position: { x: baseX + xSpacing * 3, y: baseY + xSpacing * 2 },
@@ -33,7 +33,7 @@ export const initialNodes: Node[] = [
     },
     targetPosition: 'left' as Position,
     sourcePosition: 'right' as Position
-  },*/
+  },
   {
     id: 'Click',
     type: 'Click',

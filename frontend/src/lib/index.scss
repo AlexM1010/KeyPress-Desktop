@@ -69,8 +69,7 @@ body {
 
 * {
 	transition-duration: 200ms;
-	transition-property: background, border-color, opacity, box-shadow, top, bottom, left, margin,
-		right;
+	transition-property: background, border-color, opacity, box-shadow, top, bottom, left, margin, right;
 }
 
 :root[data-theme='dark'] {

@@ -10,7 +10,7 @@
 
 <!--<Register data={data?.form ?? undefined}/>-->
 
-<div class="flex items-center justify-center min-h-screen bg-background text-black dark:text-white">
+<div class="flex items-center justify-center min-h-screen bg-[--background] text-black dark:text-white">
   <div class="text-center space-y-6">
     <h1 class="text-4xl font-bold ">Welcome to Keypress</h1>
     <p class="text-muted-foreground">Create an account to make your own Keypress projects</p>

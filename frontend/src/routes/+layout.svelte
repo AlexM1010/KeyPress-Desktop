@@ -3,9 +3,9 @@
     import { Button } from '$lib/components/ui/button';
     import { ModeWatcher } from "mode-watcher";
     import ThemeToggle from './ThemeToggle.svelte';
+    import Logo from './Logo.svelte';
     import { onMount } from 'svelte';
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
-    import "../app.css";
     import '$lib/index.scss';
 
     // No need for manual store subscriptions since we're using the derived stores
@@ -52,17 +52,12 @@
 <ModeWatcher />
 
 <!-- Navbar -->
-<div class="bg-background text-black dark:text-white">
+<div class="bg-[--background] text-black dark:text-white">
     <div class="max-w-3xl mx-auto flex justify-between items-center py-4 px-4">
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4">
             <button on:click={() => goto('/')} class="flex items-center">
-                <img 
-                    src="/Keypress-Logo.svg" 
-                    alt="Keypress Logo" 
-                    class="h-10 w-auto max-w-full object-contain" 
-                />
-                <span class="h1 --text-main font-bold text-xl">eypress</span>
+                <Logo />
             </button>
             <Button on:click={() => goto('/workspace')} variant="ghost">
                 Workspace
