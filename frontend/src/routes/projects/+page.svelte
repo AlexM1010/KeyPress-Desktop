@@ -70,27 +70,27 @@
 	});
 </script>
 
-<SearchPage {title} on:search={onSearch}>
-	<div class="projects-filters">
+<div class="mt-10">
+	<SearchPage {title} on:search={onSearch}>
 		{#each filters as tech}
 			<Chip active={tech.isSelected} classes={'text-0.8em'} on:click={() => onSelected(tech.slug)}
 				>{tech.name}</Chip
 			>
 		{/each}
-	</div>
-	{#if displayed.length === 0}
-		<div class="p-5 col-center gap-3 my-auto text-[var(--accent-text)] flex-1">
-			<UIcon icon="i-carbon-cube" classes="text-3.5em" />
-			<p class="font-300">Could not find anything...</p>
-		</div>
-	{:else}
-		<div class="projects-list mt-2">
-			{#each displayed as project}
-				<ProjectCard {project} />
-			{/each}
-		</div>
-	{/if}
-</SearchPage>
+		{#if displayed.length === 0}
+			<div class="p-5 col-center gap-3 my-auto text-[var(--accent-text)] flex-1">
+				<UIcon icon="i-carbon-cube" classes="text-3.5em" />
+				<p class="font-300">Could not find anything...</p>
+			</div>
+		{:else}
+			<div class="projects-list mt-2">
+				{#each displayed as project}
+					<ProjectCard {project} />
+				{/each}
+			</div>
+		{/if}
+	</SearchPage>
+</div>
 
 <style lang="scss">
 	.projects-list {

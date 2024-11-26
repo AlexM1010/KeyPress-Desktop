@@ -9,6 +9,9 @@
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import '$lib/index.scss';
     import { ChevronDown } from 'lucide-svelte';
+    import './navbar.css';
+
+    //TODO background is above button hover color somehow maybe
 
     let isReady = false;
     let isExpanded = true;
@@ -51,61 +54,13 @@
     $: console.log('currentUser:', $user);
 </script>
 
-<style>
-    .navbar-toggle-button {
-        position: fixed;
-        left: 10%;
-        background-color: var(--tertiary);
-        border-bottom-left-radius: 0.25rem;
-        border-bottom-right-radius: 0.25rem;
-        padding: 0.25rem;
-        cursor: pointer;
-        z-index: 20;
-        transition: all 0.3s ease;
-    }
-
-    /* Position when navbar is expanded */
-    .navbar-toggle-button.expanded {
-        top: 72px; /* Match navbar height */
-    }
-
-    /* Position when navbar is collapsed */
-    .navbar-toggle-button.collapsed {
-        top: 0;
-    }
-
-    .navbar-toggle-button:hover {
-        background-color: var(--tertiary-hover);
-    }
-
-    /* Add navbar animation styles */
-    .navbar-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 72px; /* Adjust based on your navbar height */
-        transform-origin: top;
-        transition: transform 0.3s ease;
-        z-index: 10;
-    }
-
-    .navbar-container.collapsed {
-        transform: translateY(-100%);
-        transition: transform 0.3s ease;
-    }
-</style>
-
 <ModeWatcher />
 
 <!-- Toggle Button -->
 {#if isWorkspacePage}
-<div
-    class="transition-all duration-300"
->
+<div class="transition-all duration-300">
     <button
         class="navbar-toggle-button"
-        on:click={toggleLayout}
         class:expanded={isExpanded}
         class:collapsed={!isExpanded}
         on:click={toggleLayout}
@@ -116,43 +71,42 @@
 </div>
 {/if}
 
-    <!-- Navbar -->
-    <div class="bg-background navbar-container text-black dark:text-white" class:collapsed={!isExpanded}>
-        <div class="max-w-3xl mx-auto flex justify-between items-center py-4 px-4">
-            <!-- Left side of navbar -->
-            <div class="flex items-center space-x-4">
-                <button on:click={() => goto('/')} class="flex items-center">
-                    <Logo />
-                </button>
-                <Button on:click={() => goto('/workspace')} variant="ghost">
-                    Workspace
+<!-- Navbar -->
+<div class="bg-background navbar-container text-black dark:text-white" class:collapsed={!isExpanded}>
+    <div class="w-full px-6 flex justify-between items-center h-[4rem]">
+        <!-- Left side of navbar -->
+        <div class="flex items-center space-x-4 fixed left-6">
+            <button on:click={() => goto('/')} class="flex items-center">
+                <Logo />
+            </button>
+            <Button on:click={() => goto('/workspace')} variant="ghost">
+                Workspace
+            </Button>
+            {#if $isAuthenticated && $user}
+                <Button on:click={() => goto('/projects')} variant="ghost">
+                    Projects
                 </Button>
-                {#if $isAuthenticated && $user}
-                    <Button on:click={() => goto('/projects')} variant="ghost">
-                        Projects
-                    </Button>
-                {/if}
-            </div>
-            <!-- Right side of navbar -->
-            <div class="flex items-center space-x-4">
-                {#if $isAuthenticated && $user}
-                    <span class="text-foreground">{$user.email}</span>
-                    <Button on:click={handleLogout} variant="ghost">
-                        Logout
-                    </Button>
-                {:else}
-                    <Button on:click={() => goto('/register')} variant="ghost">
-                        Register
-                    </Button>
-                    <Button on:click={() => goto('/login')} variant="ghost">
-                        Login
-                    </Button>
-                {/if}
-                <ThemeToggle />
-            </div>
+            {/if}
+        </div>
+        <!-- Right side of navbar -->
+        <div class="flex items-center space-x-4 fixed right-6">
+            {#if $isAuthenticated && $user}
+                <span class="text-foreground">{$user.email}</span>
+                <Button on:click={handleLogout} variant="ghost">
+                    Logout
+                </Button>
+            {:else}
+                <Button on:click={() => goto('/register')} variant="ghost">
+                    Register
+                </Button>
+                <Button on:click={() => goto('/login')} variant="ghost">
+                    Login
+                </Button>
+            {/if}
+            <ThemeToggle />
         </div>
     </div>
-
+</div>
 
 {#if !($isInitialized && isReady)}
     <div class="flex items-center justify-center h-screen">
