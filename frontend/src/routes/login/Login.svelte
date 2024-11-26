@@ -1,13 +1,10 @@
-<!-- src/routes/login/Login.svelte -->
 <script lang="ts">
     import "./login.scss";
     import { z } from "zod";
-    import { CircleX } from "lucide-svelte";
-    import { onMount } from "svelte";
     import { writable, get } from "svelte/store";
     import { auth, isAuthenticated } from '$lib/stores/auth';
     import { goto } from '$app/navigation';
-    
+
     // Form Schema
     const formSchema = z.object({
         email: z.string().email({ message: "Invalid email address" }),
@@ -28,60 +25,11 @@
         goto('/workspace');
     }
 
-    // Modal elements
-    let modal: HTMLElement;
-    let modalButton: HTMLElement;
-    let closeButton: HTMLElement;
-    let scrollDown: HTMLElement;
-    let isOpened = false;
-
-    // Modal control functions
-    const openModal = () => {
-        if (modal) {
-            modal.classList.add("is-open");
-            document.body.style.overflow = "hidden";
-        }
-    };
-
-    const closeModal = () => {
-        if (modal) {
-            modal.classList.remove("is-open");
-            document.body.style.overflow = "initial";
-        }
-    };
-
-    const handleScroll = () => {
-        if (window.scrollY > window.innerHeight / 3 && !isOpened) {
-            isOpened = true;
-            if (scrollDown) {
-                scrollDown.style.display = "none";
-            }
-            openModal();
-        }
-    };
-
-    const handleKeydown = (evt: KeyboardEvent) => {
-        if (evt.key === "Escape") {
-            closeModal();
-        }
-    };
-
-    onMount(() => {
-        window.addEventListener("scroll", handleScroll);
-        document.addEventListener("keydown", handleKeydown);
-        openModal(); // Open modal immediately for desktop app
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            document.removeEventListener("keydown", handleKeydown);
-        };
-    });
-
     // Form submission handler
     const handleSubmit = async (event: Event) => {
         event.preventDefault();
         const currentForm = get(form);
-        
+
         // Validate form
         const result = formSchema.safeParse(currentForm);
         if (!result.success) {
@@ -100,7 +48,6 @@
         try {
             await auth.signIn(currentForm.email, currentForm.password);
             message.set('Login successful');
-            closeModal();
             await goto('/workspace');
         } catch (error) {
             console.error('Login error:', error);
@@ -112,86 +59,77 @@
     };
 </script>
 
-<div class="modal" bind:this={modal}>
-    <div class="modal-container">
-        <div class="modal-left">
-            <h1 class="modal-title">Welcome Back!</h1>
-            <p class="modal-desc">
-                Please log in to continue to your workspace.
-            </p>
-
-            <form on:submit={handleSubmit}>
-                {#if $message}
-                    <div class="alert {$message.includes('successful') ? 'alert-success' : 'alert-error'} mb-4">
-                        {$message}
-                    </div>
-                {/if}
-
-                <div class="input-block">
-                    <label class="input-label" for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        class="input"
-                        placeholder="Email"
-                        bind:value={$form.email}
-                        disabled={$isLoading}
-                    />
-                    {#if $errors.email}
-                        <div class="text-red-500 text-sm mt-1">{$errors.email}</div>
-                    {/if}
-                </div>
-
-                <div class="input-block">
-                    <label class="input-label" for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        class="input"
-                        placeholder="Password"
-                        bind:value={$form.password}
-                        disabled={$isLoading}
-                    />
-                    {#if $errors.password}
-                        <div class="text-red-500 text-sm mt-1">{$errors.password}</div>
-                    {/if}
-                </div>
-
-                <div class="modal-buttons">
-                    <a href="/forgot-password">Forgot your password?</a>
-                    <button
-                        type="submit"
-                        class="input-button"
-                        disabled={$isLoading}
-                    >
-                        {$isLoading ? 'Logging in...' : 'Login'}
-                    </button>
-                </div>
-                <button class="input-button">Sign In With GitHub</button>
-            </form>
-
-            <p class="sign-up">
-                Don't have an account? <a href="/register">Sign up now</a>
-            </p>
-        </div>
-
-        <div class="modal-right">
-            <img
-                src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?ixlib=rb-0.3.5"
-                alt="Login background"
-            />
-        </div>
-
-        <button
-            class="icon-button close-button"
-            aria-label="Close"
-            on:click={closeModal}
-            bind:this={closeButton}
-        >
-            <CircleX strokeWidth="1.5" size="32" />
-        </button>
+<div class="login-container">
+    <div class="login-image-wrapper">
+        <img
+            class="login-image"
+            src="https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?ixlib=rb-0.3.5"
+            alt="Login background"
+        />
     </div>
-    <button class="modal-button" on:click={openModal} bind:this={modalButton}>
-        Click here to login
-    </button>
+    <div class="login-form-wrapper glass-effect">
+        <h1 class="login-title">Welcome Back!</h1>
+        <p class="login-desc">Please log in to continue to your workspace.</p>
+
+        <form on:submit={handleSubmit} class="login-form">
+            {#if $message}
+                <div class="alert {$message.includes('successful') ? 'alert-success' : 'alert-error'} mb-4">
+                    {$message}
+                </div>
+            {/if}
+
+            <div class="input-block">
+                <label for="email" class="input-label">Email address</label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    required
+                    class="input"
+                    placeholder="Email"
+                    bind:value={$form.email}
+                    disabled={$isLoading}
+                />
+                {#if $errors.email}
+                    <div class="error-text">{$errors.email}</div>
+                {/if}
+            </div>
+
+            <div class="input-block">
+                <label for="password" class="input-label">Password</label>
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                    class="input"
+                    placeholder="Password"
+                    bind:value={$form.password}
+                    disabled={$isLoading}
+                />
+                {#if $errors.password}
+                    <div class="error-text">{$errors.password}</div>
+                {/if}
+            </div>
+
+            <div class="form-actions">
+                <a href="/forgot-password" class="forgot-password-link">Forgot your password?</a>
+                <button
+                    type="submit"
+                    class="input-button"
+                    disabled={$isLoading}
+                >
+                    {$isLoading ? 'Logging in...' : 'Login'}
+                </button>
+            </div>
+
+            <button type="button" class="input-button social-login-button">Sign In With GitHub</button>
+        </form>
+
+        <p class="sign-up">
+            Don't have an account? <a href="/register" class="sign-up-link">Sign up now</a>
+        </p>
+    </div>
 </div>

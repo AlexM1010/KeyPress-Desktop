@@ -17,12 +17,12 @@
   import CustomEdge from "./CustomEdge.svelte";
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
   import { flowTheme } from "$lib/stores/theme";
-  import { user, isAuthenticated } from "$lib/stores/auth";
+  import { isAuthenticated, user } from "$lib/stores/auth";
   import Sidebar from "./Sidebar.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
-  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import '$lib/index.scss';
+  import "$lib/index.scss";
+  import "./FlowStyle.css"
 
   // Import icons from Lucide Svelte
   import {
@@ -36,11 +36,6 @@
     ChevronRight,
     LayoutDashboard,
   } from "lucide-svelte";
-
-  // Redirect to login if the user is not authenticated
-  $: if (!$isAuthenticated || !$user) {
-    goto("/login");
-  }
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
@@ -171,11 +166,13 @@
   let isSaving = false;
   let saveSuccess = false;
   let saveError = false;
+  let hasAttemptedSave = false;
 
   // Modify the handleSave function
   async function handleSave() {
     console.log("Triggering manual save...");
     if (!$user) {
+      hasAttemptedSave = true;
       console.error("User not authenticated");
       return;
     }
@@ -310,7 +307,6 @@
   });
 </script>
 
-{#if $isAuthenticated && $user}
   <div class="flow-container">
     <!-- Main Flow Area -->
     <div
@@ -351,26 +347,21 @@
                   style={isExecuting ? "animation: spin 1s linear infinite" : ""}
                 />
               </button>
-              <!-- Save Button -->
-              <button
-                class="flow-button"
-                on:click={handleSave}
-                disabled={isSaving}
-              >
-                <svelte:component
-                  this={
-                    isSaving
-                      ? Loader
-                      : saveError
-                      ? X
-                      : saveSuccess
-                      ? Check
-                      : Save
-                  }
-                  class="flow-icon"
-                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
-                />
-              </button>
+              <!-- Save Button TODO: Changes between local and cloud storage depending on auth/marketplace/premium -->
+              {#if $isAuthenticated && $user || hasAttemptedSave}
+                <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+                  <svelte:component
+                    this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
+                    class="flow-icon"
+                    style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                  />
+                </button>
+              {:else if hasAttemptedSave}
+                <button class="flow-button">
+                  <X class="flow-icon [--error]" />
+                  <span class="[--error]">Login</span>
+                </button>
+              {/if}
               <!-- Layout Button -->
               <button
                 class="flow-button"
@@ -453,121 +444,3 @@
       </div>
     </div>
   </div>
-{/if}
-
-<style>
-  /* Prevent horizontal overflow */
-  :global(html, body) {
-    overflow-x: hidden;
-  }
-
-  /* Main flow container */
-  .flow-container {
-    width: 100%;
-    height: calc(100vh - 4.5rem); /* Adjust based on header height */
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Button container styles */
-  .button-container {
-    transform-origin: right center;
-  }
-
-  /* Status toggle button styles */
-  .status-toggle-button {
-    transform-origin: left center;
-  }
-
-  .status-toggle-button:not(.opacity-0) {
-    animation: slide-in 0.3s ease-out;
-  }
-
-  /* Slide-in animation */
-  @keyframes slide-in {
-    from {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  /* Loader spin animation */
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  /* Common button styles */
-  .flow-button {
-    background-color: var(--secondary);
-    color: var(--main-text);
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    opacity: 0.8;
-  }
-
-  .flow-button:hover {
-    background-color: var(--secondary-hover);
-  }
-
-  /* Common icon styles */
-  :global(.flow-icon) {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  /* Status panel transitions */
-  .status-panel {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 320px;
-    background-color: var(--secondary);
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-  }
-
-  /* Common spacing */
-  .panel-spacing {
-    padding: 1rem;
-  }
-
-  /* Common flex layouts */
-  .flex-center {
-    display: flex;
-    align-items: center;
-  }
-
-  .flex-gap {
-    gap: 0.5rem;
-  }
-
-  .status-toggle-button-inner {
-    position: absolute;
-    top: 15%;
-    right: 80px;
-    transform: translateY(-50%);
-    background-color: var(--tertiary);
-    border-radius: 0.25rem;
-    padding: 0.25rem;
-    cursor: pointer;
-    z-index: 20;
-    transition: all 0.3s ease;
-  }
-
-  .status-toggle-button-inner:hover {
-    background-color: var(--tertiary-hover);
-  }
-</style>

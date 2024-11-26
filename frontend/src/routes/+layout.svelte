@@ -64,10 +64,10 @@
                 />
                 <span class="h1 --text-main font-bold text-xl">eypress</span>
             </button>
+            <Button on:click={() => goto('/workspace')} variant="ghost">
+                Workspace
+            </Button>
             {#if $isAuthenticated && $user}
-                <Button on:click={() => goto('/workspace')} variant="ghost">
-                    Workspace
-                </Button>
                 <Button on:click={() => goto('/projects')} variant="ghost">
                     Projects
                 </Button>

@@ -1,0 +1,114 @@
+/* Prevent horizontal overflow */
+:global(html, body) {
+    overflow-x: hidden;
+}
+
+/* Main flow container */
+.flow-container {
+    width: 100%;
+    height: calc(100vh - 4.5rem); /* Adjust based on header height */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Button container styles */
+.button-container {
+    transform-origin: right center;
+}
+
+/* Status toggle button styles */
+.status-toggle-button {
+    transform-origin: left center;
+}
+
+.status-toggle-button:not(.opacity-0) {
+    animation: slide-in 0.3s ease-out;
+}
+
+/* Slide-in animation */
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loader spin animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Common button styles */
+.flow-button {
+    background-color: var(--secondary);
+    color: var(--main-text);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    opacity: 0.8;
+}
+
+.flow-button:hover {
+    background-color: var(--secondary-hover);
+}
+
+/* Common icon styles */
+:global(.flow-icon) {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Status panel transitions */
+.status-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    background-color: var(--secondary);
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Common spacing */
+.panel-spacing {
+    padding: 1rem;
+}
+
+/* Common flex layouts */
+.flex-center {
+    display: flex;
+    align-items: center;
+}
+
+.flex-gap {
+    gap: 0.5rem;
+}
+
+.status-toggle-button-inner {
+    position: absolute;
+    top: 15%;
+    right: 80px;
+    transform: translateY(-50%);
+    background-color: var(--tertiary);
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+}
+
+.status-toggle-button-inner:hover {
+    background-color: var(--tertiary-hover);
+}
