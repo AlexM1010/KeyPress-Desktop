@@ -1,4 +1,4 @@
-// src/lib/stores/themeStore.ts
+// src/lib/stores/theme.ts
 import { derived } from 'svelte/store';
 import { userPrefersMode, systemPrefersMode } from 'mode-watcher';
 import type { ColorMode } from '@xyflow/svelte';
