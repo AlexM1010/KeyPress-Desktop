@@ -1,40 +1,37 @@
-name: Wails Build
+name: Wails macOS Build
 
 on:
   push:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        build: [
-          {name: wailsApp, platform: linux/amd64, os: ubuntu-latest},
-          {name: wailsApp, platform: windows/amd64, os: windows-latest},
-          {name: wailsApp, platform: darwin/universal, os: macos-latest}
-        ]
-    runs-on: ${{ matrix.build.os }}
+  macos-build:
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+      # Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      # Use the Wails Build Action for macOS
+      - name: Build Wails Application for macOS
+        uses: dAppServer/wails-build-action@v2.2
         with:
-          go-version: 1.18
+          build-name: myWailsApp
+          build-platform: darwin/universal
+          package: false # Disable artifact uploading since this is for sharing locally
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      # Optional: Archive the build for download (if needed)
+      - name: Archive macOS Build
+        run: |
+          mkdir -p artifact
+          mv ./build/bin/* artifact/
+        # Upload as GitHub Actions artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
         with:
-          node-version: '16.x'
-
-      - uses: dAppServer/wails-build-action@v2.2
-        with:
-          build-name: ${{ matrix.build.name }}
-          build-platform: ${{ matrix.build.platform }}
-          wails-version: latest
-          # Add other optional parameters as needed
+          name: macos-build
+          path: artifact
