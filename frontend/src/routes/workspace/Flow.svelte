@@ -22,7 +22,7 @@
   import ConnectionLine from "./ConnectionLine.svelte";
   import { onMount } from "svelte";
   import "$lib/index.scss";
-  import "./FlowStyle.css"
+  import "./FlowStyle.css";
 
   // Import icons from Lucide Svelte
   import {
@@ -35,7 +35,13 @@
     ChevronLeft,
     ChevronRight,
     LayoutDashboard,
+    Plus,
   } from "lucide-svelte";
+
+  // Define available nodes
+  const availableNodes = [
+    { type: "Start", label: "Start Node", icon: Play },
+  ];
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
@@ -47,12 +53,28 @@
   let isStatusPanelExpanded = false; // Tracks the status panel expansion
   let isExecuting = false; // Indicates if the flow is executing
 
+  // State variable to track if the left panel is expanded
+  let isLeftPanelExpanded = true; // Set to true or false based on your preference
+
   // Reactive variable to check if there are any status messages
   $: hasStatusMessages = statusMessages.length > 0;
 
   // Toggle the status panel expansion
   function toggleStatusPanel() {
     isStatusPanelExpanded = !isStatusPanelExpanded;
+  }
+
+  // Toggle the left panel expansion
+  function toggleLeftPanel() {
+    isLeftPanelExpanded = !isLeftPanelExpanded;
+  }
+
+  // Function to handle drag start event
+  function onDragStart(event: DragEvent, nodeType: string) {
+    event.dataTransfer?.setData("application/svelteflow", nodeType);
+    event.dataTransfer?.setData("text/plain", nodeType); // For compatibility
+    event.dataTransfer?.setDragImage(event.target as Element, 0, 0);
+    event.dataTransfer!.effectAllowed = "move";
   }
 
   // Array to store status messages
@@ -307,140 +329,183 @@
   });
 </script>
 
-  <div class="flow-container">
-    <!-- Main Flow Area -->
-    <div
-      class="h-full flex-1 transition-all duration-300"
-      class:pr-80={isStatusPanelExpanded}
-      class:pr-0={!isStatusPanelExpanded}
-    >
-      <SvelteFlow
-        {nodes}
-        {nodeTypes}
-        {edges}
-        {edgeTypes}
-        {colorMode}
-        connectionMode={ConnectionMode.Loose}
-        {defaultEdgeOptions}
-        on:nodedrag={onNodeDrag}
-        on:nodedragstop={onNodeDragStop}
-        on:dragover={onDragOver}
-        on:drop={onDrop}
-        fitView
-      >
-        <!-- Custom connection line -->
-        <ConnectionLine slot="connectionLine" />
-
-        <!-- Control Panel -->
-        <Panel position="top-right">
-          <div class="flex items-center">
-            <div class="button-container flex-center flex-gap transition-transform duration-300">
-              <!-- Run Flow Button -->
-              <button
-                class="flow-button"
-                on:click={handleRunFlow}
-                disabled={isExecuting}
-              >
-                <svelte:component
-                  this={executionStatus.icon}
-                  class="flow-icon {executionStatus.color}"
-                  style={isExecuting ? "animation: spin 1s linear infinite" : ""}
-                />
-              </button>
-              <!-- Save Button TODO: Changes between local and cloud storage depending on auth/marketplace/premium -->
-              {#if $isAuthenticated && $user || hasAttemptedSave}
-                <button class="flow-button" on:click={handleSave} disabled={isSaving}>
-                  <svelte:component
-                    this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
-                    class="flow-icon"
-                    style={isSaving ? "animation: spin 1s linear infinite" : ""}
-                  />
-                </button>
-              {:else if hasAttemptedSave}
-                <button class="flow-button">
-                  <X class="flow-icon [--error]" />
-                  <span class="[--error]">Login</span>
-                </button>
-              {/if}
-              <!-- Layout Button -->
-              <button
-                class="flow-button"
-                on:click={() => onLayout("TB")}
-              >
-                <LayoutDashboard class="flow-icon" />
-                <span>Layout</span>
-              </button>
-            </div>
-          </div>
-        </Panel>
-
-        <!-- Flow Controls -->
-        <Controls />
-        <Background />
-        <MiniMap />
-      </SvelteFlow>
-    </div>
-
-    <!-- Status Panel Toggle Button -->
-    {#if hasStatusPanel}
-      <div
-        class="status-toggle-button ml-2 transition-all duration-300"
-        class:opacity-0={!hasStatusPanel}
-      >
-        <button
-          class="status-toggle-button-inner"
-          style="right: {isStatusPanelExpanded ? '320px' : '0'}"
-          on:click={toggleStatusPanel}
-          aria-label={
-            isStatusPanelExpanded
-              ? "Collapse status panel"
-              : "Expand status panel"
-          }
-        >
-          <svelte:component
-            this={isStatusPanelExpanded ? ChevronRight : ChevronLeft}
-            class="flow-icon"
-          />
-        </button>
-      </div>
-    {/if}
-
-    <!-- Status Panel -->
-    <div
-      class="status-panel"
-      style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
-    >
+<div class="flow-container flex">
+  <!-- Left Panel -->
+  {#if isLeftPanelExpanded}
+    <div class="left-panel">
       <div class="panel-spacing">
         <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
-          <svelte:component
-            this={executionStatus.icon}
-            class="flow-icon {executionStatus.color}"
-          />
-          <span>Execution Status</span>
+          <Plus class="flow-icon" />
+          <span>Nodes</span>
         </h2>
-        {#if statusMessages.length === 0}
-          <p class="text-[--secondary-text]">No status updates.</p>
-        {:else}
-          <ul>
-            {#each statusMessages as msg (msg.id)}
-              <li class="flex-center mb-3">
-                <!-- Status Icon -->
-                {#if msg.type === "success"}
-                  <Check class="flow-icon text-green-500 mr-2" />
-                {:else if msg.type === "error"}
-                  <X class="flow-icon text-red-500 mr-2" />
-                {:else if msg.type === "warning"}
-                  <TriangleAlert class="flow-icon text-yellow-500 mr-2" />
-                {:else if msg.type === "info" || msg.type === "running"}
-                  <Play
-                    class="flow-icon text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
-                  />
-                {/if}
-                <span class="text-sm">{msg.message}</span>
-              </li>
-            {/each}
-          </ul>
-        {/if}
+        <ul>
+          {#each availableNodes as node}
+            <li
+              class="draggable-node"
+              draggable="true"
+              on:dragstart={(event) => onDragStart(event, node.type)}
+            >
+              {#if node.icon}
+                <svelte:component this={node.icon} class="flow-icon" />
+              {/if}
+              <span>{node.label}</span>
+            </li>
+          {/each}
+        </ul>
       </div>
     </div>
+  {/if}
+
+  <!-- Left Panel Toggle Button -->
+  <div class="left-toggle-button">
+    <button
+      class="left-toggle-button-inner"
+      style="left: {isLeftPanelExpanded ? '320px' : '0'}"
+      on:click={toggleLeftPanel}
+      aria-label={isLeftPanelExpanded ? "Collapse node panel" : "Expand node panel"}
+    >
+      <svelte:component
+        this={isLeftPanelExpanded ? ChevronLeft : ChevronRight}
+        class="flow-icon"
+      />
+    </button>
   </div>
+
+  <!-- Main Flow Area -->
+  <div
+    class="h-full flex-1 transition-all duration-300"
+    class:pl-80={isLeftPanelExpanded}
+    class:pl-0={!isLeftPanelExpanded}
+    class:pr-80={isStatusPanelExpanded}
+    class:pr-0={!isStatusPanelExpanded}
+  >
+    <SvelteFlow
+      {nodes}
+      {nodeTypes}
+      {edges}
+      {edgeTypes}
+      {colorMode}
+      connectionMode={ConnectionMode.Loose}
+      {defaultEdgeOptions}
+      on:nodedrag={onNodeDrag}
+      on:nodedragstop={onNodeDragStop}
+      on:dragover={onDragOver}
+      on:drop={onDrop}
+      fitView
+    >
+      <!-- Custom connection line -->
+      <ConnectionLine slot="connectionLine" />
+
+      <!-- Control Panel -->
+      <Panel position="top-right">
+        <div class="flex items-center">
+          <div class="button-container flex-center flex-gap transition-transform duration-300">
+            <!-- Run Flow Button -->
+            <button
+              class="flow-button"
+              on:click={handleRunFlow}
+              disabled={isExecuting}
+            >
+              <svelte:component
+                this={executionStatus.icon}
+                class="flow-icon {executionStatus.color}"
+                style={isExecuting ? "animation: spin 1s linear infinite" : ""}
+              />
+            </button>
+              <!-- Save Button TODO: Changes between local and cloud storage depending on auth/marketplace/premium -->
+            {#if $isAuthenticated && $user || hasAttemptedSave}
+              <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+                <svelte:component
+                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
+                  class="flow-icon"
+                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                />
+              </button>
+            {:else if hasAttemptedSave}
+              <button class="flow-button">
+                <X class="flow-icon text-red-500" />
+                <span class="text-red-500">Login</span>
+              </button>
+            {/if}
+            <!-- Layout Button -->
+            <button
+              class="flow-button"
+              on:click={() => onLayout("TB")}
+            >
+              <LayoutDashboard class="flow-icon" />
+              <span>Layout</span>
+            </button>
+          </div>
+        </div>
+      </Panel>
+
+      <!-- Flow Controls -->
+      <Controls />
+      <Background />
+      <MiniMap />
+    </SvelteFlow>
+  </div>
+
+  <!-- Status Panel Toggle Button -->
+  {#if hasStatusPanel}
+    <div
+      class="status-toggle-button ml-2 transition-all duration-300"
+      class:opacity-0={!hasStatusPanel}
+    >
+      <button
+        class="status-toggle-button-inner"
+        style="right: {isStatusPanelExpanded ? '320px' : '0'}"
+        on:click={toggleStatusPanel}
+        aria-label={
+          isStatusPanelExpanded
+            ? "Collapse status panel"
+            : "Expand status panel"
+        }
+      >
+        <svelte:component
+          this={isStatusPanelExpanded ? ChevronRight : ChevronLeft}
+          class="flow-icon"
+        />
+      </button>
+    </div>
+  {/if}
+
+  <!-- Status Panel -->
+  <div
+    class="status-panel"
+    style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
+  >
+    <div class="panel-spacing">
+      <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
+        <svelte:component
+          this={executionStatus.icon}
+          class="flow-icon {executionStatus.color}"
+        />
+        <span>Execution Status</span>
+      </h2>
+      {#if statusMessages.length === 0}
+        <p class="text-[--secondary-text]">No status updates.</p>
+      {:else}
+        <ul>
+          {#each statusMessages as msg (msg.id)}
+            <li class="flex-center mb-3">
+              <!-- Status Icon -->
+              {#if msg.type === "success"}
+                <Check class="flow-icon text-green-500 mr-2" />
+              {:else if msg.type === "error"}
+                <X class="flow-icon text-red-500 mr-2" />
+              {:else if msg.type === "warning"}
+                <TriangleAlert class="flow-icon text-yellow-500 mr-2" />
+              {:else if msg.type === "info" || msg.type === "running"}
+                <Play
+                  class="flow-icon text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
+                />
+              {/if}
+              <span class="text-sm">{msg.message}</span>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    </div>
+  </div>
+</div>

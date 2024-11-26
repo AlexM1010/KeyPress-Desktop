@@ -293,7 +293,6 @@
                                             min={CONFIG.VARIANCE.MIN}
                                             max={CONFIG.VARIANCE.MAX}
                                             defaultValue={CONFIG.VARIANCE.DEFAULT}
-                                            highlightColor={highlightColor}
                                         />
                                     </div>
                                 {/if}
