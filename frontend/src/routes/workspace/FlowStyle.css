@@ -11,103 +11,6 @@
     /* Adjust based on header height if necessary */
 }
 
-/* Left panel styles */
-.left-panel {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 320px;
-    background-color: var(--secondary);
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-    z-index: 10;
-}
-
-/* Left panel toggle button */
-.left-toggle-button {
-    position: absolute;
-    left: 0;
-    top: 15%;
-    transform: translateY(-50%);
-    z-index: 20;
-}
-
-.left-toggle-button-inner {
-    background-color: var(--tertiary);
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-    padding: 0.25rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.left-toggle-button-inner:hover {
-    background-color: var(--tertiary-hover);
-}
-
-/* Adjust main flow container when left panel is expanded */
-.pl-80 {
-    padding-left: 320px;
-}
-
-/* Adjust main flow container when status panel is expanded */
-.pr-80 {
-    padding-right: 320px;
-}
-
-/* Draggable node styles */
-.draggable-node {
-    display: flex;
-    align-items: center;
-    cursor: grab;
-}
-
-.node-preview {
-    transform: scale(0.8); /* Adjust scale as needed */
-}
-
-/* Prevent text selection during drag */
-.draggable-node:active {
-    cursor: grabbing;
-}
-
-/* Button container styles */
-.button-container {
-    transform-origin: right center;
-}
-
-/* Status toggle button styles */
-.status-toggle-button {
-    transform-origin: left center;
-}
-
-.status-toggle-button:not(.opacity-0) {
-    animation: slide-in 0.3s ease-out;
-}
-
-/* Slide-in animation */
-@keyframes slide-in {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Loader spin animation */
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* Common button styles */
 .flow-button {
     background-color: var(--tertiary);
@@ -136,7 +39,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: 320px;
+    width: 300px;
     background-color: var(--secondary);
     overflow-y: auto;
     transition: transform 0.3s ease;
@@ -157,11 +60,18 @@
     gap: 0.5rem;
 }
 
+/* Status toggle button styles */
+.status-toggle-button {
+    transform-origin: left center;
+}
+
+.status-toggle-button:not(.opacity-0) {
+    animation: slide-in 0.3s ease-out;
+}
+
 .status-toggle-button-inner {
     position: absolute;
     top: 15%;
-    right: 80px;
-    transform: translateY(-50%);
     background-color: var(--tertiary);
     border-top-left-radius: 0.25rem;
     border-bottom-left-radius: 0.25rem;
@@ -173,6 +83,97 @@
 
 .status-toggle-button-inner:hover {
     background-color: var(--tertiary-hover);
+}
+
+/* Left panel styles */
+.left-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 300px;
+    background-color: var(--secondary);
+    overflow-y: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Left panel toggle button  */
+.left-toggle-button {
+    transform-origin: left center;
+}
+
+.left-toggle-button:not(.opacity-0) {
+    animation: slide-in 0.3s ease-out;
+}
+
+
+.left-toggle-button-inner {
+    position: absolute;
+    top: 15%;
+    background-color: var(--tertiary);
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    padding: 0.25rem;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+}
+
+.left-toggle-button-inner:hover {
+    background-color: var(--tertiary-hover);
+}
+
+/* Adjust main flow container when left panel is expanded */
+.pl-80 {
+    padding-left: 300px;
+}
+
+/* Adjust main flow container when status panel is expanded */
+.pr-80 {
+    padding-right: 300px;
+}
+
+/* Draggable node styles */
+.draggable-node {
+    display: flex;
+    align-items: center;
+    cursor: grab;
+}
+
+.node-preview {
+    transform: scale(0.8); /* Adjust scale as needed */
+}
+
+/* Prevent text selection during drag */
+.draggable-node:active {
+    cursor: grabbing;
+}
+
+/* Button container styles */
+.button-container {
+    transform-origin: right center;
+}
+
+/* Slide-in animation */
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loader spin animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Custom styles for the Svelte Flow controls with joined buttons */

@@ -15,7 +15,7 @@
 
     let isReady = false;
     let isExpanded = true;
-    $: isWorkspacePage = $page.url.pathname === '/workspace';
+    $: isNavbarExpanded = $page.url.pathname === '/workspace';
 
     function toggleLayout() {
         isExpanded = !isExpanded;
@@ -57,7 +57,7 @@
 <ModeWatcher />
 
 <!-- Toggle Button -->
-{#if isWorkspacePage}
+{#if isNavbarExpanded}
 <div class="transition-all duration-300">
     <button
         class="navbar-toggle-button"

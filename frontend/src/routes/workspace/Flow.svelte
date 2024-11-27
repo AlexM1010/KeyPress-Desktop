@@ -432,7 +432,7 @@
   <div class="left-toggle-button">
     <button
       class="left-toggle-button-inner"
-      style="left: {isLeftPanelExpanded ? '320px' : '0'}"
+      style="left: {isLeftPanelExpanded ? '300px' : '0'}"
       on:click={toggleLeftPanel}
       aria-label={isLeftPanelExpanded ? "Collapse node panel" : "Expand node panel"}
     >
@@ -521,12 +521,12 @@
   <!-- Status Panel Toggle Button -->
   {#if hasStatusPanel}
     <div
-      class="status-toggle-button ml-2 transition-all duration-300"
+      class="status-toggle-button transition-all duration-300"
       class:opacity-0={!hasStatusPanel}
     >
       <button
         class="status-toggle-button-inner"
-        style="right: {isStatusPanelExpanded ? '320px' : '0'}"
+        style="right: {isStatusPanelExpanded ? '300px' : '0'}"
         on:click={toggleStatusPanel}
         aria-label={
           isStatusPanelExpanded
