@@ -14,16 +14,21 @@
 
   // Import custom nodes, edges, and utilities
   import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils/utils";
-  import CustomEdge from "./CustomEdge.svelte";
+  //Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
-  import { flowTheme } from "$lib/stores/theme";
-  import { isAuthenticated, user } from "$lib/stores/auth";
-  import Sidebar from "./Sidebar.svelte";
+  import DelayNode from "$lib/components/customNodes/DelayNode.svelte";
+  import StartNode from '$lib/components/customNodes/StartNode.svelte';
+  //Edges
+  import CustomEdge from "./CustomEdge.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
+  //Auth/Mount
+  import { isAuthenticated, user } from "$lib/stores/auth";
   import { onMount } from "svelte";
+  //Flow
+  import { flowTheme } from "$lib/stores/theme";
   import "$lib/index.scss";
   import "./FlowStyle.css";
-
+  
   // Import icons from Lucide Svelte
   import {
     Check,
@@ -37,11 +42,84 @@
     LayoutDashboard,
     Plus,
   } from "lucide-svelte";
+  
 
   // Define available nodes
-  const availableNodes = [
-    { type: "Start", label: "Start Node", icon: Play },
-  ];
+  const availableNodes: Array<{
+      group: string;
+      nodes: Array<{
+        type: string;
+        label: string;
+        icon: any;
+        id: string;
+        component: any;
+        isExpanded: boolean;
+        data: {
+          [key: string]: any;
+        };
+      }>;
+    }> = [
+      {
+        group: "Flow Control",
+        nodes: [
+          {
+            type: 'Start',
+            label: 'Start Node',
+            icon: Play,
+            id: 'start-node',
+            component: StartNode,
+            isExpanded: false,
+            data: {
+              label: 'Start',
+            },
+          },
+          {
+            type: 'Delay',
+            label: 'Delay Node',
+            icon: Play,
+            id: 'delay-node',
+            component: DelayNode,
+            isExpanded: false,
+            data: {
+              delayType: 'fixed',
+              time: 1000,
+              minTime: 500,
+              maxTime: 5000,
+            },
+          }
+        ]
+      },
+      {
+        group: "Flow Control",
+        nodes: [
+          {
+            type: 'Start',
+            label: 'Start Node',
+            icon: Play,
+            id: 'start-node',
+            component: StartNode,
+            isExpanded: false,
+            data: {
+              label: 'Start',
+            },
+          },
+          {
+            type: 'Delay',
+            label: 'Delay Node',
+            icon: Play,
+            id: 'delay-node',
+            component: DelayNode,
+            isExpanded: false,
+            data: {
+              delayType: 'fixed',
+              time: 1000,
+              minTime: 500,
+              maxTime: 5000,
+            },
+          }
+        ]
+      }
+    ];
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
@@ -330,31 +408,37 @@
 </script>
 
 <div class="flow-container flex">
-  <!-- Left Panel -->
+    <!-- Left Panel -->
   {#if isLeftPanelExpanded}
-    <div class="left-panel">
-      <div class="panel-spacing">
-        <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
-          <Plus class="flow-icon" />
-          <span>Nodes</span>
-        </h2>
-        <ul>
-          {#each availableNodes as node}
-            <li
-              class="draggable-node"
-              draggable="true"
-              on:dragstart={(event) => onDragStart(event, node.type)}
-            >
-              {#if node.icon}
-                <svelte:component this={node.icon} class="flow-icon" />
-              {/if}
-              <span>{node.label}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
+  <div class="left-panel">
+    <div class="panel-spacing">
+      <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
+        <Plus class="flow-icon" />
+        <span>Nodes</span>
+      </h2>
+      {#each availableNodes as group}
+        <div class="node-group">
+          <h3 class="text-sm font-medium text-secondary mb-2">{group.group}</h3>
+          <ul>
+            {#each group.nodes as node}
+              <li
+                class="draggable-node"
+                draggable="true"
+                on:dragstart={(event) => onDragStart(event, node.type)}
+              >
+                <div class="node-preview">
+                  <svelte:component this={node.component} id={node.id} data={node.data} />
+                </div>
+              </li>
+            {/each}
+          </ul>
+          <div class="group-separator"></div>
+        </div>
+      {/each}
     </div>
+  </div>
   {/if}
+
 
   <!-- Left Panel Toggle Button -->
   <div class="left-toggle-button">
