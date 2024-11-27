@@ -72,7 +72,7 @@
 {/if}
 
 <!-- Navbar -->
-<div class="bg-background navbar-container text-black dark:text-white" class:collapsed={!isExpanded}>
+<div class="navbar-container text-black dark:text-white" class:collapsed={!isExpanded}>
     <div class="w-full px-6 flex justify-between items-center h-[4rem]">
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4 fixed left-6">

@@ -1,14 +1,7 @@
-<!-- localhost:5173/ -->
+
 <script lang="ts">
-  import '../app.css';
   import { Button } from "$lib/components/ui/button";
-  import type { PageData } from "./$types.js";
-  //import Register from "./register/Register.svelte"; 
-
-  //export let data: PageData;
 </script>
-
-<!--<Register data={data?.form ?? undefined}/>-->
 
 <div class="flex items-center justify-center min-h-screen bg-[--background] text-black dark:text-white">
   <div class="text-center space-y-6">
