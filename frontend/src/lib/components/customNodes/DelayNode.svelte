@@ -34,13 +34,10 @@
     }
 
     $: {
-        if (data.delayType === 'Fixed' && !data.time) {
-            data.time = 1000;
-        }
-        if (data.delayType === 'Random') {
-            data.minTime = data.minTime || 500;
-            data.maxTime = data.maxTime || 1500;
-        }
+        data.delayType = data.delayType || 'Fixed';
+        data.time = data.time || 1000;
+        data.minTime = data.minTime || 500;
+        data.maxTime = data.maxTime || 1500;
     }
 </script>
 

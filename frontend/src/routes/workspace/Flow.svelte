@@ -16,8 +16,10 @@
   import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils/utils";
   //Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
-  import DelayNode from "$lib/components/customNodes/DelayNode.svelte";
+  import MouseClickNode from '$lib/components/customNodes/MouseClickNode.svelte';
+  import MouseMoveNode from '$lib/components/customNodes/MouseMoveNode.svelte';
   import StartNode from '$lib/components/customNodes/StartNode.svelte';
+  import DelayNode from '$lib/components/customNodes/DelayNode.svelte';
   //Edges
   import CustomEdge from "./CustomEdge.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
@@ -46,7 +48,7 @@
 
   // Define available nodes
   const availableNodes: Array<{
-      group: string;
+    group: string;
       nodes: Array<{
         type: string;
         label: string;
@@ -59,9 +61,9 @@
         };
       }>;
     }> = [
-      {
-        group: "Flow Control",
-        nodes: [
+    {
+      group: "Flow Control",
+      nodes: [ 
           {
             type: 'Start',
             label: 'Start Node',
@@ -87,39 +89,32 @@
               maxTime: 5000,
             },
           }
-        ]
-      },
-      {
-        group: "Flow Control",
-        nodes: [
+      ]
+    },
+    {
+      group: "Mouse Control",
+      nodes: [
           {
-            type: 'Start',
-            label: 'Start Node',
+            type: 'Click',
+            label: 'Click Node',
             icon: Play,
-            id: 'start-node',
-            component: StartNode,
+            id: 'click-node',
+            component: MouseClickNode,
             isExpanded: false,
-            data: {
-              label: 'Start',
-            },
+            data: {},
           },
           {
-            type: 'Delay',
-            label: 'Delay Node',
+            type: 'MoveMouse',
+            label: 'Move Node',
             icon: Play,
-            id: 'delay-node',
-            component: DelayNode,
+            id: 'move-node',
+            component: MouseMoveNode,
             isExpanded: false,
-            data: {
-              delayType: 'fixed',
-              time: 1000,
-              minTime: 500,
-              maxTime: 5000,
-            },
+            data: {},
           }
-        ]
-      }
-    ];
+      ]
+    }
+  ];
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
