@@ -178,9 +178,6 @@
 
         <!-- Special Keys Selection -->
         <div class="flex flex-col">
-            <label for="special-keys-group" class="text-sm font-medium text-[--secondary-text] mb-2">
-                Special Keys:
-            </label>
             <ButtonGroup variant="default">
                 {#each specialKeysByOS[currentOS] as specialKey}
                     <ButtonGroupItem
@@ -197,22 +194,19 @@
 
         <!-- Macro Recording Controls -->
         <div class="flex flex-col">
-            <label for="macro-controls" class="text-sm font-medium text-[--secondary-text] mb-2">
-                Macro Keys:
-            </label>
             <div id="macro-controls" class="flex items-center space-x-2">
                 <button
                     on:click={isRecording ? stopRecording : startRecording}
                     class={`px-3 py-2 rounded-md shadow-sm focus:outline-none transition-all duration-300 ${
                         isRecording 
                             ? 'bg-red-500 text-[--main-text] animate-pulse' 
-                            : 'bg-[--secondary] text-[--secondary-text] hover:bg-[--secondary-hover]'
+                            : 'bg-[--main] text-[--secondary-text] hover:bg-[--main-hover]'
                     }`}
                 >
                     {isRecording ? 'Recording...' : 'Record Macro'}
                 </button>
                 <span 
-                    class="px-3 py-2 bg-[--secondary-hover] rounded-md shadow-sm transition-all duration-200"
+                    class="px-3 py-2 bg-[--main-hover] bg-opacity-50 rounded-md shadow-sm transition-all duration-200"
                     in:fade={{duration: 200}}
                 >
                     {macroKeys.length ? macroDisplay : 'No macro'}

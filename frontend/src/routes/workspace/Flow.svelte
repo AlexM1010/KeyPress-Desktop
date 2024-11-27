@@ -71,9 +71,7 @@
             id: 'start-node',
             component: StartNode,
             isExpanded: false,
-            data: {
-              label: 'Start',
-            },
+            data: {},
           },
           {
             type: 'Delay',
@@ -82,12 +80,7 @@
             id: 'delay-node',
             component: DelayNode,
             isExpanded: false,
-            data: {
-              delayType: 'fixed',
-              time: 1000,
-              minTime: 500,
-              maxTime: 5000,
-            },
+            data: {},
           }
       ]
     },
