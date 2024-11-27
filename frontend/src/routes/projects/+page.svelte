@@ -70,7 +70,7 @@
 	});
 </script>
 
-<div class="mt-10">
+<div class="mt-[4rem]">
 	<SearchPage {title} on:search={onSearch}>
 		{#each filters as tech}
 			<Chip active={tech.isSelected} classes={'text-0.8em'} on:click={() => onSelected(tech.slug)}
@@ -78,7 +78,7 @@
 			>
 		{/each}
 		{#if displayed.length === 0}
-			<div class="p-5 col-center gap-3 my-auto text-[var(--accent-text)] flex-1">
+			<div class="p-5 col-center gap-3 my-auto text-[var(--main-text)] flex-1">
 				<UIcon icon="i-carbon-cube" classes="text-3.5em" />
 				<p class="font-300">Could not find anything...</p>
 			</div>

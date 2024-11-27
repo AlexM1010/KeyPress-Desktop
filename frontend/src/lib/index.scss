@@ -24,7 +24,7 @@ html { font-family: "Inter", "system-ui"; }
 	--dark-8: #8e8e8e;
 
 	--light-0: #fff;
-	--light-00: #cacaca;
+	--light-00: #fffffff5;
 	--light-1: #e1e1e1;
 	--light-2: #d1d1d1;
 	--light-3: #c1c1c1;
@@ -118,8 +118,8 @@ body {
 :root[data-theme='light'] {
 	color-scheme: light;
 
-	--main: var(--light-1);
-	--main-close: var(--light-00);
+	--main: var(--light-0);
+	--main-close: var(--light-0);
 	--main-hover: var(--light-1);
 	--secondary: var(--light-1);
 	--secondary-hover: var(--light-2);
