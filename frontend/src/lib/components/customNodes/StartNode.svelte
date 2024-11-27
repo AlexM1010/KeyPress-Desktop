@@ -203,7 +203,7 @@
                             : 'bg-[--main] text-[--secondary-text] hover:bg-[--main-hover]'
                     }`}
                 >
-                    {isRecording ? 'Recording...' : 'Record Macro'}
+                    {isRecording ? 'Recording...' : 'Record'}
                 </button>
                 <span 
                     class="px-3 py-2 bg-[--main-hover] bg-opacity-50 rounded-md shadow-sm transition-all duration-200"

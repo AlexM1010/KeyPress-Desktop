@@ -43,6 +43,7 @@
     background-color: var(--secondary);
     overflow-y: auto;
     transition: transform 0.3s ease;
+    transition: margin-top 0.3s;
 }
 
 /* Common spacing */
@@ -95,7 +96,14 @@
     background-color: var(--secondary);
     overflow-y: auto;
     transition: transform 0.3s ease;
+    transition: margin-top 0.3s;
 }
+
+.left-panel.expanded,
+  .status-panel.expanded {
+    transition: margin-top 0.3s;
+    margin-top: 4rem;
+  }
 
 /* Left panel toggle button  */
 .left-toggle-button {
@@ -152,6 +160,15 @@
 /* Button container styles */
 .button-container {
     transform-origin: right center;
+}
+
+.nav-button-container {
+    transition: margin-top 0.3s;
+    transform-origin: right center;
+}
+.nav-button-container.expanded {
+    transition: margin-top 0.3s;
+    margin-top: 4rem;
 }
 
 /* Slide-in animation */

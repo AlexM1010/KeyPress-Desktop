@@ -10,15 +10,15 @@
     import '$lib/index.scss';
     import { ChevronDown } from 'lucide-svelte';
     import './navbar.css';
+    import { isExpanded } from '$lib/stores/navbar';
 
     //TODO background is above button hover color somehow maybe
 
     let isReady = false;
-    let isExpanded = true;
-    $: isNavbarExpanded = $page.url.pathname === '/workspace';
+    $: isNavbarToggle = $page.url.pathname === '/workspace';
 
     function toggleLayout() {
-        isExpanded = !isExpanded;
+        isExpanded.update(value => !value);
     }
 
     onMount(() => {
@@ -57,22 +57,22 @@
 <ModeWatcher />
 
 <!-- Toggle Button -->
-{#if isNavbarExpanded}
+{#if isNavbarToggle}
 <div class="transition-all duration-300">
     <button
         class="navbar-toggle-button"
-        class:expanded={isExpanded}
-        class:collapsed={!isExpanded}
+        class:expanded={$isExpanded}
+        class:collapsed={!$isExpanded}
         on:click={toggleLayout}
-        aria-label={isExpanded ? "Collapse layout" : "Expand layout"}
+        aria-label={$isExpanded ? "Collapse layout" : "Expand layout"}
     >
-        <ChevronDown class={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+        <ChevronDown class={`w-5 h-5 transition-transform ${$isExpanded ? 'rotate-180' : ''}`} />
     </button>
 </div>
 {/if}
 
 <!-- Navbar -->
-<div class="navbar-container text-black dark:text-white" class:collapsed={!isExpanded}>
+<div class="navbar-container text-white" class:collapsed={!$isExpanded}>
     <div class="w-full px-6 flex justify-between items-center h-[4rem]">
         <!-- Left side of navbar -->
         <div class="flex items-center space-x-4 fixed left-6">

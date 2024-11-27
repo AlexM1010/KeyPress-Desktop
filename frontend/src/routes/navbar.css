@@ -35,7 +35,7 @@
     transform-origin: top;
     transition: transform 0.3s ease;
     z-index: 10;
-    background-color: var(--main);
+    background-color: var(--keypress-1); 
 }
 
 .navbar-container.collapsed {

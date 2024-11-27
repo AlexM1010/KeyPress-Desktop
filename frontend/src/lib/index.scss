@@ -58,9 +58,14 @@ html { font-family: "Inter", "system-ui"; }
 	--dark-0-60: rgba(0, 0, 0, 0.6);
 	--light-0-60: rgba(255, 255, 255, 0.6);
 
+	--keypress-1-dark: #000020;
+	--keypress-1-light: #000020;
+
 	// fonts
 	--text-f: 'Inter';
 	--title-f: 'Inter';
+
+	--radius: 0.5rem;
 }
 
 body {
@@ -106,6 +111,8 @@ body {
 	--code-operator: var(--code-operator-dark);
 	--link: var(--link-light);
 	--error: var(--error-color-light);
+
+	--keypress-1: var(--keypress-1-dark);
 }
 
 :root[data-theme='light'] {
@@ -142,6 +149,8 @@ body {
 	--code-operator: var(--code-operator-light);
 	--link: var(--link-dark);
 	--error: var(--error-color-dark);
+
+	--keypress-1: var(--keypress-1-light);
 }
 
 .container {

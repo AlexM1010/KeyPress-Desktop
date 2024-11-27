@@ -30,6 +30,8 @@
   import { flowTheme } from "$lib/stores/theme";
   import "$lib/index.scss";
   import "./FlowStyle.css";
+  import { isExpanded } from '$lib/stores/navbar';
+  $: expandedClass = $isExpanded ? 'expanded' : '';
   
   // Import icons from Lucide Svelte
   import {
@@ -398,7 +400,7 @@
 <div class="flow-container flex">
     <!-- Left Panel -->
   {#if isLeftPanelExpanded}
-  <div class="left-panel">
+  <div class="left-panel {expandedClass}">
     <div class="panel-spacing">
       <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
         <Plus class="flow-icon" />
@@ -471,7 +473,7 @@
       <!-- Control Panel -->
       <Panel position="top-right">
         <div class="flex items-center">
-          <div class="button-container flex-center flex-gap transition-transform duration-300">
+          <div class="nav-button-container flex-center flex-gap transition-transform duration-300 {expandedClass}">
             <!-- Run Flow Button -->
             <button
               class="flow-button"
@@ -544,7 +546,7 @@
 
   <!-- Status Panel -->
   <div
-    class="status-panel"
+    class="status-panel {expandedClass}"
     style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
   >
     <div class="panel-spacing">
