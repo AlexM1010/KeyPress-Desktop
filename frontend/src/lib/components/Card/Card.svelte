@@ -1,31 +1,26 @@
 <script lang="ts">
-	import { convertNamedToHexColor, type NamedColor } from '$lib/utils/colors';
-	import { changeColorOpacity, isHexColor } from '@riadh-adrani/utils';
+	//MODIFIED BY Alex
 	import { onMount } from 'svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 
 	let el: HTMLElement;
 
 	export let color = '#ffffff00';
-
 	export let margin = '0px';
 	export let tiltDegree = 2;
 	export let classes: Array<string> = [];
 	export let href: undefined | string = undefined;
 	export let bgImg: string | undefined = undefined;
 
-	$: computedColor = isHexColor(color) ? color : convertNamedToHexColor(color as NamedColor);
-	$: borderColor = changeColorOpacity(computedColor, 0.5);
-	$: dropColor = changeColorOpacity(computedColor, 0.15);
-	$: bgColor = changeColorOpacity(computedColor, 0.01);
-
-	$: {
-		if (el) {
-			el.style.setProperty('--border-color', borderColor);
-			el.style.setProperty('--drop-color', dropColor);
-			el.style.setProperty('--bg-color', bgColor);
-		}
+	function hexToRgb(hex: string, alpha: number = 1): string {
+		const bigint = parseInt(hex.slice(1), 16);
+		const r = (bigint >> 16) & 255;
+		const g = (bigint >> 8) & 255;
+		const b = bigint & 255;
+		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 	}
+
+	$: el?.style.setProperty('--drop-color', hexToRgb(color, 0.5));
 
 	// svelte typing is broken...
 	const onHover: MouseEventHandler<HTMLDivElement> = (ev) => {
@@ -84,9 +79,9 @@
 		overflow: hidden;
 
 		//Standard:
-		--border-color: transparent;
-		--bg-color: transparent;
-		--drop-color: transparent;
+		--border-color: var(--main-text);
+		--bg-color: var(--main);
+		--drop-color: color;
 
 		--bg-img: url();
 

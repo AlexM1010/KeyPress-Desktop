@@ -1,5 +1,4 @@
-import type { Color } from './utils/colors';
-
+//Modified by alex 
 export enum Platform {
 	GitHub = 'github',
 	StackOverflow = 'stackoverflow',
@@ -46,7 +45,7 @@ export interface Skill<S extends string = string> extends Omit<Item<S>, 'shortDe
 
 export interface Project<S extends string = string> extends Item<S> {
 	links: Array<Link>;
-	color: Color;
+	color: string;
 	period: {
 		from: Date;
 		to?: Date;
@@ -93,7 +92,7 @@ export interface FlowReview<S extends string = string> extends Omit<Item<S>, 'sh
 
 export interface Flow<S extends string = string> extends Item<S> {
 	links: Array<Link>;
-	color: Color;
+	color: string;
 	period: {
 		from: Date;
 		to?: Date;

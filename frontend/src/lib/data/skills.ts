@@ -1,37 +1,37 @@
 import Assets from './assets';
 import type { Skill, SkillCategory } from '../types';
 import svelte from '../md/svelte.md?raw';
-import { omit, type StringWithAutoComplete } from '@riadh-adrani/utils';
 
 const defineSkillCategory = <S extends string>(data: SkillCategory<S>): SkillCategory<S> => data;
 
 const categories = [
-	defineSkillCategory({ name: 'Programming Languages', slug: 'pro-lang' }),
-	defineSkillCategory({ name: 'Frameworks', slug: 'framework' }),
-	defineSkillCategory({ name: 'Libraries', slug: 'library' }),
-	defineSkillCategory({ name: 'Langauges', slug: 'lang' }),
-	defineSkillCategory({ name: 'Databases', slug: 'db' }),
-	defineSkillCategory({ name: 'ORMs', slug: 'orm' }),
-	defineSkillCategory({ name: 'DevOps', slug: 'devops' }),
-	defineSkillCategory({ name: 'Testing', slug: 'test' }),
-	defineSkillCategory({ name: 'Dev Tools', slug: 'devtools' }),
-	defineSkillCategory({ name: 'Markup & Style', slug: 'markup-style' }),
-	defineSkillCategory({ name: 'Design', slug: 'design' }),
-	defineSkillCategory({ name: 'Soft Skills', slug: 'soft' })
+    defineSkillCategory({ name: 'Programming Languages', slug: 'pro-lang' }),
+    defineSkillCategory({ name: 'Frameworks', slug: 'framework' }),
+    defineSkillCategory({ name: 'Libraries', slug: 'library' }),
+    defineSkillCategory({ name: 'Langauges', slug: 'lang' }),
+    defineSkillCategory({ name: 'Databases', slug: 'db' }),
+    defineSkillCategory({ name: 'ORMs', slug: 'orm' }),
+    defineSkillCategory({ name: 'DevOps', slug: 'devops' }),
+    defineSkillCategory({ name: 'Testing', slug: 'test' }),
+    defineSkillCategory({ name: 'Dev Tools', slug: 'devtools' }),
+    defineSkillCategory({ name: 'Markup & Style', slug: 'markup-style' }),
+    defineSkillCategory({ name: 'Design', slug: 'design' }),
+    defineSkillCategory({ name: 'Soft Skills', slug: 'soft' })
 ] as const;
 
 const defineSkill = <S extends string>(
-	skill: Omit<Skill<S>, 'category'> & {
-		category?: StringWithAutoComplete<(typeof categories)[number]['slug']>;
-	}
+    skill: Omit<Skill<S>, 'category'> & {
+        category?: (typeof categories)[number]['slug'];
+    }
 ): Skill<S> => {
-	const out: Skill<S> = omit(skill, 'category');
+    const { category: categorySlug, ...rest } = skill;
+    const out: Skill<S> = rest;
 
-	if (skill.category) {
-		out.category = categories.find((it) => it.slug === skill.category);
-	}
+    if (categorySlug) {
+        out.category = categories.find((it) => it.slug === categorySlug);
+    }
 
-	return out;
+    return out;
 };
 
 export const items = [
@@ -102,7 +102,7 @@ export const items = [
 export const title = 'Skills';
 
 export const getSkills = (
-	...slugs: Array<StringWithAutoComplete<(typeof items)[number]['slug']>>
+	...slugs: Array<(typeof items)[number]['slug']>
 ): Array<Skill> => items.filter((it) => slugs.includes(it.slug));
 
 export const groupByCategory = (
