@@ -6,7 +6,6 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 
-	export let title = 'Title';
 	export let search = '';
     let searchInput: Input;
 

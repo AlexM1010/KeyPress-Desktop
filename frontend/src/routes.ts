@@ -1,16 +1,13 @@
-import Home from './routes/+page.svelte' 
+import Workspace from './routes/+page.svelte' 
 import Login from './routes/login/+page.svelte'
-import Workspace from './routes/workspace/+page.svelte'
 import Projects from './routes/projects/+page.svelte'
 
 const routes = {
     // Exact path
-    '/': Home,
+    '/': Workspace,
 
     // Using named parameters, with last being optional
     '/login': Login,
-
-    '/Worspace': Workspace,
 
     '/Projects': Projects,
 

@@ -15,7 +15,6 @@
     //TODO background is above button hover color somehow maybe
 
     let isReady = false;
-    $: isNavbarToggle = $page.url.pathname === '/workspace';
 
     function toggleLayout() {
         isExpanded.update(value => !value);
@@ -57,7 +56,7 @@
 <ModeWatcher />
 
 <!-- Toggle Button -->
-{#if isNavbarToggle}
+{#if $page.url.pathname === '/'}
 <div class="transition-all duration-300">
     <button
         class="navbar-toggle-button"
@@ -75,11 +74,9 @@
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
     <div class="w-full px-6 flex justify-between items-center h-[4rem]">
         <!-- Left side of navbar -->
-        <div class="flex items-center space-x-4 fixed left-6">
-            <button on:click={() => goto('/')} class="flex items-center">
-                <Logo />
-            </button>
-            <Button on:click={() => goto('/workspace')} variant="ghost">
+        <div class="flex items-center fixed">
+            <Logo />
+            <Button on:click={() => goto('/')} variant="ghost">
                 Workspace
             </Button>
             {#if $isAuthenticated && $user}

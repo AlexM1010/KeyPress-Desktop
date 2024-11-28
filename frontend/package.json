@@ -63,7 +63,6 @@
 		"prettier": "^3.3.3",
 		"prismjs": "^1.29.0",
 		"sass": "^1.79.5",
-		"svelte-preprocess": "^6.0.3",
-		"svelvet": "^10.0.2"
+		"svelte-preprocess": "^6.0.3"
 	}
 }

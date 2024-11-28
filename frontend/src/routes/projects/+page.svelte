@@ -71,7 +71,7 @@
 </script>
 
 <div class="mt-[4rem]">
-	<SearchPage {title} on:search={onSearch}>
+	<SearchPage on:search={onSearch}>
 		{#each filters as tech}
 			<Chip active={tech.isSelected} classes={'text-0.8em'} on:click={() => onSelected(tech.slug)}
 				>{tech.name}</Chip
