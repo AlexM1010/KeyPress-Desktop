@@ -1,7 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/stores'; 
-    import { Button } from '$lib/components/ui/button';
     import { ModeWatcher } from "mode-watcher";
     import ThemeToggle from './ThemeToggle.svelte';
     import Logo from './Logo.svelte';
@@ -11,8 +10,6 @@
     import { ChevronDown } from 'lucide-svelte';
     import './navbar.css';
     import { isExpanded } from '$lib/stores/navbar';
-
-    //TODO background is above button hover color somehow maybe
 
     let isReady = false;
 
@@ -74,31 +71,31 @@
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
     <div class="w-full px-6 flex justify-between items-center h-[4rem]">
         <!-- Left side of navbar -->
-        <div class="flex items-center fixed">
+        <div class="flex items-center space-x-4 fixed">
             <Logo />
-            <Button on:click={() => goto('/')} variant="ghost">
+            <button class="nav-btn" on:click={() => goto('/')}>
                 Workspace
-            </Button>
+            </button>
             {#if $isAuthenticated && $user}
-                <Button on:click={() => goto('/projects')} variant="ghost">
+                <button class="nav-btn" on:click={() => goto('/projects')}>
                     Projects
-                </Button>
+                </button>
             {/if}
         </div>
         <!-- Right side of navbar -->
         <div class="flex items-center space-x-4 fixed right-6">
             {#if $isAuthenticated && $user}
                 <span class="text-foreground">{$user.email}</span>
-                <Button on:click={handleLogout} variant="ghost">
+                <button class="nav-btn" on:click={handleLogout}>
                     Logout
-                </Button>
+                </button>
             {:else}
-                <Button on:click={() => goto('/register')} variant="ghost">
+                <button class="nav-btn" on:click={() => goto('/register')}>
                     Register
-                </Button>
-                <Button on:click={() => goto('/login')} variant="ghost">
+                </button>
+                <button class="nav-btn" on:click={() => goto('/login')}>
                     Login
-                </Button>
+                </button>
             {/if}
             <ThemeToggle />
         </div>
@@ -112,3 +109,22 @@
 {:else}
     <slot />
 {/if}
+
+<style>
+    .nav-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        color: var(--keypress-1-text);
+    }
+    .nav-btn:hover {
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+    .nav-btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px var(--ring-offset);
+    }
+</style>

@@ -113,6 +113,7 @@ body {
 	--error: var(--error-color-light);
 
 	--keypress-1: var(--keypress-1-dark);
+	--keypress-1-text: var(--light-0);
 }
 
 :root[data-theme='light'] {
@@ -151,6 +152,7 @@ body {
 	--error: var(--error-color-dark);
 
 	--keypress-1: var(--keypress-1-light);
+	--keypress-1-text: var(--light-0);
 }
 
 .container {
