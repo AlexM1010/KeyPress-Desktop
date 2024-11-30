@@ -69,36 +69,34 @@
 
 <!-- Navbar -->
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
-    <div class="w-full px-6 flex justify-between items-center h-[4rem]">
-        <!-- Left side of navbar -->
-        <div class="flex items-center space-x-4 fixed">
-            <Logo />
-            <button class="nav-btn" on:click={() => goto('/')}>
-                Workspace
+    <!-- Left side of navbar -->
+    <div class="navbar-left">
+        <Logo customClass="logo" />
+        <button class="nav-btn" on:click={() => goto('/')}>
+            Workspace
+        </button>
+        {#if $isAuthenticated && $user}
+            <button class="nav-btn" on:click={() => goto('/projects')}>
+                Projects
             </button>
-            {#if $isAuthenticated && $user}
-                <button class="nav-btn" on:click={() => goto('/projects')}>
-                    Projects
-                </button>
-            {/if}
-        </div>
-        <!-- Right side of navbar -->
-        <div class="flex items-center space-x-4 fixed right-6">
-            {#if $isAuthenticated && $user}
-                <span class="text-foreground">{$user.email}</span>
-                <button class="nav-btn" on:click={handleLogout}>
-                    Logout
-                </button>
-            {:else}
-                <button class="nav-btn" on:click={() => goto('/register')}>
-                    Register
-                </button>
-                <button class="nav-btn" on:click={() => goto('/login')}>
-                    Login
-                </button>
-            {/if}
-            <ThemeToggle />
-        </div>
+        {/if}
+    </div>
+    <!-- Right side of navbar -->
+    <div class="flex items-center">
+        {#if $isAuthenticated && $user}
+            <span class="user-email text-foreground">{$user.email}</span>
+            <button class="nav-btn" on:click={handleLogout}>
+                Logout
+            </button>
+        {:else}
+            <button class="nav-btn" on:click={() => goto('/register')}>
+                Register
+            </button>
+            <button class="nav-btn" on:click={() => goto('/login')}>
+                Login
+            </button>
+        {/if}
+        <ThemeToggle />
     </div>
 </div>
 
@@ -109,22 +107,3 @@
 {:else}
     <slot />
 {/if}
-
-<style>
-    .nav-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        transition: background-color 0.2s;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-        color: var(--keypress-1-text);
-    }
-    .nav-btn:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-    }
-    .nav-btn:focus-visible {
-        outline: none;
-        box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px var(--ring-offset);
-    }
-</style>

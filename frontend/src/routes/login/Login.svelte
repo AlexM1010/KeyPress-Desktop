@@ -22,7 +22,7 @@
 
     // Redirect if already authenticated
     $: if ($isAuthenticated) {
-        goto('/workspace');
+        goto('/projects');
     }
 
     // Form submission handler
@@ -48,7 +48,7 @@
         try {
             await auth.signIn(currentForm.email, currentForm.password);
             message.set('Login successful');
-            await goto('/workspace');
+            await goto('/projects');
         } catch (error) {
             console.error('Login error:', error);
             message.set(error instanceof Error ? error.message : 'An error occurred during login');

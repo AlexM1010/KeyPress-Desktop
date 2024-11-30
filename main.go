@@ -19,13 +19,15 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "Keypress",
-		Width:  1024,
-		Height: 768,
+		Title:     "Keypress",
+		Width:     1024,
+		Height:    768,
+		MinWidth:  380,
+		MinHeight: 400,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1}, //TODO: update with light/dark mode
+		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 32, A: 1},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
