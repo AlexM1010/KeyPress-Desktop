@@ -43,7 +43,7 @@ type App struct {
 // Node represents a single node in the flowchart.
 type Node struct {
 	ID       string                 `json:"id"`
-	Type     string                 `json:"type"` // "Start", "MoveMouse", "Click"
+	Type     string                 `json:"type"`
 	Data     map[string]interface{} `json:"data"`
 	Position map[string]float64     `json:"position"`
 }
@@ -293,14 +293,14 @@ func executeTask(task Task, app *App) {
 	}()
 
 	switch task.Type {
-	case "Start":
+	case "StartNode":
 		log.Printf("Flow Started - Task ID: %s", task.ID)
 		app.emitEvent("task-success", map[string]interface{}{
 			"taskID": task.ID,
-			"type":   "Start",
+			"type":   "StartNode",
 		})
 
-	case "MoveMouse":
+	case "MouseMoveNode":
 		log.Printf("MoveMouse task starting - Data: %+v", task.Data)
 
 		// Extract and validate position configurations
@@ -436,7 +436,7 @@ func executeTask(task Task, app *App) {
 			"type":   "MoveMouse",
 		})
 
-	case "Click":
+	case "MouseClickNode":
 		log.Printf("Click task starting - Data: %+v", task.Data)
 
 		// Get buttonType
@@ -583,7 +583,7 @@ func executeTask(task Task, app *App) {
 			"taskID": task.ID,
 			"type":   "KeyTap",
 		})
-	case "Delay":
+	case "DelayNode":
 		log.Printf("Delay task starting - Data: %+v", task.Data)
 
 		// Get delayType
@@ -760,7 +760,7 @@ func (a *App) StartExecution(flow string) error {
 // findStartNode locates the StartNode in the flowchart.
 func (a *App) findStartNode(nodes []Node) (Node, error) {
 	for _, node := range nodes {
-		if node.Type == "Start" {
+		if node.Type == "StartNode" {
 			return node, nil
 		}
 	}

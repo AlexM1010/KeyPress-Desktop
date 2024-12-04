@@ -1,0 +1,95 @@
+<script lang="ts">
+  import { Plus, Play } from "lucide-svelte";
+  import { isExpanded } from '$lib/stores/navbar';
+  import MouseClickNode from '$lib/components/customNodes/MouseClickNode.svelte';
+  import MouseMoveNode from '$lib/components/customNodes/MouseMoveNode.svelte';
+  import StartNode from '$lib/components/customNodes/StartNode.svelte';
+  import DelayNode from '$lib/components/customNodes/DelayNode.svelte';
+
+  export let availableNodes = [
+    {
+      group: "Flow Control",
+      nodes: [ 
+        {
+          type: 'StartNode',
+          label: 'Start Node',
+          icon: Play,
+          id: 'start-node',
+          component: StartNode,
+          isExpanded: false,
+          data: undefined,
+        },
+        {
+          type: 'DelayNode',
+          label: 'Delay Node',
+          icon: Play,
+          id: 'delay-node',
+          component: DelayNode,
+          isExpanded: false,
+          data: undefined,
+        }
+      ]
+    },
+    {
+      group: "Mouse Control",
+      nodes: [
+        {
+          type: 'MouseClickNode',
+          label: 'Click Node',
+          icon: Play,
+          id: 'click-node',
+          component: MouseClickNode,
+          isExpanded: false,
+          data: undefined,
+        },
+        {
+          type: 'MouseMoveNode',
+          label: 'Move Node',
+          icon: Play,
+          id: 'move-node',
+          component: MouseMoveNode,
+          isExpanded: false,
+          data: undefined,
+        }
+      ]
+    }
+  ];
+
+  $: expandedClass = $isExpanded ? 'expanded' : '';
+
+  // Function to handle drag start event
+  function onDragStart(event: DragEvent, nodeType: string) {
+    event.dataTransfer?.setData("application/svelteflow", nodeType);
+    event.dataTransfer?.setData("text/plain", nodeType);
+    event.dataTransfer?.setDragImage(event.target as Element, 0, 0);
+    event.dataTransfer!.effectAllowed = "move";
+  }
+</script>
+
+<div class="left-panel {expandedClass}">
+  <div class="panel-spacing">
+    <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
+      <Plus class="flow-icon" />
+      <span>Nodes</span>
+    </h2>
+    {#each availableNodes as group}
+      <div class="node-group">
+        <h3 class="text-sm font-medium text-secondary mb-2">{group.group}</h3>
+        <ul>
+          {#each group.nodes as node}
+            <li
+              class="draggable-node"
+              draggable="true"
+              on:dragstart={(event) => onDragStart(event, node.type)}
+            >
+              <div class="node-preview">
+                <svelte:component this={node.component} id={node.id} data={node.data} />
+              </div>
+            </li>
+          {/each}
+        </ul>
+        <div class="group-separator"></div>
+      </div>
+    {/each}
+  </div>
+</div>

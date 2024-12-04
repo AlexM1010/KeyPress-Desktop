@@ -10,13 +10,8 @@
     ConnectionMode,
     useSvelteFlow,
   } from "@xyflow/svelte";
-  import type {
-    DefaultEdgeOptions,
-    Node,
-    Edge,
-  } from "@xyflow/svelte";
+  import type { DefaultEdgeOptions } from "@xyflow/svelte";
 
-  
   // Import custom nodes, edges, and utilities
   import { nodesData as defaultNodesData, edgesData as defaultEdgesData } from "$lib/stores/flow";
   import { onNodeDrag, onNodeDragStop, onLayout } from "$lib/utils/workspaceUtils";
@@ -24,13 +19,8 @@
   export let nodes = defaultNodesData;
   export let edges = defaultEdgesData;
 
-
   // Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
-  import MouseClickNode from '$lib/components/customNodes/MouseClickNode.svelte';
-  import MouseMoveNode from '$lib/components/customNodes/MouseMoveNode.svelte';
-  import StartNode from '$lib/components/customNodes/StartNode.svelte';
-  import DelayNode from '$lib/components/customNodes/DelayNode.svelte';
   //Edges
   import CustomEdge from "./CustomEdge.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
@@ -51,72 +41,25 @@
     Play,
     Loader,
     TriangleAlert,
-    ChevronLeft,
-    ChevronRight,
     LayoutDashboard,
-    Plus,
   } from "lucide-svelte";
+
+  import LeftPanel from './flowpanels/LeftPanel.svelte';
+  import LeftPanelToggleButton from './flowpanels/LeftPanelToggleButton.svelte';
+  import StatusPanel from './flowpanels/StatusPanel.svelte';
+  import StatusPanelToggleButton from './flowpanels/StatusPanelToggleButton.svelte';
 
   $: expandedClass = $isExpanded ? 'expanded' : '';
 
-  const availableNodes = [
-    {
-      group: "Flow Control",
-      nodes: [ 
-        {
-          type: 'Start',
-          label: 'Start Node',
-          icon: Play,
-          id: 'start-node',
-          component: StartNode,
-          isExpanded: false,
-            data: undefined,
-        },
-        {
-          type: 'DelayNode',
-          label: 'Delay Node',
-          icon: Play,
-          id: 'delay-node',
-          component: DelayNode,
-          isExpanded: false,
-            data: undefined,
-        }
-      ]
-    },
-    {
-      group: "Mouse Control",
-      nodes: [
-        {
-          type: 'Click',
-          label: 'Click Node',
-          icon: Play,
-          id: 'click-node',
-          component: MouseClickNode,
-          isExpanded: false,
-            data: undefined,
-        },
-        {
-          type: 'MoveMouse',
-          label: 'Move Node',
-          icon: Play,
-          id: 'move-node',
-          component: MouseMoveNode,
-          isExpanded: false,
-            data: undefined,
-        }
-      ]
-    }
-  ];
-
   function handleNodeDataUpdate(event: CustomEvent) {
-        const { id, data: newData } = event.detail;
-        $nodes = $nodes.map(node => {
-            if (node.id === id) {
-                return { ...node, data: newData };
-            }
-            return node;
-        });
-    }
+    const { id, data: newData } = event.detail;
+    $nodes = $nodes.map(node => {
+        if (node.id === id) {
+            return { ...node, data: newData };
+        }
+        return node;
+    });
+  }
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
@@ -125,11 +68,9 @@
   const { toObject, screenToFlowPosition } = useSvelteFlow();
 
   // State variables
-  let isStatusPanelExpanded = false; // Tracks the status panel expansion
-  let isExecuting = false; // Indicates if the flow is executing
-
-  // State variable to track if the left panel is expanded
-  let isLeftPanelExpanded = true; // Set to true or false based on your preference
+  let isStatusPanelExpanded = false;
+  let isExecuting = false;
+  let isLeftPanelExpanded = true;
 
   // Toggle the status panel expansion
   function toggleStatusPanel() {
@@ -148,13 +89,32 @@
     isStatusPanelExpanded = false;
   }
 
-  // Function to handle drag start event
-  function onDragStart(event: DragEvent, nodeType: string) {
-    event.dataTransfer?.setData("application/svelteflow", nodeType);
-    event.dataTransfer?.setData("text/plain", nodeType);
-    event.dataTransfer?.setDragImage(event.target as Element, 0, 0);
-    event.dataTransfer!.effectAllowed = "move";
-  }
+  // Handle drag over event to allow dropping nodes onto the flow
+  const onDragOver = (event: DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer && (event.dataTransfer.dropEffect = "move");
+  };
+
+  // Handle drop event to add new nodes to the flow
+  const onDrop = (event: DragEvent) => {
+    event.preventDefault();
+    const type = event.dataTransfer?.getData("application/svelteflow");
+    if (!type) return;
+
+    const position = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    const newNode = {
+      id: `${Math.random()}`,
+      type,
+      position,
+      data: { label: `${type} node` },
+    };
+
+    $nodes = [...$nodes, newNode];
+  };
 
   // Status messages
   let statusMessages: { id: string; type: string; message: string }[] = [];
@@ -191,36 +151,6 @@
     interactionWidth: 20,
   };
 
-  // Handle drag over event to allow dropping nodes onto the flow
-  const onDragOver = (event: DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer && (event.dataTransfer.dropEffect = "move");
-  };
-
-  // Handle drop event to add new nodes to the flow
-  const onDrop = (event: DragEvent) => {
-    event.preventDefault();
-    const type = event.dataTransfer?.getData("application/svelteflow");
-    if (!type) return;
-
-    // Convert screen coordinates to flow coordinates
-    const position = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-
-    // Create a new node with a unique ID
-    const newNode = {
-      id: `${Math.random()}`,
-      type,
-      position,
-      data: { label: `${type} node` },
-    };
-
-    // Add the new node to the nodes array
-    $nodes = [...$nodes, newNode];
-  };
-
   // Function to handle running the entire flow
   async function handleRunFlow() {
     try {
@@ -233,7 +163,7 @@
 
       // Check if the flow contains a Start node
       const hasStartNode = currentFlowData.nodes.some(
-        (node) => node.type === "Start"
+        (node) => node.type === "StartNode"
       );
       if (!hasStartNode) {
         alert("Flowchart must contain a Start node.");
@@ -318,7 +248,7 @@
   // Computed property to determine if the status panel should be shown
   $: hasStatusPanel = isStatusPanelExpanded || statusMessages.length > 0;
 
-  // Function to add a status message with automatic removal after 10 seconds
+  // Function to add a status message
   function addStatusMessage(msg: {
     id: string;
     type: string;
@@ -330,7 +260,7 @@
     }, 10000);
   }
 
-  // Set up event listeners for various execution events
+  // Set up event listeners
   function setupEventListeners() {
     window.runtime.EventsOn("task-started", (taskId: string) => {
       addStatusMessage({
@@ -411,50 +341,15 @@
 <div class="flow-container flex">
   <!-- Left Panel -->
   {#if isLeftPanelExpanded}
-  <div class="left-panel {expandedClass}">
-    <div class="panel-spacing">
-      <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
-        <Plus class="flow-icon" />
-        <span>Nodes</span>
-      </h2>
-      {#each availableNodes as group}
-        <div class="node-group">
-          <h3 class="text-sm font-medium text-secondary mb-2">{group.group}</h3>
-          <ul>
-            {#each group.nodes as node}
-              <li
-                class="draggable-node"
-                draggable="true"
-                on:dragstart={(event) => onDragStart(event, node.type)}
-              >
-                <div class="node-preview">
-                  <svelte:component this={node.component} id={node.id} data={node.data} />
-                </div>
-              </li>
-            {/each}
-          </ul>
-          <div class="group-separator"></div>
-        </div>
-      {/each}
-    </div>
-  </div>
+    <LeftPanel />
   {/if}
 
   {#if !previewMode}
-  <!-- Left Panel Toggle Button -->
-  <div class="left-toggle-button">
-    <button
-      class="left-toggle-button-inner"
-      style="left: {isLeftPanelExpanded ? '300px' : '0'}"
-      on:click={toggleLeftPanel}
-      aria-label={isLeftPanelExpanded ? "Collapse node panel" : "Expand node panel"}
-    >
-      <svelte:component
-        this={isLeftPanelExpanded ? ChevronLeft : ChevronRight}
-        class="flow-icon"
-      />
-    </button>
-  </div>
+    <!-- Left Panel Toggle Button -->
+    <LeftPanelToggleButton
+      {isLeftPanelExpanded}
+      {toggleLeftPanel}
+    />
   {/if}
 
   <!-- Main Flow Area -->
@@ -483,121 +378,70 @@
     >
       <!-- Custom connection line -->
       <ConnectionLine slot="connectionLine" />
-      {#if !previewMode}
       <!-- Control Panel -->
-      <Panel position="top-right">
-        <div class="flex items-center">
-          <div class="nav-button-container flex-center flex-gap transition-transform duration-300 {expandedClass}">
-            <!-- Run Flow Button -->
-            <button
-              class="flow-button"
-              on:click={handleRunFlow}
-              disabled={isExecuting}
-            >
-              <svelte:component
-                this={executionStatus.icon}
-                class="flow-icon {executionStatus.color}"
-                style={isExecuting ? "animation: spin 1s linear infinite" : ""}
-              />
-            </button>
-            <!-- Save Button -->
-            {#if ($isAuthenticated && $user) || hasAttemptedSave}
-              <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+      {#if !previewMode}
+        <Panel position="top-right">
+          <div class="flex items-center">
+            <div class="nav-button-container flex-center flex-gap transition-transform duration-300 {expandedClass}">
+              <!-- Run Flow Button -->
+              <button
+                class="flow-button"
+                on:click={handleRunFlow}
+                disabled={isExecuting}
+              >
                 <svelte:component
-                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
-                  class="flow-icon"
-                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                  this={executionStatus.icon}
+                  class="flow-icon {executionStatus.color}"
+                  style={isExecuting ? "animation: spin 1s linear infinite" : ""}
                 />
               </button>
-            {:else if hasAttemptedSave}
-              <button class="flow-button">
-                <X class="flow-icon text-red-500" />
-                <span class="text-red-500">Login</span>
+              <!-- Save Button -->
+              {#if ($isAuthenticated && $user) || hasAttemptedSave}
+                <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+                  <svelte:component
+                    this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
+                    class="flow-icon"
+                    style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                  />
+                </button>
+              {:else if hasAttemptedSave}
+                <button class="flow-button">
+                  <X class="flow-icon text-red-500" />
+                  <span class="text-red-500">Login</span>
+                </button>
+              {/if}
+              <!-- Layout Button -->
+              <button
+                class="flow-button"
+                on:click={() => onLayout("TB")}
+              >
+                <LayoutDashboard class="flow-icon" />
+                <span>Layout</span>
               </button>
-            {/if}
-            <!-- Layout Button -->
-            <button
-              class="flow-button"
-              on:click={() => onLayout("TB")}
-            >
-              <LayoutDashboard class="flow-icon" />
-              <span>Layout</span>
-            </button>
+            </div>
           </div>
-        </div>
-      </Panel>
-
-      <!-- Flow Controls -->
-      <Controls />
-      <MiniMap />
+        </Panel>
+        <!-- Flow Controls -->
+        <Controls />
+        <MiniMap />
       {/if}
-
       <Background />
     </SvelteFlow>
   </div>
 
-  <!-- Status Panel Toggle Button -->
   {#if !previewMode}
-  {#if hasStatusPanel}
-    <div
-      class="status-toggle-button transition-all duration-300"
-      class:opacity-0={!hasStatusPanel}
-    >
-      <button
-        class="status-toggle-button-inner"
-        style="right: {isStatusPanelExpanded ? '300px' : '0'}"
-        on:click={toggleStatusPanel}
-        aria-label={
-          isStatusPanelExpanded
-            ? "Collapse status panel"
-            : "Expand status panel"
-        }
-      >
-        <svelte:component
-          this={isStatusPanelExpanded ? ChevronRight : ChevronLeft}
-          class="flow-icon"
-        />
-      </button>
-    </div>
-  {/if}
+    <!-- Status Panel Toggle Button -->
+    <StatusPanelToggleButton
+      {isStatusPanelExpanded}
+      {hasStatusPanel}
+      {toggleStatusPanel}
+    />
   {/if}
 
   <!-- Status Panel -->
-  <div
-    class="status-panel {expandedClass}"
-    style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
-  >
-    <div class="panel-spacing">
-      <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
-        <svelte:component
-          this={executionStatus.icon}
-          class="flow-icon {executionStatus.color}"
-        />
-        <span>Execution Status</span>
-      </h2>
-      {#if statusMessages.length === 0}
-        <p class="text-[--secondary-text]">No status updates.</p>
-      {:else}
-        <ul>
-          {#each statusMessages as msg (msg.id)}
-            <li class="flex-center mb-3">
-              <!-- Status Icon -->
-              {#if msg.type === "success"}
-                <Check class="flow-icon text-green-500 mr-2" />
-              {:else if msg.type === "error"}
-                <X class="flow-icon text-red-500 mr-2" />
-              {:else if msg.type === "warning"}
-                <TriangleAlert class="flow-icon text-yellow-500 mr-2" />
-              {:else if msg.type === "info" || msg.type === "running"}
-                <Play
-                  class="flow-icon text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
-                />
-              {/if}
-              <span class="text-sm">{msg.message}</span>
-            </li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-  </div>
+  <StatusPanel
+    {isStatusPanelExpanded}
+    {statusMessages}
+    {executionStatus}
+  />
 </div>

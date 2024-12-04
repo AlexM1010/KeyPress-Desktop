@@ -1,0 +1,45 @@
+<script lang="ts">
+  import { Check, X, Play, TriangleAlert } from "lucide-svelte";
+  import { isExpanded } from '$lib/stores/navbar';
+  export let isStatusPanelExpanded;
+  export let statusMessages;
+  export let executionStatus;
+  $: expandedClass = $isExpanded ? 'expanded' : '';
+</script>
+
+<div
+  class="status-panel {expandedClass}"
+  style="transform: translateX({isStatusPanelExpanded ? '0' : '100%'})"
+>
+  <div class="panel-spacing">
+    <h2 class="text-lg font-semibold mb-4 flex-center flex-gap">
+      <svelte:component
+        this={executionStatus.icon}
+        class="flow-icon {executionStatus.color}"
+      />
+      <span>Execution Status</span>
+    </h2>
+    {#if statusMessages.length === 0}
+      <p class="text-[--secondary-text]">No status updates.</p>
+    {:else}
+      <ul>
+        {#each statusMessages as msg (msg.id)}
+          <li class="flex-center mb-3">
+            {#if msg.type === "success"}
+              <Check class="flow-icon text-green-500 mr-2" />
+            {:else if msg.type === "error"}
+              <X class="flow-icon text-red-500 mr-2" />
+            {:else if msg.type === "warning"}
+              <TriangleAlert class="flow-icon text-yellow-500 mr-2" />
+            {:else if msg.type === "info" || msg.type === "running"}
+              <Play
+                class="flow-icon text-blue-500 mr-2 {msg.type === 'running' ? 'animate-pulse' : ''}"
+              />
+            {/if}
+            <span class="text-sm">{msg.message}</span>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+</div>

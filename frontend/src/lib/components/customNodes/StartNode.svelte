@@ -152,7 +152,7 @@
     handles={handles}
     {isConnectable}
     id={id}
-    type="start"
+    type="StartNode"
     data={{ macroKeys, isRecording, currentOS }} 
     on:duplicate={handleDuplicate} 
     on:delete={handleDelete}

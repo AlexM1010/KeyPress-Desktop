@@ -12,9 +12,9 @@ import DelayNode from './DelayNode.svelte';
 export const nodeTypes: NodeTypes = {
   'ColorPicker': ColorPickerNode as unknown as typeof SvelteComponent,
   'svgNode': SVGNode as unknown as typeof SvelteComponent,
-  'Click': MouseClickNode as unknown as typeof SvelteComponent,
-  'Keypress': KeyPressNode as unknown as typeof SvelteComponent,
-  'Start': StartNode as unknown as typeof SvelteComponent,
-  'MoveMouse': MouseMoveNode as unknown as typeof SvelteComponent,
+  'MouseClickNode': MouseClickNode as unknown as typeof SvelteComponent,
+  'KeyPressNode': KeyPressNode as unknown as typeof SvelteComponent,
+  'StartNode': StartNode as unknown as typeof SvelteComponent,
+  'MouseMoveNode': MouseMoveNode as unknown as typeof SvelteComponent,
   'DelayNode': DelayNode as unknown as typeof SvelteComponent
 };
