@@ -1,7 +1,7 @@
 <!-- ButtonGroupItem.svelte -->
 <script lang="ts">
     import { getContext, onMount, onDestroy } from 'svelte';
-    import { cn } from '$lib/utils.js';
+    import { cn } from '$lib/utils/buttonUtils';
     import { derived } from 'svelte/store';
     import "$lib/index.scss";
 

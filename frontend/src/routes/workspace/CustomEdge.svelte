@@ -331,6 +331,7 @@
 <style>
   .edge-container {
     position: relative;
+    color: #000;
   }
 
   .hover-point {

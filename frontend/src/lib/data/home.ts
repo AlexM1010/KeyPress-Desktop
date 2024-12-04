@@ -1,5 +1,5 @@
-import { Platform } from '$lib/types';
-import { getSkills } from './nodes';
+import { Platform } from '$lib/types/types';
+import { getSkills } from '$lib/data/skills';
 
 export const title = 'Home';
 

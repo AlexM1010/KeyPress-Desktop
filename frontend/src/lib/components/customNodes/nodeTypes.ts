@@ -16,5 +16,5 @@ export const nodeTypes: NodeTypes = {
   'Keypress': KeyPressNode as unknown as typeof SvelteComponent,
   'Start': StartNode as unknown as typeof SvelteComponent,
   'MoveMouse': MouseMoveNode as unknown as typeof SvelteComponent,
-  'Delay': DelayNode as unknown as typeof SvelteComponent
+  'DelayNode': DelayNode as unknown as typeof SvelteComponent
 };

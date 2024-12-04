@@ -7,7 +7,7 @@
     import type { HandleConfig } from "../types";
     import ContextMenu from "./ContextMenu.svelte";
     import { cubicOut } from "svelte/easing";
-    import nodes from '$lib/stores/nodes';
+    import { nodesData as nodes, type NodeData } from '$lib/stores/flow';
     import { createEventDispatcher } from 'svelte';
     import '$lib/index.scss';
 
@@ -15,12 +15,12 @@
     export let icon: ComponentType;
     export let title: string;
     export let color: string;
-    export let isExpanded = true;
-    export let isConnectable = true;
+    export let isExpanded: boolean = true;
+    export let isConnectable: boolean = true;
     export let handles: HandleConfig[] = [];
     export let id: string;
     export let type: string;
-    export let data: any;
+    export let data: NodeData;
 
     const dispatch = createEventDispatcher();
 
@@ -44,17 +44,10 @@
     }
 
     // Reactive statement to update nodes when data changes
-    $: {
-        nodes.update(nodes => {
-            const nodeIndex = nodes.findIndex(node => node.id === id);
-            if (nodeIndex !== -1) {
-                nodes[nodeIndex] = { id, type, data };
-            } else {
-                nodes.push({ id, type, data });
-            }
-            return nodes;
-        });
+    $: if (data) {
+        dispatch('updateNodeData', { id: data.id, data: data.data });
     }
+
 
     function getHandlePosition(handle: HandleConfig): string {
         const offsetX = handle.offsetX ?? 0;

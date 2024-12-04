@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Icons } from '$lib/utils';
 	import { viewBox } from './Icons';
 
 	let el: SVGElement;
@@ -7,7 +6,7 @@
 	export let size = '30px';
 	export let color = 'var(--main-text)';
 
-	export let icon: Icons;
+	export let icon;
 </script>
 
 <svg

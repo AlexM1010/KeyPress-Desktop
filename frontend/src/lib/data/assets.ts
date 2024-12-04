@@ -1,4 +1,4 @@
-import type { Asset } from '$lib/types';
+import type { Asset } from '$lib/types/types';
 import { theme } from '$lib/stores/theme';
 import { base } from '$app/paths';
 

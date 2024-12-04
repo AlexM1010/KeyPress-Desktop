@@ -3,7 +3,7 @@
 	import * as skills from '$lib/data/skills';
 	import { onMount } from 'svelte';
 
-	import type { Project, Skill } from '$lib/types';
+	import type { Project, Skill } from '$lib/types/types';
 
 	import Chip from '$lib/components/Chip/Chip.svelte';
 	import ProjectCard from '$lib/components/ProjectCard/ProjectCard.svelte';

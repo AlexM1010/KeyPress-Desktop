@@ -33,7 +33,7 @@ export const initialNodes: Node[] = [
     },
     targetPosition: 'left' as Position,
     sourcePosition: 'right' as Position
-  }, */
+  }, 
   {
     id: 'Click',
     type: 'Click',
@@ -48,10 +48,10 @@ export const initialNodes: Node[] = [
   },*/
   {
     id: 'DelayNode',
-    type: 'Delay',
+    type: 'DelayNode',
     position: { x: baseX + xSpacing * 2, y: baseY + xSpacing },
     data: {}
-  },
+  },/*
   {
     id: 'Start',
     type: 'Start',

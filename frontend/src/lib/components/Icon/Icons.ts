@@ -1,5 +1,11 @@
-import { Icons } from '$lib/utils';
-
+enum Icons {
+    Youtube = 'Youtube',
+    Facebook = 'Facebook',
+    GitHub = 'GitHub',
+    Search = 'Search',
+    Code = 'Code'
+}
+//TODO: not working quick fix
 export const viewBox = (icon: Icons) => {
 	if (icon === Icons.Youtube) return '0 0 461.001 461.001';
 

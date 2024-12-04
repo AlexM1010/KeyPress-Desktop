@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import type { Item, Skill } from '$lib/types';
+import type { Item, Skill } from '$lib/types/types';
 
 dayjs.extend(duration);
 

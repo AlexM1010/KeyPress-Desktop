@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Experience } from '$lib/types';
+	//import type { Experience } from '$lib/types/types';
 	import { computeExactDuration, getMonthName, getTimeDiff } from '$lib/utils/helpers';
 	import Card from '../Card/Card.svelte';
 	import CardLogo from '../Card/CardLogo.svelte';
@@ -11,7 +11,7 @@
 	import Chip from '../Chip/Chip.svelte';
 	import CardDivider from '../Card/CardDivider.svelte';
 
-	export let experience: Experience;
+	export let experience;
 
 	// const months = getTimeDiff(experience.period.from, experience.period.to);
 	const exactDuration = computeExactDuration(experience.period.from, experience.period.to);

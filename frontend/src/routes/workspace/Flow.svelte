@@ -9,12 +9,23 @@
     MiniMap,
     ConnectionMode,
     useSvelteFlow,
-    type DefaultEdgeOptions,
+  } from "@xyflow/svelte";
+  import type {
+    DefaultEdgeOptions,
+    Node,
+    Edge,
   } from "@xyflow/svelte";
 
+  
   // Import custom nodes, edges, and utilities
-  import { nodes, edges, onNodeDrag, onNodeDragStop, onLayout } from "./utils/utils";
-  //Nodes
+  import { nodesData as defaultNodesData, edgesData as defaultEdgesData } from "$lib/stores/flow";
+  import { onNodeDrag, onNodeDragStop, onLayout } from "$lib/utils/workspaceUtils";
+
+  export let nodes = defaultNodesData;
+  export let edges = defaultEdgesData;
+
+
+  // Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
   import MouseClickNode from '$lib/components/customNodes/MouseClickNode.svelte';
   import MouseMoveNode from '$lib/components/customNodes/MouseMoveNode.svelte';
@@ -31,8 +42,7 @@
   import "$lib/index.scss";
   import "./FlowStyle.css";
   import { isExpanded } from '$lib/stores/navbar';
-  $: expandedClass = $isExpanded ? 'expanded' : '';
-  
+
   // Import icons from Lucide Svelte
   import {
     Check,
@@ -46,70 +56,67 @@
     LayoutDashboard,
     Plus,
   } from "lucide-svelte";
-  
 
-  // Define available nodes
-  const availableNodes: Array<{
-    group: string;
-      nodes: Array<{
-        type: string;
-        label: string;
-        icon: any;
-        id: string;
-        component: any;
-        isExpanded: boolean;
-        data: {
-          [key: string]: any;
-        };
-      }>;
-    }> = [
+  $: expandedClass = $isExpanded ? 'expanded' : '';
+
+  const availableNodes = [
     {
       group: "Flow Control",
       nodes: [ 
-          {
-            type: 'Start',
-            label: 'Start Node',
-            icon: Play,
-            id: 'start-node',
-            component: StartNode,
-            isExpanded: false,
-            data: {},
-          },
-          {
-            type: 'Delay',
-            label: 'Delay Node',
-            icon: Play,
-            id: 'delay-node',
-            component: DelayNode,
-            isExpanded: false,
-            data: {},
-          }
+        {
+          type: 'Start',
+          label: 'Start Node',
+          icon: Play,
+          id: 'start-node',
+          component: StartNode,
+          isExpanded: false,
+            data: undefined,
+        },
+        {
+          type: 'DelayNode',
+          label: 'Delay Node',
+          icon: Play,
+          id: 'delay-node',
+          component: DelayNode,
+          isExpanded: false,
+            data: undefined,
+        }
       ]
     },
     {
       group: "Mouse Control",
       nodes: [
-          {
-            type: 'Click',
-            label: 'Click Node',
-            icon: Play,
-            id: 'click-node',
-            component: MouseClickNode,
-            isExpanded: false,
-            data: {},
-          },
-          {
-            type: 'MoveMouse',
-            label: 'Move Node',
-            icon: Play,
-            id: 'move-node',
-            component: MouseMoveNode,
-            isExpanded: false,
-            data: {},
-          }
+        {
+          type: 'Click',
+          label: 'Click Node',
+          icon: Play,
+          id: 'click-node',
+          component: MouseClickNode,
+          isExpanded: false,
+            data: undefined,
+        },
+        {
+          type: 'MoveMouse',
+          label: 'Move Node',
+          icon: Play,
+          id: 'move-node',
+          component: MouseMoveNode,
+          isExpanded: false,
+            data: undefined,
+        }
       ]
     }
   ];
+
+  function handleNodeDataUpdate(event: CustomEvent) {
+        const { id, data: newData } = event.detail;
+        $nodes = $nodes.map(node => {
+            if (node.id === id) {
+                return { ...node, data: newData };
+            }
+            return node;
+        });
+    }
 
   // Reactive statement to sync color mode with flow theme
   $: colorMode = $flowTheme;
@@ -124,9 +131,6 @@
   // State variable to track if the left panel is expanded
   let isLeftPanelExpanded = true; // Set to true or false based on your preference
 
-  // Reactive variable to check if there are any status messages
-  $: hasStatusMessages = statusMessages.length > 0;
-
   // Toggle the status panel expansion
   function toggleStatusPanel() {
     isStatusPanelExpanded = !isStatusPanelExpanded;
@@ -137,15 +141,22 @@
     isLeftPanelExpanded = !isLeftPanelExpanded;
   }
 
+  export let previewMode: boolean  = false;
+
+  if (previewMode) {
+    isLeftPanelExpanded = false;
+    isStatusPanelExpanded = false;
+  }
+
   // Function to handle drag start event
   function onDragStart(event: DragEvent, nodeType: string) {
     event.dataTransfer?.setData("application/svelteflow", nodeType);
-    event.dataTransfer?.setData("text/plain", nodeType); // For compatibility
+    event.dataTransfer?.setData("text/plain", nodeType);
     event.dataTransfer?.setDragImage(event.target as Element, 0, 0);
     event.dataTransfer!.effectAllowed = "move";
   }
 
-  // Array to store status messages
+  // Status messages
   let statusMessages: { id: string; type: string; message: string }[] = [];
   let isSuccess = false;
 
@@ -176,7 +187,7 @@
     animated: true,
     deletable: true,
     selectable: true,
-    data: { color: "#000000" },
+    data: { color: "var(--main-text)" },
     interactionWidth: 20,
   };
 
@@ -398,7 +409,7 @@
 </script>
 
 <div class="flow-container flex">
-    <!-- Left Panel -->
+  <!-- Left Panel -->
   {#if isLeftPanelExpanded}
   <div class="left-panel {expandedClass}">
     <div class="panel-spacing">
@@ -429,7 +440,7 @@
   </div>
   {/if}
 
-
+  {#if !previewMode}
   <!-- Left Panel Toggle Button -->
   <div class="left-toggle-button">
     <button
@@ -444,6 +455,7 @@
       />
     </button>
   </div>
+  {/if}
 
   <!-- Main Flow Area -->
   <div
@@ -460,16 +472,18 @@
       {edgeTypes}
       {colorMode}
       connectionMode={ConnectionMode.Loose}
-      {defaultEdgeOptions}
-      on:nodedrag={onNodeDrag}
-      on:nodedragstop={onNodeDragStop}
-      on:dragover={onDragOver}
-      on:drop={onDrop}
+      defaultEdgeOptions={defaultEdgeOptions}
+      on:nodedrag={!previewMode ? onNodeDrag : undefined}
+      on:nodedragstop={!previewMode ? onNodeDragStop : undefined}
+      on:dragover={!previewMode ? onDragOver : undefined}
+      on:drop={!previewMode ? onDrop : undefined}
+      on:updateNodeData={handleNodeDataUpdate}
+      proOptions={{ hideAttribution: previewMode }}
       fitView
     >
       <!-- Custom connection line -->
       <ConnectionLine slot="connectionLine" />
-
+      {#if !previewMode}
       <!-- Control Panel -->
       <Panel position="top-right">
         <div class="flex items-center">
@@ -486,8 +500,8 @@
                 style={isExecuting ? "animation: spin 1s linear infinite" : ""}
               />
             </button>
-              <!-- Save Button TODO: Changes between local and cloud storage depending on auth/marketplace/premium -->
-            {#if $isAuthenticated && $user || hasAttemptedSave}
+            <!-- Save Button -->
+            {#if ($isAuthenticated && $user) || hasAttemptedSave}
               <button class="flow-button" on:click={handleSave} disabled={isSaving}>
                 <svelte:component
                   this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
@@ -515,12 +529,15 @@
 
       <!-- Flow Controls -->
       <Controls />
-      <Background />
       <MiniMap />
+      {/if}
+
+      <Background />
     </SvelteFlow>
   </div>
 
   <!-- Status Panel Toggle Button -->
+  {#if !previewMode}
   {#if hasStatusPanel}
     <div
       class="status-toggle-button transition-all duration-300"
@@ -542,6 +559,7 @@
         />
       </button>
     </div>
+  {/if}
   {/if}
 
   <!-- Status Panel -->

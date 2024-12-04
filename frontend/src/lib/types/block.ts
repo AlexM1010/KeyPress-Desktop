@@ -1,10 +1,9 @@
 // src/types/block.ts
 import type { NodeProps, Node } from '@xyflow/svelte'; // Adjust based on svelte-flow's type exports
-import type { Nullish } from '$lib/utils/util';
+import type { Nullish } from '$lib/utils/utils';
 import { z } from 'zod';
 import type { BlockDefinition, BlockParameterValue } from '$lib/types/manifest';
 import type { EdgeVariant } from '$lib/types/edge';
-import { writable } from 'svelte/store';
 
 export type CtrlData = Record<
   string,

@@ -1,5 +1,5 @@
 import Assets from './assets';
-import type { Skill, SkillCategory } from '../types';
+import type { Skill, SkillCategory } from '../types/types';
 import svelte from '../md/svelte.md?raw';
 
 const defineSkillCategory = <S extends string>(data: SkillCategory<S>): SkillCategory<S> => data;

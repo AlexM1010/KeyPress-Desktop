@@ -149,7 +149,7 @@ import {
 } from "@xyflow/svelte";
 import "@xyflow/svelte/dist/style.css";
 import { initialNodes, initialEdges } from "$lib/components/customNodes/nodes-and-edges";
-import type { PageData } from '../$types';
+import type { PageData } from '../../routes/workspace/$types';
 
 export let data: PageData;
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Skill } from '$lib/types';
+	import type { Skill } from '$lib/types/types';
 	import { getAssetURL } from '$lib/data/assets';
 	import UIcon from '../Icon/UIcon.svelte';
 

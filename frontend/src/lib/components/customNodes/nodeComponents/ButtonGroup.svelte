@@ -2,7 +2,7 @@
 <script lang="ts">
     import { setContext } from 'svelte';
     import { writable } from 'svelte/store';
-    import { cn } from '$lib/utils.js';
+    import { cn } from '$lib/utils/buttonUtils';
   
     export const variant: 'default' | 'danger' = 'default';
     export const size: 'sm' | 'md' | 'lg' = 'md';

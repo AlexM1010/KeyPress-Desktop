@@ -4,7 +4,7 @@
     import NodeWrapper from './nodeComponents/NodeWrapper.svelte';
     import type { ComponentType } from 'svelte';
     import { Handle, Position } from "@xyflow/svelte";
-    import type { HandleConfig } from "./types";
+    import type { HandleConfig, DelayNodeData } from '$lib/stores/flow';
     import TimeInput from './nodeComponents/TimeInput.svelte';
     import ButtonGroup from "./nodeComponents/ButtonGroup.svelte";
     import ButtonGroupItem from "./nodeComponents/ButtonGroupItem.svelte";
@@ -15,11 +15,16 @@
     export let color: string = 'bg-gradient-to-r from-blue-500 to-blue-600';
     export let highlightColor: string = 'bg-blue-500';
 
-    export let data = {
-        delayType: 'Fixed',
-        time: 1000,
-        minTime: 500,
-        maxTime: 1500
+    export let data: DelayNodeData = {
+        id: '',
+        type: 'DelayNode',
+        position: { x: 0, y: 0 },
+        data: {
+            delayType: 'Fixed',
+            time: 1000,
+            minTime: 500,
+            maxTime: 1500
+        }
     };
 
     const handles: HandleConfig[] = [
@@ -30,20 +35,24 @@
     const DELAY_TYPES = ['Fixed', 'Random'];
 
     function updateDelayType(newType: string) {
-        data.delayType = newType;
+        data.data.delayType = newType as 'Fixed' | 'Random';
     }
 
     $: {
-        data.delayType = data.delayType || 'Fixed';
-        data.time = data.time || 1000;
-        data.minTime = data.minTime || 500;
-        data.maxTime = data.maxTime || 1500;
+        if (!data.data) {
+            data.data = {
+                delayType: 'Fixed',
+                time: 1000,
+                minTime: 500,
+                maxTime: 1500
+            };
+        }
     }
 </script>
 
 <NodeWrapper
-    id={id}
-    icon={icon}
+    {id}
+    {icon}
     {title}
     {color}
     type="Delay"
@@ -59,7 +68,7 @@
                 <ButtonGroupItem 
                     value={type}
                     on:click={() => updateDelayType(type)}
-                    active={data.delayType === type}
+                    active={data.data.delayType === type}
                     itemHighlightColor={highlightColor}
                 >
                     {type}
@@ -68,20 +77,20 @@
         </ButtonGroup>
 
         <!-- Fixed Delay Input -->
-        {#if data.delayType === 'Fixed'}
+        {#if data.data.delayType === 'Fixed'}
             <TimeInput
                 label="Time"
-                bind:value={data.time}
+                bind:value={data.data.time}
                 defaultValue={1000}
                 startingUnit="ms"
                 minValue={0}
                 highlightColor={highlightColor}
             />
         <!-- Random Delay Inputs -->
-        {:else if data.delayType === 'Random'}
+        {:else if data.data.delayType === 'Random'}
             <TimeInput
                 label="Minimum Time"
-                bind:value={data.minTime}
+                bind:value={data.data.minTime}
                 defaultValue={500}
                 startingUnit="ms"
                 minValue={0}
@@ -89,7 +98,7 @@
             />
             <TimeInput
                 label="Maximum Time"
-                bind:value={data.maxTime}
+                bind:value={data.data.maxTime}
                 defaultValue={1500}
                 startingUnit="ms"
                 minValue={0}
