@@ -7,7 +7,7 @@
     import { onMount } from 'svelte';
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import '$lib/index.scss';
-    import { ChevronDown, Map, Folder, LogOut, UserPlus, LogIn, Check } from 'lucide-svelte';
+    import { ChevronDown, Map, Folder, LogOut, UserPlus, LogIn, Layers } from 'lucide-svelte';
     import './navbar.css';
     import { isExpanded } from '$lib/stores/navbar';
 
@@ -70,7 +70,7 @@
 <!-- Navbar -->
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
         <button class="nav-btn" on:click={() => goto('/swiper')} aria-label="Decisions">
-            <Check class="w-5 h-5" />
+            <Layers class="w-5 h-5" />
         </button>
         <button class="nav-btn" on:click={() => goto('/map')} aria-label="Map">
             <Map class="w-5 h-5" />
