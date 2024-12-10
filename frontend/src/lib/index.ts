@@ -8,6 +8,3 @@ import type { BlockProps } from '$lib/types/block';
 
 // Re-export utilities
 export * from './utils';
-
-// Re-export Supabase utilities
-export * from './supabase';

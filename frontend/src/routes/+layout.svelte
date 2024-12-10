@@ -77,6 +77,9 @@
         <button class="nav-btn" on:click={() => goto('/cardSwiper')}>
             Decisions
         </button>
+        <button class="nav-btn" on:click={() => goto('/map')}>
+            Map
+        </button>
         {#if $isAuthenticated && $user}
             <button class="nav-btn" on:click={() => goto('/projects')}>
                 Projects

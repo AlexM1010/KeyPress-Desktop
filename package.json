@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@wailsapp/runtime": "^1.1.1"
+    "@wailsapp/runtime": "^1.1.1",
+    "svelte": "^5.10.0"
   }
 }
