@@ -74,7 +74,7 @@
         <button class="nav-btn" on:click={() => goto('/workspace')}>
             Workspace
         </button>
-        <button class="nav-btn" on:click={() => goto('/cardSwiper')}>
+        <button class="nav-btn" on:click={() => goto('/swiper')}>
             Decisions
         </button>
         <button class="nav-btn" on:click={() => goto('/map')}>

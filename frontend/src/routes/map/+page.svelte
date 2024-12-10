@@ -72,7 +72,7 @@
 
   :global(.marker) {
       background-color: #ff0000;
-      border-radius: 50%;
+      border-radius: 1rem;
       cursor: pointer;
       padding: 0.5rem;
       color: #ffffff;
@@ -80,5 +80,18 @@
       justify-content: center;
       align-items: center;
       font-weight: bold;
+  }
+
+  :global(.marker::after) {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 10px solid #ff0000;
   }
 </style>

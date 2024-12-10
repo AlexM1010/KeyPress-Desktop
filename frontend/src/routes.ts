@@ -1,4 +1,4 @@
-import CardSwiper from './routes/cardSwiper/+page.svelte'
+import Swiper from './routes/swiper/+page.svelte'
 import Workspace from './routes/workspace/+page.svelte' 
 import Login from './routes/login/+page.svelte'
 import Projects from './routes/projects/+page.svelte'
@@ -6,7 +6,7 @@ import Map from './routes/map/+page.svelte'
 
 const routes = {
     // Exact path
-    '/cardSwiper': CardSwiper,
+    '/swiper': Swiper,
 
     '/workspace': Workspace,
 
