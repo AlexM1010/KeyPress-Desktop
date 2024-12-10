@@ -4,6 +4,7 @@
     import { get } from 'svelte/store';
     import { onMount, onDestroy } from 'svelte';
     import { fade } from 'svelte/transition';
+    import { Check, X } from 'lucide-svelte';
 
     const data = (index: number): Card => {
         const currentCards = get(cards);
@@ -59,10 +60,14 @@
     <div class="glow right" style="opacity: {rightGlowOpacity}"></div>
 
     {#if showNo}
-        <div class="edge-text left-text" transition:fade> No </div>
+        <div class="edge-text left-text" transition:fade>
+            <X size={32} color="white" />
+        </div>
     {/if}
     {#if showYes}
-        <div class="edge-text right-text" transition:fade> Yes </div>
+        <div class="edge-text right-text" transition:fade>
+            <Check size={32} color="white" />
+        </div>
     {/if}
 
     <div class="w-full max-w-sm mx-auto px-4">
