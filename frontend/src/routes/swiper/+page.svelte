@@ -89,7 +89,7 @@
         background-image: url('/card-bg.png');
         background-size: cover;
         background-position: center;
-        filter: blur(8px);
+        filter: blur(4px);
         z-index: 0;
     }
 
@@ -105,6 +105,7 @@
         width: 100px;
         pointer-events: none;
         transition: opacity 0.3s;
+        z-index: 2;
     }
 
     .left {
@@ -123,8 +124,9 @@
         transform: translateY(-50%);
         font-size: 2rem;
         font-weight: bold;
-        color: white;
+        color: rgba(255, 255, 255, 0.7);
         pointer-events: none;
+        z-index: 2;
     }
 
     .left-text {

@@ -3,6 +3,7 @@
 	export let title: string = '';
 	export let description: string = '';
 	export let image: string = '';
+	//TODO: resize card image so its square and have the text on a gradient to solid background
 </script>
 
 <div

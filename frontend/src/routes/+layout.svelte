@@ -7,7 +7,7 @@
     import { onMount } from 'svelte';
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import '$lib/index.scss';
-    import { ChevronDown } from 'lucide-svelte';
+    import { ChevronDown, Map, Folder, LogOut, UserPlus, LogIn, Check } from 'lucide-svelte';
     import './navbar.css';
     import { isExpanded } from '$lib/stores/navbar';
 
@@ -69,40 +69,31 @@
 
 <!-- Navbar -->
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
-    <!-- Left side of navbar -->
-    <div class="navbar-left">
-        <button class="nav-btn" on:click={() => goto('/workspace')}>
-            Workspace
+        <button class="nav-btn" on:click={() => goto('/swiper')} aria-label="Decisions">
+            <Check class="w-5 h-5" />
         </button>
-        <button class="nav-btn" on:click={() => goto('/swiper')}>
-            Decisions
-        </button>
-        <button class="nav-btn" on:click={() => goto('/map')}>
-            Map
+        <button class="nav-btn" on:click={() => goto('/map')} aria-label="Map">
+            <Map class="w-5 h-5" />
         </button>
         {#if $isAuthenticated && $user}
-            <button class="nav-btn" on:click={() => goto('/projects')}>
-                Projects
+            <button class="nav-btn" on:click={() => goto('/projects')} aria-label="Projects">
+                <Folder class="w-5 h-5" />
             </button>
         {/if}
-    </div>
-    <!-- Right side of navbar -->
-    <div class="flex items-center">
         {#if $isAuthenticated && $user}
             <span class="user-email text-foreground">{$user.email}</span>
-            <button class="nav-btn" on:click={handleLogout}>
-                Logout
+            <button class="nav-btn" on:click={handleLogout} aria-label="Logout">
+                <LogOut class="w-5 h-5" />
             </button>
         {:else}
-            <button class="nav-btn" on:click={() => goto('/register')}>
-                Register
+            <button class="nav-btn" on:click={() => goto('/register')} aria-label="Register">
+                <UserPlus class="w-5 h-5" />
             </button>
-            <button class="nav-btn" on:click={() => goto('/login')}>
-                Login
+            <button class="nav-btn" on:click={() => goto('/login')} aria-label="Login">
+                <LogIn class="w-5 h-5" />
             </button>
         {/if}
         <ThemeToggle />
-    </div>
 </div>
 
 {#if !($isInitialized && isReady)}
