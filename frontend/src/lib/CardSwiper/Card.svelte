@@ -11,7 +11,7 @@
 >
 	<!-- Use the provided image. If none, display a placeholder. -->
 	{#if image}
-		<img class="w-full h-full rounded-xl object-cover" src={image} alt={title} />
+		<img class="w-full h-full rounded-xl object-cover" src={image} alt={title} style="filter: blur(2px);" />
 	{:else}
 		<div class="w-full h-full flex items-center justify-center bg-gray-200 rounded-xl">
 			No image available

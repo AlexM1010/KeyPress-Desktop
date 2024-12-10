@@ -1,11 +1,41 @@
 <script lang="ts">
     import { CardSwiper } from '$lib/CardSwiper';
 
-    let data = (index: number) => {
-        return {
-            title: 'Card ' + index,
-            description: 'Description ' + index,
-            image: `https://picsum.photos/600/800?random=${index}`
+    interface Card {
+        title: string;
+        description: string;
+        image: string;
+    }
+
+    const customCards: Card[] = [
+        { 
+            title: 'Dog', 
+            description: 'This is the first card.', 
+            image: 'https://loremflickr.com/600/800/Dog'
+        },
+        { 
+            title: 'Cat', 
+            description: 'This is the second card.', 
+            image: 'https://loremflickr.com/600/800/Cat'
+        },
+        { 
+            title: 'Tree', 
+            description: 'This is the third card.', 
+            image: 'https://loremflickr.com/600/800/Tree'
+        },
+		{ 
+            title: 'Oil', 
+            description: 'This is the third card.', 
+            image: 'https://loremflickr.com/600/800/Evil'
+        },
+        // Add more custom cards as needed
+    ];
+
+    const data = (index: number): Card => {
+        return customCards[index] || {
+            title: 'Default Title',
+            description: 'Default Description',
+            image: 'https://loremflickr.com/600/800/Default'
         };
     };
 </script>
