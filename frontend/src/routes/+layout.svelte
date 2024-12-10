@@ -71,9 +71,11 @@
 <div class="navbar-container text-white" class:collapsed={!$isExpanded}>
     <!-- Left side of navbar -->
     <div class="navbar-left">
-        <Logo customClass="logo" />
-        <button class="nav-btn" on:click={() => goto('/')}>
+        <button class="nav-btn" on:click={() => goto('/workspace')}>
             Workspace
+        </button>
+        <button class="nav-btn" on:click={() => goto('/')}>
+            Decisions
         </button>
         {#if $isAuthenticated && $user}
             <button class="nav-btn" on:click={() => goto('/projects')}>

@@ -42,6 +42,7 @@
 		"@dagrejs/dagre": "^1.1.4",
 		"@supabase/supabase-js": "^2.46.1",
 		"@tailwindcss/forms": "^0.5.9",
+		"@use-gesture/vanilla": "^10.3.1",
 		"@xyflow/svelte": "^0.1.21",
 		"dompurify": "^3.2.1",
 		"dotenv": "^16.4.5",
