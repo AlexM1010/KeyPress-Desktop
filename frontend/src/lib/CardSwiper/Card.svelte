@@ -1,6 +1,5 @@
 <script lang="ts">
 	export let element: HTMLElement;
-
 	export let title: string = '';
 	export let description: string = '';
 	export let image: string = '';
@@ -10,27 +9,17 @@
 	class="w-full h-full absolute cursor-grab ease-in-out rounded-xl touch-none select-none border border-black bg-white"
 	bind:this={element}
 >
-	<img class="w-full h-full rounded-xl object-cover" src={image} alt={title} />
-	<div class="absolute inset-0 bg-gradient-to-t from-white/80 via-white/0 rounded-b-xl"></div>
-	<div class="p-4 absolute bottom-0 w-full flex justify-center">
-		<div class="flex items-center flex-col">
-			<h3 class="text-3xl font-semibold pb-4">{title}</h3>
-			<p>{description}</p>
+	<!-- Use the provided image. If none, display a placeholder. -->
+	{#if image}
+		<img class="w-full h-full rounded-xl object-cover" src={image} alt={title} />
+	{:else}
+		<div class="w-full h-full flex items-center justify-center bg-gray-200 rounded-xl">
+			No image available
 		</div>
-	</div>
-</div>
+	{/if}
 
-<!--
-<div
-	class="w-full h-full absolute cursor-grab ease-in-out rounded-xl touch-none select-none border border-black bg-white"
-	bind:this={element}
->
-	{#key image}
-		{#if image}
-			<img class="w-full h-full rounded-xl object-cover" src={image} alt={title} />
-		{/if}
-	{/key}
 	<div class="absolute inset-0 bg-gradient-to-t from-white/80 via-white/0 rounded-b-xl"></div>
+
 	<div class="p-4 absolute bottom-0 w-full flex justify-center">
 		<div class="flex items-center flex-col">
 			<h3 class="text-3xl font-semibold pb-4">{title}</h3>
@@ -38,4 +27,3 @@
 		</div>
 	</div>
 </div>
--->

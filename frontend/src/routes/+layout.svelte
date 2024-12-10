@@ -74,7 +74,7 @@
         <button class="nav-btn" on:click={() => goto('/workspace')}>
             Workspace
         </button>
-        <button class="nav-btn" on:click={() => goto('/')}>
+        <button class="nav-btn" on:click={() => goto('/cardSwiper')}>
             Decisions
         </button>
         {#if $isAuthenticated && $user}
