@@ -7,7 +7,7 @@
     import { onMount } from 'svelte';
     import { auth, isAuthenticated, user, isInitialized } from '$lib/stores/auth';
     import '$lib/index.scss';
-    import { ChevronDown, Map, Folder, LogOut, UserPlus, LogIn, Layers } from 'lucide-svelte';
+    import { ChevronDown, Map, Folder, LogOut, UserPlus, LogIn, Layers, ChartNoAxesCombined } from 'lucide-svelte';
     import './navbar.css';
     import { isExpanded } from '$lib/stores/navbar';
 
@@ -74,6 +74,9 @@
         </button>
         <button class="nav-btn" on:click={() => goto('/map')} aria-label="Map">
             <Map class="w-5 h-5" />
+        </button>
+        <button class="nav-btn" on:click={() => goto('/stats')} aria-label="Stats">
+            <ChartNoAxesCombined class="w-5 h-5" />
         </button>
         {#if $isAuthenticated && $user}
             <button class="nav-btn" on:click={() => goto('/projects')} aria-label="Projects">

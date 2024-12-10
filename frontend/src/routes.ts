@@ -3,6 +3,7 @@ import Workspace from './routes/workspace/+page.svelte'
 import Login from './routes/login/+page.svelte'
 import Projects from './routes/projects/+page.svelte'
 import Map from './routes/map/+page.svelte'
+import Stats from './routes/stats/+page.svelte'
 
 const routes = {
     // Exact path
@@ -15,6 +16,8 @@ const routes = {
     '/projects': Projects,
 
     '/map': Map,
+
+    '/stats': Stats,
 
 
     // Catch-all
