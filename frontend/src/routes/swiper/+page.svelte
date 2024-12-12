@@ -8,6 +8,7 @@
     import { Check, X } from 'lucide-svelte';
     import { acceptedCards } from '$lib/stores/stats';
     import * as runtime from '$lib/wailsjs/runtime/runtime';
+    import { v4 as uuidv4 } from 'uuid'; 
 
     let leftGlowOpacity = 0.2;
     let rightGlowOpacity = 0.2;
@@ -49,8 +50,26 @@
         }
     };
 
+    // Add session management
+    let session = {
+        gameId: '',
+        playerId: ''
+    };
+
     onMount(() => {
         window.addEventListener('mousemove', handleMouseMove);
+        // Try to get existing session
+        const savedSession = localStorage.getItem('gameSession');
+        if (savedSession) {
+            session = JSON.parse(savedSession);
+        } else {
+            // Create new session with proper UUIDs
+            session = {
+                gameId: uuidv4(),
+                playerId: uuidv4()
+            };
+            localStorage.setItem('gameSession', JSON.stringify(session));
+        }
     });
 
     onDestroy(() => {
@@ -61,27 +80,24 @@
     async function handleCardAccepted(event: CustomEvent<{ card: CardData }>) {
         const chosenCard = event.detail.card;
 
-        // Update local stats
         if (chosenCard.effects) {
             updateStats(chosenCard.effects);
         }
 
-        // Emit stats to the backend via Wails runtime events
+        // Use proper UUIDs from session
         const statsPayload = {
-            player_id: 'player1', // Replace with actual player ID
-            game_id: 'game1',    // Replace with actual game ID
+            player_id: session.playerId,  // Now using UUID
+            game_id: session.gameId,      // Now using UUID
             ...chosenCard.effects,
         };
 
         try {
-            // Emit data to the Go backend for processing
             runtime.EventsEmit('card:accepted', statsPayload);
             console.log('Stats successfully synced with the backend.');
         } catch (error) {
             console.error('Error syncing stats:', error);
         }
 
-        // Increment accepted cards in the store
         acceptedCards.update((count) => count + 1);
     }
 </script>

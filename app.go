@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-vgo/robotgo"
+	"github.com/google/uuid"
 	supa "github.com/supabase-community/auth-go"
 	"github.com/supabase-community/auth-go/types"
 	"github.com/supabase-community/postgrest-go"
@@ -220,8 +221,16 @@ func (a *App) InitializeFromToken(token string) error {
 }
 
 // =============================================== Game Database ===============================================
-// UpdatePlayerStats updates player statistics using Upsert with correct parameters and return values
+// UpdatePlayerStats function update
 func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, numIPs, ipValue float64) error {
+	// Validate UUID format
+	if _, err := uuid.Parse(playerID); err != nil {
+		return fmt.Errorf("invalid player_id UUID format: %w", err)
+	}
+	if _, err := uuid.Parse(gameID); err != nil {
+		return fmt.Errorf("invalid game_id UUID format: %w", err)
+	}
+
 	data := map[string]interface{}{
 		"player_id":  playerID,
 		"game_id":    gameID,
@@ -233,15 +242,12 @@ func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, n
 		"updated_at": time.Now(),
 	}
 
-	// Upsert the data (insert or update if existing)
 	_, _, err := a.dbClient.From("game_stats").Upsert(data, "", "*", "exact").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to update player stats: %w", err)
 	}
 
-	// Emit the update to the frontend
 	runtime.EventsEmit(a.ctx, "stats:updated", data)
-
 	return nil
 }
 
