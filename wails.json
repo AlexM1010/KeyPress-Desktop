@@ -1,14 +1,14 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "Keypress",
-  "outputfilename": "Keypress",
+  "name": "GreenWash.INC",
+  "outputfilename": "GreenWash.INC",
   "frontend:install": "npm install",
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
-  "wailsjsdir": "./frontend/src/lib",
+  "wailsjsdir": "./frontend",
   "author": {
     "name": "AWM1010",
-    "email": "alexander.marshall6@nhs.net"
+    "email": "alex.marshall2020@gmail.com"
   }
 }
