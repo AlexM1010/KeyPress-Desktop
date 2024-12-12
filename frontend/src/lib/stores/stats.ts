@@ -24,7 +24,7 @@ export interface StatHistoryData {
 /**
  * Current Stat Stores
  */
-export const money = writable<number>(10000);
+export const money = writable<number>(1000000);
 export const opinion = writable<number>(5);
 export const risk = writable<number>(50);
 export const numIPs = writable<number>(0);
