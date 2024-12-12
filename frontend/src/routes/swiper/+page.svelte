@@ -6,21 +6,24 @@
     import { onMount, onDestroy } from 'svelte';
     import { fade } from 'svelte/transition';
     import { Check, X } from 'lucide-svelte';
+    import { acceptedCards } from '$lib/stores/stats';
+    import * as runtime from '$lib/wailsjs/runtime/runtime';
 
+    let leftGlowOpacity = 0.2;
+    let rightGlowOpacity = 0.2;
+    let showNo = false;
+    let showYes = false;
+
+    // Fetch data for cards
     const data = (index: number): CardData => {
         const currentCards = get(cards);
         return currentCards[index] || {
             title: 'Default Title',
             description: 'Default Description',
             image: 'https://loremflickr.com/600/800/Default',
-            stats: []
+            stats: [],
         };
     };
-
-    let leftGlowOpacity = 0.2;
-    let rightGlowOpacity = 0.2;
-    let showNo = false;
-    let showYes = false;
 
     const handleMouseMove = (event: MouseEvent) => {
         const { clientX } = event;
@@ -54,12 +57,32 @@
         window.removeEventListener('mousemove', handleMouseMove);
     });
 
-    // This function is called when a CardData is accepted.
-    function handleCardAccepted(event: CustomEvent<{ card: CardData }>) {
+    // Handle card acceptance
+    async function handleCardAccepted(event: CustomEvent<{ card: CardData }>) {
         const chosenCard = event.detail.card;
+
+        // Update local stats
         if (chosenCard.effects) {
             updateStats(chosenCard.effects);
         }
+
+        // Emit stats to the backend via Wails runtime events
+        const statsPayload = {
+            player_id: 'player1', // Replace with actual player ID
+            game_id: 'game1',    // Replace with actual game ID
+            ...chosenCard.effects,
+        };
+
+        try {
+            // Emit data to the Go backend for processing
+            runtime.EventsEmit('card:accepted', statsPayload);
+            console.log('Stats successfully synced with the backend.');
+        } catch (error) {
+            console.error('Error syncing stats:', error);
+        }
+
+        // Increment accepted cards in the store
+        acceptedCards.update((count) => count + 1);
     }
 </script>
 
@@ -126,12 +149,12 @@
 
     .left {
         left: 0;
-        background: linear-gradient(to right, rgba(255,0,0,0.5), transparent);
+        background: linear-gradient(to right, rgba(255, 0, 0, 0.5), transparent);
     }
 
     .right {
         right: 0;
-        background: linear-gradient(to left, rgba(0,255,0,0.5), transparent);
+        background: linear-gradient(to left, rgba(0, 255, 0, 0.5), transparent);
     }
 
     .edge-text {

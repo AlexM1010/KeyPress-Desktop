@@ -10,8 +10,24 @@ export function GetIsExecuting() {
   return window['go']['main']['App']['GetIsExecuting']();
 }
 
+export function GetPlayerStats(arg1) {
+  return window['go']['main']['App']['GetPlayerStats'](arg1);
+}
+
+export function GetStatHistory(arg1, arg2) {
+  return window['go']['main']['App']['GetStatHistory'](arg1, arg2);
+}
+
 export function InitializeFromToken(arg1) {
   return window['go']['main']['App']['InitializeFromToken'](arg1);
+}
+
+export function ListenForEvents() {
+  return window['go']['main']['App']['ListenForEvents']();
+}
+
+export function LogStatHistory(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['LogStatHistory'](arg1, arg2, arg3, arg4);
 }
 
 export function SignIn(arg1, arg2) {
@@ -28,4 +44,8 @@ export function StartExecution(arg1) {
 
 export function StopExecution() {
   return window['go']['main']['App']['StopExecution']();
+}
+
+export function UpdatePlayerStats(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['main']['App']['UpdatePlayerStats'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }

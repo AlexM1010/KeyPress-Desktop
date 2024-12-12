@@ -6,7 +6,15 @@ export function GetAuthState():Promise<{[key: string]: any}>;
 
 export function GetIsExecuting():Promise<boolean>;
 
+export function GetPlayerStats(arg1:string):Promise<Array<{[key: string]: any}>>;
+
+export function GetStatHistory(arg1:string,arg2:string):Promise<Array<{[key: string]: any}>>;
+
 export function InitializeFromToken(arg1:string):Promise<void>;
+
+export function ListenForEvents():Promise<void>;
+
+export function LogStatHistory(arg1:string,arg2:string,arg3:string,arg4:number):Promise<void>;
 
 export function SignIn(arg1:string,arg2:string):Promise<types.TokenResponse>;
 
@@ -15,3 +23,5 @@ export function SignOut(arg1:string):Promise<void>;
 export function StartExecution(arg1:string):Promise<void>;
 
 export function StopExecution():Promise<void>;
+
+export function UpdatePlayerStats(arg1:string,arg2:string,arg3:number,arg4:number,arg5:number,arg6:number,arg7:number):Promise<void>;

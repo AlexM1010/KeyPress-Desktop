@@ -8,6 +8,7 @@ export interface CardData {
     description?: string;
     image?: string;
     effects?: CardEffects;
+    categories?: string[];
 }
 
 const initialCards: CardData[] = [
@@ -21,7 +22,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Production']
     },
     {
         title: 'Upgrade Emission Filters',
@@ -33,7 +35,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Environmental']
     },
     {
         title: 'Trade Carbon Credits',
@@ -45,7 +48,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Environmental']
     },
     {
         title: 'Invest in Hydrogen Tech',
@@ -57,7 +61,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Environmental', '+Patents']
     },
     {
         title: 'Launch New Product Line',
@@ -69,7 +74,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Production', '+Expansion']
     },
     {
         title: 'Optimize Supply Chain',
@@ -81,7 +87,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Production']
     },
     {
         title: 'Expand Market Reach',
@@ -93,19 +100,8 @@ const initialCards: CardData[] = [
             riskChangeFromCard: 0,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
-        }
-    },
-    {
-        title: 'Enhance Customer Support',
-        description: 'Spend £400k to improve customer support services, increasing customer satisfaction and retention.',
-        image: 'https://loremflickr.com/600/800/customersupport',
-        effects: {
-            moneyChangeFromCard: 400000,
-            opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
-            numIPsFromCard: 0,
-            ipValueChangeFromCard: 0
-        }
+        },
+        categories: ['+Expansion']
     }
 ];
 

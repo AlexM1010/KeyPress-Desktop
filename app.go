@@ -15,6 +15,7 @@ import (
 	"github.com/go-vgo/robotgo"
 	supa "github.com/supabase-community/auth-go"
 	"github.com/supabase-community/auth-go/types"
+	"github.com/supabase-community/postgrest-go"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -28,7 +29,8 @@ type AuthStore struct {
 // Update the App struct
 type App struct {
 	ctx          context.Context
-	authClient   supa.Client // Change type to *supa.Client
+	authClient   supa.Client
+	dbClient     *postgrest.Client
 	auth         *AuthStore
 	taskQueue    *TaskQueue
 	isExecuting  bool
@@ -80,13 +82,31 @@ type TaskQueue struct {
 }
 
 // NewApp creates a new App application struct with auth
+// NewApp creates a new App application struct with auth
 func NewApp() *App {
 	authClient := supa.New(
-		"fuobfyypdlixgvwzrvoy", // Supabase URL
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
+		"pbmnznjpmbgnqpwyhxeb", // Supabase URL
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibW56bmpwbWJnbnFwd3loeGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5OTcyNzYsImV4cCI6MjA0OTU3MzI3Nn0.siN90qJiicER15yj0wyurJinGOyMG-gyGgN9Cfo7J_E",
 	)
+
+	// Initialize postgrest client properly
+	dbClient := postgrest.NewClient(
+		"https://pbmnznjpmbgnqpwyhxeb.supabase.co/rest/v1",
+		"public", // schema
+		map[string]string{
+			"apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibW56bmpwbWJnbnFwd3loeGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5OTcyNzYsImV4cCI6MjA0OTU3MzI3Nn0.siN90qJiicER15yj0wyurJinGOyMG-gyGgN9Cfo7J_E",
+		},
+	)
+	if dbClient.ClientError != nil {
+		log.Fatalf("Failed to initialize database client: %v", dbClient.ClientError)
+	}
+
+	// Set the auth token
+	dbClient.SetAuthToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBibW56bmpwbWJnbnFwd3loeGViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM5OTcyNzYsImV4cCI6MjA0OTU3MzI3Nn0.siN90qJiicER15yj0wyurJinGOyMG-gyGgN9Cfo7J_E")
+
 	return &App{
 		authClient:   authClient,
+		dbClient:     dbClient,
 		auth:         &AuthStore{},
 		taskQueue:    NewTaskQueue(nil, 100),
 		completed:    make(map[string]bool),
@@ -116,6 +136,7 @@ func (a *App) startup(ctx context.Context) {
 	a.emitAuthState()
 	a.taskQueue.app = a  // Set the app reference in TaskQueue
 	a.taskQueue.Start(3) // Start 3 workers by default
+	a.ListenForEvents()  // Start listening for data updates
 }
 
 // SignIn with updated store management
@@ -196,6 +217,134 @@ func (a *App) InitializeFromToken(token string) error {
 
 	a.emitAuthState()
 	return nil
+}
+
+// =============================================== Game Database ===============================================
+// UpdatePlayerStats updates player statistics using Upsert with correct parameters and return values
+func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, numIPs, ipValue float64) error {
+	data := map[string]interface{}{
+		"player_id":  playerID,
+		"game_id":    gameID,
+		"money":      money,
+		"opinion":    opinion,
+		"risk":       risk,
+		"num_ips":    numIPs,
+		"ip_value":   ipValue,
+		"updated_at": time.Now(),
+	}
+
+	// Upsert the data (insert or update if existing)
+	_, _, err := a.dbClient.From("game_stats").Upsert(data, "", "*", "exact").Execute()
+	if err != nil {
+		return fmt.Errorf("failed to update player stats: %w", err)
+	}
+
+	// Emit the update to the frontend
+	runtime.EventsEmit(a.ctx, "stats:updated", data)
+
+	return nil
+}
+
+// LogStatHistory logs statistic changes with correct Insert parameters and return values
+func (a *App) LogStatHistory(playerID, gameID, statType string, value float64) error {
+	history := map[string]interface{}{
+		"player_id": playerID,
+		"game_id":   gameID,
+		"stat_type": statType,
+		"value":     value,
+		"timestamp": time.Now(),
+	}
+
+	_, _, err := a.dbClient.From("stat_histories").Insert(history, false, "", "*", "exact").Execute()
+	if err != nil {
+		return fmt.Errorf("failed to log stat history: %w", err)
+	}
+
+	return nil
+}
+
+// GetPlayerStats retrieves player statistics with correct Select parameters and handling
+func (a *App) GetPlayerStats(gameID string) ([]map[string]interface{}, error) {
+	res, _, err := a.dbClient.From("game_stats").Select("*", "exact", false).Eq("game_id", gameID).Execute()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch player stats: %w", err)
+	}
+
+	var stats []map[string]interface{}
+	err = json.Unmarshal(res, &stats)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal player stats: %w", err)
+	}
+
+	return stats, nil
+}
+
+// GetStatHistory fetches statistic history with correct Select and Order method calls
+func (a *App) GetStatHistory(gameID, statType string) ([]map[string]interface{}, error) {
+	res, _, err := a.dbClient.From("stat_histories").
+		Select("*", "exact", false).
+		Eq("game_id", gameID).
+		Eq("stat_type", statType).
+		Order("timestamp", &postgrest.OrderOpts{
+			Ascending:    true,
+			NullsFirst:   false,
+			ForeignTable: "",
+		}).
+		Execute()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch stat history: %w", err)
+	}
+
+	var history []map[string]interface{}
+	err = json.Unmarshal(res, &history)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal stat history: %w", err)
+	}
+
+	return history, nil
+}
+
+// Listen for card:accepted event and update stats
+func (a *App) ListenForEvents() {
+	runtime.EventsOn(a.ctx, "card:accepted", func(optionalData ...interface{}) {
+		// Ensure there is at least one argument and it's of the expected type
+		if len(optionalData) == 0 {
+			log.Println("No data received for card:accepted event")
+			return
+		}
+
+		log.Printf("Received data type: %T", optionalData[0])
+		log.Printf("Received data: %+v", optionalData[0])
+
+		// Parse the first argument as map[string]interface{}
+		payload, ok := optionalData[0].(map[string]interface{})
+		if !ok {
+			log.Println("Invalid data type for card:accepted event")
+			return
+		}
+
+		// Extract individual stats with type assertions
+		playerID, ok1 := payload["player_id"].(string)
+		gameID, ok2 := payload["game_id"].(string)
+		money, ok3 := payload["moneyChangeFromCard"].(float64)
+		opinion, ok4 := payload["opinionChangeFromCard"].(float64)
+		risk, ok5 := payload["riskChangeFromCard"].(float64)
+		numIPs, ok6 := payload["numIPsFromCard"].(float64)
+		ipValue, ok7 := payload["ipValueChangeFromCard"].(float64)
+
+		if !ok1 || !ok2 || !ok3 || !ok4 || !ok5 || !ok6 || !ok7 {
+			log.Println("Incomplete or invalid data received for card:accepted event")
+			return
+		}
+
+		// Update player stats in the database
+		if err := a.UpdatePlayerStats(playerID, gameID, money, opinion, risk, numIPs, ipValue); err != nil {
+			log.Printf("Failed to update player stats: %v", err)
+			return
+		}
+
+		log.Println("Player stats successfully updated.")
+	})
 }
 
 //=============================================== Flow Execution ===============================================
