@@ -1,17 +1,19 @@
 <script lang="ts">
     import { CardSwiper } from '$lib/CardSwiper';
-    import { cards, type Card } from '$lib/stores/swiper';
+    import { cards, type CardData } from '$lib/stores/swiper';
+    import { updateStats } from '$lib/stores/stats';
     import { get } from 'svelte/store';
     import { onMount, onDestroy } from 'svelte';
     import { fade } from 'svelte/transition';
     import { Check, X } from 'lucide-svelte';
 
-    const data = (index: number): Card => {
+    const data = (index: number): CardData => {
         const currentCards = get(cards);
         return currentCards[index] || {
             title: 'Default Title',
             description: 'Default Description',
-            image: 'https://loremflickr.com/600/800/Default'
+            image: 'https://loremflickr.com/600/800/Default',
+            stats: []
         };
     };
 
@@ -51,6 +53,14 @@
     onDestroy(() => {
         window.removeEventListener('mousemove', handleMouseMove);
     });
+
+    // This function is called when a CardData is accepted.
+    function handleCardAccepted(event: CustomEvent<{ card: CardData }>) {
+        const chosenCard = event.detail.card;
+        if (chosenCard.effects) {
+            updateStats(chosenCard.effects);
+        }
+    }
 </script>
 
 <div class="background"></div>
@@ -72,7 +82,8 @@
 
     <div class="w-full max-w-sm mx-auto px-4">
         <div class="aspect-[2/3] relative">
-            <CardSwiper cardData={data} anchor={10000}/>
+            <!-- Listen to the cardAccepted event -->
+            <CardSwiper cardData={data} anchor={10000} on:cardAccepted={handleCardAccepted} />
         </div>
     </div>
 </div>

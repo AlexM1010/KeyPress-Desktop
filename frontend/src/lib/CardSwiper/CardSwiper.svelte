@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { DragGesture, type FullGestureState } from '@use-gesture/vanilla';
-	import type { CardData, Direction, SwipeEventData } from '.';
+	import type { Direction, SwipeEventData } from '.';
 	import Card from './Card.svelte';
+	import type { CardData } from '$lib/stores/swiper';
 
 	let container: HTMLElement;
 	let card1: HTMLElement, card2: HTMLElement;
@@ -44,13 +45,26 @@
 		}
 	});
 
+	const dispatch = createEventDispatcher<{
+        cardAccepted: { card: CardData, index: number };
+        cardRejected: { card: CardData, index: number };
+    }>();
+
 	const cardSwiped = (el: HTMLElement, velocity: [number, number], movement: [number, number]) => {
 		el.classList.add('transition-transform', 'duration-300');
 
 		let direction: Direction = movement[0] > 0 ? 'right' : 'left';
 		let data = el === card1 ? card1Data : card2Data;
+		let currentIndex = cardIndex - 2;
 
-		if (onSwipe) onSwipe({ direction, element: el, data, index: cardIndex - 2 });
+		// Dispatch events based on swipe direction
+		if (direction === 'right') {
+			dispatch('cardAccepted', { card: data, index: currentIndex });
+		} else {
+			dispatch('cardRejected', { card: data, index: currentIndex });
+		}
+
+		if (onSwipe) onSwipe({ direction, element: el, data, index: currentIndex });
 
 		thresholdPassed = movement[0] > 0 ? 1 : -1;
 

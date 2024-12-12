@@ -2,11 +2,8 @@
  * change this to your own data structure, that each card will use
  * then change the Card.svelte file to use your data structure
  */
-export type CardData = {
-	title?: string;
-	description?: string;
-	image?: string;
-};
+
+import type { CardData } from '$lib/stores/swiper';
 
 export type SwipeEventData = {
 	direction: Direction;
