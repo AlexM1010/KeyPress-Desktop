@@ -73,7 +73,7 @@
     };
 </script>
 
-<div style="width: 100%">
+<div>
     <Chart {...options}>
         <CandlestickSeries
             data={$combinedCandlestickDataStore}
