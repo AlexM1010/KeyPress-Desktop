@@ -14,6 +14,10 @@ export function GetIsExecuting() {
   return window['go']['main']['App']['GetIsExecuting']();
 }
 
+export function GetMultiplePlayersStatHistory(arg1, arg2, arg3) {
+  return window['go']['main']['App']['GetMultiplePlayersStatHistory'](arg1, arg2, arg3);
+}
+
 export function GetPlayerStats(arg1) {
   return window['go']['main']['App']['GetPlayerStats'](arg1);
 }

@@ -3,6 +3,43 @@
     import OpinionChart from './OpinionChart.svelte';
     import RiskChart from './RiskChart.svelte';
     import IPsChart from './IPsChart.svelte';
+    import { onMount } from 'svelte';
+    import { allPlayersRiskHistory } from '$lib/stores/stats';
+    import { GetMultiplePlayersStatHistory } from '$lib/wailsjs/go/main/App';
+
+    interface PlayerHistoryPoint {
+        time: string;
+        value: number;
+        player_id: string;
+    }
+
+    onMount(async () => {
+        const gameID = "YOUR_GAME_ID"; //Get user to pick their own game ID
+        const statType = "risk";
+        const playerIDs = ["player-1-uuid", "player-2-uuid"];
+
+        try {
+            // Call the Wails backend method directly
+            const data: { [key: string]: any[] } = await GetMultiplePlayersStatHistory(gameID, playerIDs, statType);
+
+            // Transform data to match Record<string, PlayerHistoryPoint[]>
+            const formattedData: Record<string, PlayerHistoryPoint[]> = {};
+
+            for (const key in data) {
+                formattedData[key] = data[key].map(item => ({
+                    time: item.time,
+                    value: item.value,
+                    player_id: item.player_id,
+                }));
+            }
+
+            // Set the transformed data to the store
+            allPlayersRiskHistory.set(formattedData);
+            console.log("Loaded allPlayersRiskHistory:", formattedData);
+        } catch (error) {
+            console.error("Failed to fetch player history data:", error);
+        }
+    });
 </script>
 
 <div style="transform: translateX(-40);">
@@ -36,7 +73,7 @@
         padding: 0.2rem 0;
         border-bottom: 0.2rem solid rgba(255, 255, 255, 0.9);
     }
-    
+
     .chart-title {
         position: absolute;
         top: 10px;

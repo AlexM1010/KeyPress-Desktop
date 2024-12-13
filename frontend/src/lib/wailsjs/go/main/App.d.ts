@@ -8,6 +8,8 @@ export function GetAuthState():Promise<{[key: string]: any}>;
 
 export function GetIsExecuting():Promise<boolean>;
 
+export function GetMultiplePlayersStatHistory(arg1:string,arg2:Array<string>,arg3:string):Promise<{[key: string]: Array<{[key: string]: any}>}>;
+
 export function GetPlayerStats(arg1:string):Promise<Array<{[key: string]: any}>>;
 
 export function GetStatHistory(arg1:string,arg2:string):Promise<Array<{[key: string]: any}>>;

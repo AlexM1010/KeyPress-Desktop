@@ -222,6 +222,63 @@ func (a *App) InitializeFromToken(token string) error {
 
 // =============================================== Game Database ===============================================
 
+// GetMultiplePlayersStatHistory fetches statistic history for up to 4 players for a given game and stat_type.
+// Returns a map: player_id -> []{ time: string, value: float64 }
+func (a *App) GetMultiplePlayersStatHistory(gameID string, playerIDs []string, statType string) (map[string][]map[string]interface{}, error) {
+	// Limit the number of players to 4
+	if len(playerIDs) > 4 {
+		playerIDs = playerIDs[:4]
+	}
+
+	// Prepare result map
+	result := make(map[string][]map[string]interface{})
+
+	for _, playerID := range playerIDs {
+		// Fetch stat histories for this player
+		res, _, err := a.dbClient.From("stat_histories").
+			Select("*", "exact", false).
+			Eq("game_id", gameID).
+			Eq("stat_type", statType).
+			Eq("player_id", playerID).
+			Order("timestamp", &postgrest.OrderOpts{
+				Ascending:  true,
+				NullsFirst: false,
+			}).
+			Execute()
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch stat history for player %s: %w", playerID, err)
+		}
+
+		var rawHistory []map[string]interface{}
+		if err = json.Unmarshal(res, &rawHistory); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal player %s's stat history: %w", playerID, err)
+		}
+
+		// Transform raw history into a simpler "time/value" pair format
+		playerHistory := make([]map[string]interface{}, 0, len(rawHistory))
+		for _, entry := range rawHistory {
+			// Extract and assert correct types
+			tsRaw, tsOk := entry["timestamp"].(string)
+			valRaw, valOk := entry["value"].(float64)
+
+			if !tsOk || !valOk {
+				// If timestamp or value can't be parsed, skip this entry
+				continue
+			}
+
+			// Store simplified record
+			playerHistory = append(playerHistory, map[string]interface{}{
+				"time":  tsRaw,
+				"value": valRaw,
+			})
+		}
+
+		result[playerID] = playerHistory
+	}
+
+	return result, nil
+}
+
 // UpdatePlayerStats updates the player's current stats and logs each change in stat_histories
 func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, numIPs, ipValue float64) error {
 	// Validate UUID formats

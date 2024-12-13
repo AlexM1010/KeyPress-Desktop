@@ -19,7 +19,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: -1000000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: 100,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
@@ -32,7 +32,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: -700000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: -50,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
@@ -45,7 +45,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: -600000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: -50,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
@@ -58,7 +58,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: -600000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: -50,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
@@ -71,7 +71,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: 800000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: 100,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
@@ -84,7 +84,7 @@ const initialCards: CardData[] = [
         effects: {
             moneyChangeFromCard: 500000,
             opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
+            riskChangeFromCard: -50,
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
