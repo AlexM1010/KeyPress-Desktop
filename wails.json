@@ -6,7 +6,7 @@
   "frontend:build": "npm run build",
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "auto",
-  "wailsjsdir": "./frontend",
+  "wailsjsdir": "./frontend/src/lib",
   "author": {
     "name": "AWM1010",
     "email": "alex.marshall2020@gmail.com"

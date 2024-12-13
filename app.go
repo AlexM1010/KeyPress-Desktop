@@ -221,9 +221,10 @@ func (a *App) InitializeFromToken(token string) error {
 }
 
 // =============================================== Game Database ===============================================
-// UpdatePlayerStats function update
+
+// UpdatePlayerStats updates the player's current stats and logs each change in stat_histories
 func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, numIPs, ipValue float64) error {
-	// Validate UUID format
+	// Validate UUID formats
 	if _, err := uuid.Parse(playerID); err != nil {
 		return fmt.Errorf("invalid player_id UUID format: %w", err)
 	}
@@ -231,6 +232,7 @@ func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, n
 		return fmt.Errorf("invalid game_id UUID format: %w", err)
 	}
 
+	// Prepare data for upserting into game_stats
 	data := map[string]interface{}{
 		"player_id":  playerID,
 		"game_id":    gameID,
@@ -242,11 +244,28 @@ func (a *App) UpdatePlayerStats(playerID, gameID string, money, opinion, risk, n
 		"updated_at": time.Now(),
 	}
 
+	// Upsert the player's current stats
 	_, _, err := a.dbClient.From("game_stats").Upsert(data, "", "*", "exact").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to update player stats: %w", err)
 	}
 
+	// Log each stat change in stat_histories
+	stats := map[string]float64{
+		"money":    money,
+		"opinion":  opinion,
+		"risk":     risk,
+		"num_ips":  numIPs,
+		"ip_value": ipValue,
+	}
+
+	for statType, value := range stats {
+		if err := a.LogStatHistory(playerID, gameID, statType, value); err != nil {
+			log.Printf("Failed to log %s stat history: %v", statType, err)
+		}
+	}
+
+	// Emit a stats updated event to notify frontend
 	runtime.EventsEmit(a.ctx, "stats:updated", data)
 	return nil
 }
@@ -351,6 +370,29 @@ func (a *App) ListenForEvents() {
 
 		log.Println("Player stats successfully updated.")
 	})
+}
+
+// GetAllPlayersStatHistory fetches statistic history for all players in a game
+func (a *App) GetAllPlayersStatHistory(gameID, statType string) ([]map[string]interface{}, error) {
+	res, _, err := a.dbClient.From("stat_histories").
+		Select("*", "exact", false).
+		Eq("game_id", gameID).
+		Eq("stat_type", statType).
+		Order("timestamp", &postgrest.OrderOpts{
+			Ascending:  true,
+			NullsFirst: false,
+		}).
+		Execute()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch all players' stat history: %w", err)
+	}
+
+	var history []map[string]interface{}
+	if err = json.Unmarshal(res, &history); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal all players' stat history: %w", err)
+	}
+
+	return history, nil
 }
 
 //=============================================== Flow Execution ===============================================

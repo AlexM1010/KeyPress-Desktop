@@ -1,3 +1,4 @@
+<!-- frontend\src\routes\stats\RiskChart.svelte -->
 <script lang="ts">
     import { derived } from 'svelte/store';
     import { ColorType, CrosshairMode } from 'lightweight-charts';

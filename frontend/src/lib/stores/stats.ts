@@ -147,3 +147,11 @@ export function updateStats(cardEffects: CardEffects) {
     ipValueHistory.update(history => [...history, { time: newTime, value: updatedIPValue }]);
 }
 
+interface PlayerHistoryPoint {
+    time: string;
+    value: number;
+    player_id: string;
+}
+
+// Store to hold all players' risk history
+export const allPlayersRiskHistory = writable<Record<string, PlayerHistoryPoint[]>>({});
