@@ -15,7 +15,7 @@ const initialCards: CardData[] = [
     {
         title: 'Expand Refinery Capacity',
         description: 'Invest £1M to boost production. This reduces bottlenecks and increases long-term profitability.',
-        image: 'https://loremflickr.com/600/800/factory',
+        image: '../../cardImages/oilrig.jpg',
         effects: {
             moneyChangeFromCard: -1000000,
             opinionChangeFromCard: 0,
@@ -23,12 +23,12 @@ const initialCards: CardData[] = [
             numIPsFromCard: 0,
             ipValueChangeFromCard: 0
         },
-        categories: ['+Production']
+        categories: ['+Production', '+OilRig']
     },
     {
         title: 'Upgrade Emission Filters',
         description: 'Spend £700k to install advanced emission filters, improving environmental performance.',
-        image: 'https://loremflickr.com/600/800/smokestack',
+        image: '../../cardImages/smokestack.jpg',
         effects: {
             moneyChangeFromCard: -700000,
             opinionChangeFromCard: 0,
@@ -41,7 +41,7 @@ const initialCards: CardData[] = [
     {
         title: 'Trade Carbon Credits',
         description: 'Purchase 2 carbon credits (min) at £300k each to improve your Environmental Impact Score.',
-        image: 'https://loremflickr.com/600/800/forest',
+        image: '../../cardImages/green.jpg',
         effects: {
             moneyChangeFromCard: -600000,
             opinionChangeFromCard: 0,
@@ -54,7 +54,7 @@ const initialCards: CardData[] = [
     {
         title: 'Invest in Hydrogen Tech',
         description: 'Spend £600k in R&D to boost Environmental Impact Score and Patent Portfolio Value.',
-        image: 'https://loremflickr.com/600/800/windmill',
+        image: '../../cardImages/green.jpg',
         effects: {
             moneyChangeFromCard: -600000,
             opinionChangeFromCard: 0,
@@ -67,7 +67,7 @@ const initialCards: CardData[] = [
     {
         title: 'Launch New Product Line',
         description: 'Invest £800k to develop and launch a new product line, increasing revenue streams.',
-        image: 'https://loremflickr.com/600/800/product',
+        image: '../../cardImages/science.jpg',
         effects: {
             moneyChangeFromCard: 800000,
             opinionChangeFromCard: 0,
@@ -80,7 +80,7 @@ const initialCards: CardData[] = [
     {
         title: 'Optimize Supply Chain',
         description: 'Allocate £500k to streamline supply chain operations, reducing costs and enhancing profitability.',
-        image: 'https://loremflickr.com/600/800/supplychain',
+        image: '../../cardImages/shipping.jpg',
         effects: {
             moneyChangeFromCard: 500000,
             opinionChangeFromCard: 0,
@@ -89,19 +89,6 @@ const initialCards: CardData[] = [
             ipValueChangeFromCard: 0
         },
         categories: ['+Production']
-    },
-    {
-        title: 'Expand Market Reach',
-        description: 'Invest £900k in marketing and sales to enter new markets and boost sales.',
-        image: 'https://loremflickr.com/600/800/marketing',
-        effects: {
-            moneyChangeFromCard: 900000,
-            opinionChangeFromCard: 0,
-            riskChangeFromCard: 0,
-            numIPsFromCard: 0,
-            ipValueChangeFromCard: 0
-        },
-        categories: ['+Expansion']
     }
 ];
 
