@@ -13,23 +13,12 @@ import (
 	"time"
 
 	"github.com/go-vgo/robotgo"
-	supa "github.com/supabase-community/auth-go"
-	"github.com/supabase-community/auth-go/types"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
-
-// AuthStore manages authentication state
-type AuthStore struct {
-	mu            sync.RWMutex
-	currentUser   *types.UserResponse
-	isInitialized bool
-}
 
 // Update the App struct
 type App struct {
 	ctx          context.Context
-	authClient   supa.Client // Change type to *supa.Client
-	auth         *AuthStore
 	taskQueue    *TaskQueue
 	isExecuting  bool
 	execMutex    sync.Mutex
@@ -79,15 +68,9 @@ type TaskQueue struct {
 	app     *App
 }
 
-// NewApp creates a new App application struct with auth
+// NewApp creates a new App application struct without authentication.
 func NewApp() *App {
-	authClient := supa.New(
-		"fuobfyypdlixgvwzrvoy", // Supabase URL
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
-	)
 	return &App{
-		authClient:   authClient,
-		auth:         &AuthStore{},
 		taskQueue:    NewTaskQueue(nil, 100),
 		completed:    make(map[string]bool),
 		notifyCh:     make(chan string, 100),
@@ -95,107 +78,11 @@ func NewApp() *App {
 	}
 }
 
-// EmitAuthState sends the current auth state to frontend
-func (a *App) emitAuthState() {
-	a.auth.mu.RLock()
-	defer a.auth.mu.RUnlock()
-
-	authState := map[string]interface{}{
-		"user":          a.auth.currentUser,
-		"isInitialized": a.auth.isInitialized,
-	}
-
-	// Emit the auth state change event to frontend
-	runtime.EventsEmit(a.ctx, "auth:stateChange", authState)
-}
-
 // Initialize auth state on startup
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.auth.isInitialized = true
-	a.emitAuthState()
 	a.taskQueue.app = a  // Set the app reference in TaskQueue
 	a.taskQueue.Start(3) // Start 3 workers by default
-}
-
-// SignIn with updated store management
-func (a *App) SignIn(email, password string) (*types.TokenResponse, error) {
-	response, err := a.authClient.SignInWithEmailPassword(email, password)
-	if err != nil {
-		return nil, fmt.Errorf("signin failed: %w", err)
-	}
-
-	// Get user details with the new token
-	authedClient := a.authClient.WithToken(response.AccessToken)
-	user, err := authedClient.GetUser()
-	if err != nil {
-		return nil, fmt.Errorf("get user failed: %w", err)
-	}
-
-	// Update store
-	a.auth.mu.Lock()
-	a.auth.currentUser = user
-	a.auth.mu.Unlock()
-
-	// Emit state change
-	a.emitAuthState()
-
-	return response, nil
-}
-
-// SignOut with store update
-func (a *App) SignOut(token string) error {
-	authedClient := a.authClient.WithToken(token)
-
-	err := authedClient.Logout()
-	if err != nil {
-		return fmt.Errorf("signout failed: %w", err)
-	}
-
-	// Clear store
-	a.auth.mu.Lock()
-	a.auth.currentUser = nil
-	a.auth.mu.Unlock()
-
-	// Emit state change
-	a.emitAuthState()
-
-	return nil
-}
-
-// GetAuthState returns current auth state
-func (a *App) GetAuthState() map[string]interface{} {
-	a.auth.mu.RLock()
-	defer a.auth.mu.RUnlock()
-
-	return map[string]interface{}{
-		"user":          a.auth.currentUser,
-		"isInitialized": a.auth.isInitialized,
-	}
-}
-
-// InitializeFromToken initializes the auth state from a stored token
-func (a *App) InitializeFromToken(token string) error {
-	if token == "" {
-		a.auth.mu.Lock()
-		a.auth.currentUser = nil
-		a.auth.mu.Unlock()
-		a.emitAuthState()
-		return nil
-	}
-
-	authedClient := a.authClient.WithToken(token)
-	user, err := authedClient.GetUser()
-	if err != nil {
-		return fmt.Errorf("initialize from token failed: %w", err)
-	}
-
-	a.auth.mu.Lock()
-	a.auth.currentUser = user
-	a.auth.mu.Unlock()
-
-	a.emitAuthState()
-	return nil
 }
 
 //=============================================== Flow Execution ===============================================

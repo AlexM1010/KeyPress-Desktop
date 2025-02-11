@@ -24,8 +24,7 @@
   //Edges
   import CustomEdge from "./CustomEdge.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
-  //Auth/Mount
-  import { isAuthenticated, user } from "$lib/stores/auth";
+
   import { onMount } from "svelte";
   //Flow
   import { flowTheme } from "$lib/stores/theme";
@@ -202,11 +201,6 @@
   // Modify the handleSave function
   async function handleSave() {
     console.log("Triggering manual save...");
-    if (!$user) {
-      hasAttemptedSave = true;
-      console.error("User not authenticated");
-      return;
-    }
 
     try {
       isSaving = true;
@@ -396,7 +390,7 @@
                 />
               </button>
               <!-- Save Button -->
-              {#if ($isAuthenticated && $user) || hasAttemptedSave}
+              {#if hasAttemptedSave}
                 <button class="flow-button" on:click={handleSave} disabled={isSaving}>
                   <svelte:component
                     this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
