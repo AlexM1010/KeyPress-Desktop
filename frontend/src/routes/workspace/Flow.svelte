@@ -203,18 +203,7 @@
     try {
       isSaving = true;
       const currentFlowData = toObject();
-
-      // Manual save with dialog
-      const savePath = await window.go.main.App.SaveFile(currentFlowData);
-      
-      if (savePath) {
-        saveSuccess = true;
-        addStatusMessage({
-          id: `save-${Date.now()}`,
-          type: "success",
-          message: "Flow saved successfully to " + savePath
-        });
-      }
+      await window.go.main.App.SaveFile(currentFlowData);
     } catch (error) {
       console.error("Failed to save flow", error);
       saveError = true;

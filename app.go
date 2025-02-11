@@ -3,13 +3,13 @@
 package main
 
 import (
+	"Keypress/utils"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
 	"sync"
 	"time"
 
@@ -94,31 +94,17 @@ func (a *App) startup(ctx context.Context) {
 
 // SaveFile shows the native Save File dialog and saves the flow data to the selected location.
 func (a *App) SaveFile(flowData FlowData) (string, error) {
-	selection, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title:           "Select Save Location",
-		DefaultFilename: "flowchart.json",
-		Filters: []runtime.FileFilter{
-			{DisplayName: "JSON Files (*.json)", Pattern: "*.json"},
-			{DisplayName: "All Files", Pattern: "*.*"},
-		},
-	})
-
-	if err != nil || selection == "" {
-		return "", fmt.Errorf("save dialog canceled or error: %v", err)
-	}
-
-	// Convert flow data to JSON
-	jsonData, err := json.MarshalIndent(flowData, "", "  ")
+	// First attempt to save to XDG data directory
+	defaultPath, err := utils.SaveFlowData(flowData, "default_flow")
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal flow data: %v", err)
+		log.Printf("Failed to save to default location: %v", err)
+		// Continue to allow manual save
+		return "", err
+	} else {
+		// Emit save success event
+		a.emitEvent("save-success", fmt.Sprintf("Flow saved to %s", defaultPath))
+		return defaultPath, nil
 	}
-
-	// Save to the selected location
-	if err := os.WriteFile(selection, jsonData, 0644); err != nil {
-		return "", fmt.Errorf("failed to save file: %v", err)
-	}
-
-	return selection, nil
 }
 
 //=============================================== Flow Execution ===============================================
