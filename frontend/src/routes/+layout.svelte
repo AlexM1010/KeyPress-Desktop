@@ -75,27 +75,12 @@
         <button class="nav-btn" on:click={() => goto('/')}>
             Workspace
         </button>
-        {#if $isAuthenticated && $user}
-            <button class="nav-btn" on:click={() => goto('/projects')}>
-                Projects
-            </button>
-        {/if}
+        <button class="nav-btn" on:click={() => goto('/projects')}>
+            Projects
+        </button>
     </div>
     <!-- Right side of navbar -->
     <div class="flex items-center">
-        {#if $isAuthenticated && $user}
-            <span class="user-email text-foreground">{$user.email}</span>
-            <button class="nav-btn" on:click={handleLogout}>
-                Logout
-            </button>
-        {:else}
-            <button class="nav-btn" on:click={() => goto('/register')}>
-                Register
-            </button>
-            <button class="nav-btn" on:click={() => goto('/login')}>
-                Login
-            </button>
-        {/if}
         <ThemeToggle />
     </div>
 </div>
