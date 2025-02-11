@@ -6,6 +6,10 @@ export function GetIsExecuting() {
   return window['go']['main']['App']['GetIsExecuting']();
 }
 
+export function SaveFile(arg1) {
+  return window['go']['main']['App']['SaveFile'](arg1);
+}
+
 export function StartExecution(arg1) {
   return window['go']['main']['App']['StartExecution'](arg1);
 }

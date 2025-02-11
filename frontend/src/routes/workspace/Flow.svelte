@@ -198,44 +198,38 @@
   let saveError = false;
   let hasAttemptedSave = false;
 
-  // Modify the handleSave function
+  // Modified handleSave function to handle both auto-save and manual save
   async function handleSave() {
-    console.log("Triggering manual save...");
-
     try {
       isSaving = true;
-      saveSuccess = false;
-      saveError = false;
+      const currentFlowData = toObject();
 
-      // TODO: Implement save functionality here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate save
-
-      saveSuccess = true;
-      addStatusMessage({
-        id: `save-${Date.now()}`,
-        type: "success",
-        message: "Flow saved successfully.",
-      });
-
-      // Reset success state after 2 seconds
-      setTimeout(() => {
-        saveSuccess = false;
-      }, 2000);
+      // Manual save with dialog
+      const savePath = await window.go.main.App.SaveFile(currentFlowData);
+      
+      if (savePath) {
+        saveSuccess = true;
+        addStatusMessage({
+          id: `save-${Date.now()}`,
+          type: "success",
+          message: "Flow saved successfully to " + savePath
+        });
+      }
     } catch (error) {
-      console.error("Failed to save flow:", error);
+      console.error("Failed to save flow", error);
       saveError = true;
       addStatusMessage({
         id: `save-error-${Date.now()}`,
         type: "error",
-        message: "Failed to save flow.",
+        message: "Failed to save flow: " + error
       });
-
-      // Reset error state after 2 seconds
-      setTimeout(() => {
-        saveError = false;
-      }, 2000);
     } finally {
       isSaving = false;
+      // Reset success/error state after 3 seconds
+      setTimeout(() => {
+        saveSuccess = false;
+        saveError = false;
+      }, 3000);
     }
   }
 
@@ -324,6 +318,23 @@
         isSuccess = false;
       }, 1000);
     });
+
+    // Add save status listeners
+    window.runtime.EventsOn("save-success", (message) => {
+      addStatusMessage({
+        id: `save-${Date.now()}`,
+        type: "success",
+        message: message
+      });
+    });
+
+    window.runtime.EventsOn("save-error", (message) => {
+      addStatusMessage({
+        id: `save-error-${Date.now()}`,
+        type: "error",
+        message: message
+      });
+    });
   }
 
   // Initialize event listeners when the component mounts
@@ -390,18 +401,16 @@
                 />
               </button>
               <!-- Save Button -->
+              <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+                <svelte:component
+                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
+                  class="flow-icon"
+                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                />
+              </button>
               {#if hasAttemptedSave}
-                <button class="flow-button" on:click={handleSave} disabled={isSaving}>
-                  <svelte:component
-                    this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
-                    class="flow-icon"
-                    style={isSaving ? "animation: spin 1s linear infinite" : ""}
-                  />
-                </button>
-              {:else if hasAttemptedSave}
                 <button class="flow-button">
                   <X class="flow-icon text-red-500" />
-                  <span class="text-red-500">Login</span>
                 </button>
               {/if}
               <!-- Layout Button -->

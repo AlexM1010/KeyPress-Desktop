@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -50,6 +51,12 @@ type Flowchart struct {
 	Edges []Edge `json:"edges"`
 }
 
+// FlowData represents the complete flow chart data structure
+type FlowData struct {
+	Nodes []Node `json:"nodes"`
+	Edges []Edge `json:"edges"`
+}
+
 // Task represents a single executable task.
 type Task struct {
 	ID   string
@@ -68,7 +75,7 @@ type TaskQueue struct {
 	app     *App
 }
 
-// NewApp creates a new App application struct without authentication.
+// NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{
 		taskQueue:    NewTaskQueue(nil, 100),
@@ -83,6 +90,35 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 	a.taskQueue.app = a  // Set the app reference in TaskQueue
 	a.taskQueue.Start(3) // Start 3 workers by default
+}
+
+// SaveFile shows the native Save File dialog and saves the flow data to the selected location.
+func (a *App) SaveFile(flowData FlowData) (string, error) {
+	selection, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
+		Title:           "Select Save Location",
+		DefaultFilename: "flowchart.json",
+		Filters: []runtime.FileFilter{
+			{DisplayName: "JSON Files (*.json)", Pattern: "*.json"},
+			{DisplayName: "All Files", Pattern: "*.*"},
+		},
+	})
+
+	if err != nil || selection == "" {
+		return "", fmt.Errorf("save dialog canceled or error: %v", err)
+	}
+
+	// Convert flow data to JSON
+	jsonData, err := json.MarshalIndent(flowData, "", "  ")
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal flow data: %v", err)
+	}
+
+	// Save to the selected location
+	if err := os.WriteFile(selection, jsonData, 0644); err != nil {
+		return "", fmt.Errorf("failed to save file: %v", err)
+	}
+
+	return selection, nil
 }
 
 //=============================================== Flow Execution ===============================================
