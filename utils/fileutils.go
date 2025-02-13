@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	AppName = "Keypress"
+	AppName           = "Keypress"
+	LastOpenedFileKey = "last_opened_file.txt"
 )
 
 // GetAppConfigDir returns the application-specific config directory
@@ -43,6 +44,36 @@ func GetAppDataDir() (string, error) {
 	return dir, nil
 }
 
+// SaveLastOpenedFile saves the path of the last opened file
+func SaveLastOpenedFile(filePath string) error {
+	configDir, err := GetAppConfigDir()
+	if err != nil {
+		return err
+	}
+
+	lastOpenedPath := filepath.Join(configDir, LastOpenedFileKey)
+	return os.WriteFile(lastOpenedPath, []byte(filePath), 0644)
+}
+
+// GetLastOpenedFile retrieves the path of the last opened file
+func GetLastOpenedFile() (string, error) {
+	configDir, err := GetAppConfigDir()
+	if err != nil {
+		return "", err
+	}
+
+	lastOpenedPath := filepath.Join(configDir, LastOpenedFileKey)
+	data, err := os.ReadFile(lastOpenedPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", nil
+		}
+		return "", err
+	}
+
+	return string(data), nil
+}
+
 // SaveFlowData saves the flow data to the specified location
 func SaveFlowData(data interface{}, filename string) (string, error) {
 	// Get the app data directory
@@ -68,6 +99,11 @@ func SaveFlowData(data interface{}, filename string) (string, error) {
 	// Write the file
 	if err := os.WriteFile(fullPath, jsonData, 0644); err != nil {
 		return "", fmt.Errorf("failed to write file: %w", err)
+	}
+
+	// Save as last opened file
+	if err := SaveLastOpenedFile(fullPath); err != nil {
+		return "", fmt.Errorf("failed to save last opened file: %w", err)
 	}
 
 	return fullPath, nil

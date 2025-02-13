@@ -13,11 +13,8 @@
   import type { DefaultEdgeOptions } from "@xyflow/svelte";
 
   // Import custom nodes, edges, and utilities
-  import { nodesData as defaultNodesData, edgesData as defaultEdgesData } from "$lib/stores/flow";
+  import { nodesData as nodes, edgesData as edges } from "$lib/stores/flow";
   import { onNodeDrag, onNodeDragStop, onLayout } from "$lib/utils/workspaceUtils";
-
-  export let nodes = defaultNodesData;
-  export let edges = defaultEdgesData;
 
   // Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
@@ -193,31 +190,33 @@
   }
 
   // Function to handle saving the flow
-  let isSaving = false;
-  let saveSuccess = false;
-  let saveError = false;
-  let hasAttemptedSave = false;
+  type SaveState = 
+    | { status: 'idle' }
+    | { status: 'saving' }
+    | { status: 'success' }
+    | { status: 'error', message: string };
 
-  // Modified handleSave function to handle both auto-save and manual save
+  let saveState: SaveState = { status: 'idle' };
+
+  // Modified handleSave function
   async function handleSave() {
     try {
-      isSaving = true;
+      saveState = { status: 'saving' };
       const currentFlowData = toObject();
       await window.go.main.App.SaveFile(currentFlowData);
+      saveState = { status: 'success' };
     } catch (error) {
-      console.error("Failed to save flow", error);
-      saveError = true;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      saveState = { status: 'error', message: errorMessage };
       addStatusMessage({
         id: `save-error-${Date.now()}`,
         type: "error",
-        message: "Failed to save flow: " + error
+        message: "Failed to save flow: " + errorMessage
       });
     } finally {
-      isSaving = false;
-      // Reset success/error state after 3 seconds
+      // Reset to idle after 3 seconds
       setTimeout(() => {
-        saveSuccess = false;
-        saveError = false;
+        saveState = { status: 'idle' };
       }, 3000);
     }
   }
@@ -325,10 +324,29 @@
       });
     });
   }
+  
+  // Load the last opened file when the component mounts
+  async function loadLastOpenedFile() {
+    try {
+      const data = await window.go.main.App.LoadLastFile();
+      if (data) {
+        $nodes = data.nodes;
+        $edges = data.edges;
+      }
+    } catch (error) {
+      console.error("Failed to load last file:", error);
+      addStatusMessage({
+        id: `load-error-${Date.now()}`,
+        type: "error",
+        message: "Failed to load last file: " + error
+      });
+    }
+  }
 
   // Initialize event listeners when the component mounts
   onMount(() => {
     setupEventListeners();
+    loadLastOpenedFile();
   });
 </script>
 
@@ -390,18 +408,22 @@
                 />
               </button>
               <!-- Save Button -->
-              <button class="flow-button" on:click={handleSave} disabled={isSaving}>
+              <button 
+                class="flow-button" 
+                on:click={handleSave} 
+                disabled={saveState.status === 'saving'}
+              >
                 <svelte:component
-                  this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
+                  this={
+                    saveState.status === 'saving' ? Loader :
+                    saveState.status === 'error' ? X :
+                    saveState.status === 'success' ? Check :
+                    Save
+                  }
                   class="flow-icon"
-                  style={isSaving ? "animation: spin 1s linear infinite" : ""}
+                  style={saveState.status === 'saving' ? "animation: spin 1s linear infinite" : ""}
                 />
               </button>
-              {#if hasAttemptedSave}
-                <button class="flow-button">
-                  <X class="flow-icon text-red-500" />
-                </button>
-              {/if}
               <!-- Layout Button -->
               <button
                 class="flow-button"

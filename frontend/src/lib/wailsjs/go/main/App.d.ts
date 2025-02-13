@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function GetIsExecuting():Promise<boolean>;
 
+export function LoadLastFile():Promise<main.FlowData>;
+
 export function SaveFile(arg1:main.FlowData):Promise<string>;
 
 export function StartExecution(arg1:string):Promise<void>;

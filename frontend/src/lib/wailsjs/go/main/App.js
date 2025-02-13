@@ -6,6 +6,10 @@ export function GetIsExecuting() {
   return window['go']['main']['App']['GetIsExecuting']();
 }
 
+export function LoadLastFile() {
+  return window['go']['main']['App']['LoadLastFile']();
+}
+
 export function SaveFile(arg1) {
   return window['go']['main']['App']['SaveFile'](arg1);
 }

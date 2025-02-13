@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -105,6 +106,34 @@ func (a *App) SaveFile(flowData FlowData) (string, error) {
 		a.emitEvent("save-success", fmt.Sprintf("Flow saved to %s", defaultPath))
 		return defaultPath, nil
 	}
+}
+
+// LoadLastFile attempts to load the last opened file's data
+func (a *App) LoadLastFile() (*FlowData, error) {
+	// Get the last opened file path
+	lastFilePath, err := utils.GetLastOpenedFile()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get last opened file: %w", err)
+	}
+
+	// If no last file exists, return nil without error
+	if lastFilePath == "" {
+		return nil, nil
+	}
+
+	// Read the file
+	data, err := os.ReadFile(lastFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read last file: %w", err)
+	}
+
+	// Parse the JSON data
+	var flowData FlowData
+	if err := json.Unmarshal(data, &flowData); err != nil {
+		return nil, fmt.Errorf("failed to parse flow data: %w", err)
+	}
+
+	return &flowData, nil
 }
 
 //=============================================== Flow Execution ===============================================
