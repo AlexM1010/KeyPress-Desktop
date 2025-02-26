@@ -6,7 +6,6 @@
 	import CardLink from '../Card/CardLink.svelte';
 	import CardDivider from '../Card/CardDivider.svelte';
 	import ChipIcon from '../Chip/ChipIcon.svelte';
-	import CardLogo from '../Card/CardLogo.svelte';
 	import type { Project } from '$lib/types/types';
 	import { getAssetURL } from '$lib/data/assets';
 	import { base } from '$app/paths';
@@ -27,7 +26,6 @@
   </script>
   
   <Card color={project.color} href={`${base}/projects/${project.slug}`}>
-	<CardLogo alt={project.name} src={getAssetURL(project.logo)} size={40} radius={'0'} />
 	<div class="m-t-[20px] row justify-between items-center display: inline-flex">
 	  <CardTitle title={project.name} />
 	  <div class="row">
