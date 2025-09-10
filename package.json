@@ -1,4 +1,12 @@
 {
+  "name": "keypress",
+  "version": "1.0.0",
+  "scripts": {
+    "generate-schemas": "node scripts/generate-schemas.js",
+    "generate-schemas:install": "node scripts/generate-schemas.js --install",
+    "generate-schemas:win": "powershell -ExecutionPolicy Bypass -File scripts/generate-schemas.ps1",
+    "generate-schemas:win:install": "powershell -ExecutionPolicy Bypass -File scripts/generate-schemas.ps1 -Install"
+  },
   "dependencies": {
     "@wailsapp/runtime": "^1.1.1"
   }

@@ -2,3 +2,13 @@ build/bin
 node_modules
 frontend/build
 export.md
+.kiro/steering/product.md
+.kiro/steering/structure.md
+.kiro/steering/tech.md
+.vscode/launch.json
+.vscode/settings.json
+.kiro/specs/data-flow-optimization/design.md
+.kiro/specs/data-flow-optimization/requirements.md
+.kiro/specs/data-flow-optimization/tasks.md
+.vscode/settings.json
+.vscode/settings.json

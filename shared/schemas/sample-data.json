@@ -1,0 +1,176 @@
+{
+  "nodes": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "type": "StartNode",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "metadata": {
+        "label": "Start",
+        "description": "Starting point of the flow",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {}
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "type": "MouseClickNode",
+      "position": {
+        "x": 200,
+        "y": 200
+      },
+      "metadata": {
+        "label": "Mouse Click",
+        "description": "Click the mouse button",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {
+        "buttonType": "left",
+        "clickCount": 1,
+        "clickDelay": {
+          "value": 100,
+          "unit": "ms"
+        },
+        "pressReleaseDelay": {
+          "value": 50,
+          "unit": "ms"
+        },
+        "releaseAfterPress": true,
+        "scrollConfig": {
+          "directions": ["up"],
+          "lines": 3
+        }
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440002",
+      "type": "DelayNode",
+      "position": {
+        "x": 300,
+        "y": 300
+      },
+      "metadata": {
+        "label": "Delay",
+        "description": "Wait for a specified duration",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {
+        "delayType": "Fixed",
+        "duration": {
+          "value": 1000,
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440003",
+      "type": "MouseMoveNode",
+      "position": {
+        "x": 400,
+        "y": 400
+      },
+      "metadata": {
+        "label": "Mouse Move",
+        "description": "Move the mouse cursor",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {
+        "moveType": "absolute",
+        "coordinate": {
+          "x": 500,
+          "y": 600
+        },
+        "duration": {
+          "value": 500,
+          "unit": "ms"
+        },
+        "smooth": true
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440004",
+      "type": "KeyPressNode",
+      "position": {
+        "x": 500,
+        "y": 500
+      },
+      "metadata": {
+        "label": "Key Press",
+        "description": "Press keyboard keys",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {
+        "keys": [
+          {
+            "key": "Enter",
+            "modifiers": ["ctrl"],
+            "duration": {
+              "value": 100,
+              "unit": "ms"
+            }
+          }
+        ],
+        "sequential": true,
+        "interval": {
+          "value": 100,
+          "unit": "ms"
+        }
+      }
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440005",
+      "type": "TypeStringNode",
+      "position": {
+        "x": 600,
+        "y": 600
+      },
+      "metadata": {
+        "label": "Type String",
+        "description": "Type text string",
+        "version": "1.0.0",
+        "created": "2024-01-01T00:00:00.000Z",
+        "modified": "2024-01-01T00:00:00.000Z"
+      },
+      "config": {
+        "text": "Hello World",
+        "typingSpeed": {
+          "value": 50,
+          "unit": "ms"
+        },
+        "clearBefore": false,
+        "pressEnter": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge1",
+      "source": "550e8400-e29b-41d4-a716-446655440000",
+      "target": "550e8400-e29b-41d4-a716-446655440001"
+    },
+    {
+      "id": "edge2",
+      "source": "550e8400-e29b-41d4-a716-446655440001",
+      "target": "550e8400-e29b-41d4-a716-446655440002"
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00.000Z",
+    "modified": "2024-01-01T00:00:00.000Z",
+    "name": "Sample Flow",
+    "description": "A sample automation flow"
+  }
+}

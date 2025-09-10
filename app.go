@@ -241,9 +241,21 @@ func executeTask(task Task, app *App) {
 	case "MouseMoveNode":
 		log.Printf("MoveMouse task starting - Data: %+v", task.Data)
 
+		// Extract nested data
+		nodeData, ok := task.Data["data"].(map[string]interface{})
+		if !ok {
+			err := fmt.Sprintf("Invalid node data structure: %v", task.Data)
+			log.Printf("MoveMouse error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
 		// Extract and validate position configurations
-		startPos, ok1 := task.Data["startPosition"].(map[string]interface{})
-		endPos, ok2 := task.Data["endPosition"].(map[string]interface{})
+		startPos, ok1 := nodeData["startPosition"].(map[string]interface{})
+		endPos, ok2 := nodeData["endPosition"].(map[string]interface{})
 		if !ok1 || !ok2 {
 			err := "Invalid or missing position configurations"
 			log.Printf("MoveMouse error: %s for task %s", err, task.ID)
@@ -299,13 +311,13 @@ func executeTask(task Task, app *App) {
 		}
 
 		// Extract movement settings
-		speed := task.Data["speed"].(map[string]interface{})
+		speed := nodeData["speed"].(map[string]interface{})
 		speedType := speed["type"].(string)
 		speedValue := speed["value"].(float64)
 		randomize := speed["randomize"].(bool)
 		variance := speed["variance"].(float64)
-		pathType := task.Data["pathType"].(string)
-		dragWhileMoving := task.Data["dragWhileMoving"].(bool)
+		pathType := nodeData["pathType"].(string)
+		dragWhileMoving := nodeData["dragWhileMoving"].(bool)
 
 		// Calculate final speed with randomization if enabled
 		finalSpeed := speedValue
@@ -377,10 +389,22 @@ func executeTask(task Task, app *App) {
 	case "MouseClickNode":
 		log.Printf("Click task starting - Data: %+v", task.Data)
 
-		// Get buttonType
-		buttonType, ok := task.Data["buttonType"].(string)
+		// Extract nested data
+		nodeData, ok := task.Data["data"].(map[string]interface{})
 		if !ok {
-			err := fmt.Sprintf("Invalid buttonType value: %v", task.Data["buttonType"])
+			err := fmt.Sprintf("Invalid node data structure: %v", task.Data)
+			log.Printf("Click error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		// Get buttonType
+		buttonType, ok := nodeData["buttonType"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid buttonType value: %v", nodeData["buttonType"])
 			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -401,9 +425,9 @@ func executeTask(task Task, app *App) {
 		}
 
 		// Get numberOfClicks
-		numberOfClicks, ok := task.Data["numberOfClicks"].(float64)
+		numberOfClicks, ok := nodeData["numberOfClicks"].(float64)
 		if !ok {
-			err := fmt.Sprintf("Invalid numberOfClicks value: %v", task.Data["numberOfClicks"])
+			err := fmt.Sprintf("Invalid numberOfClicks value: %v", nodeData["numberOfClicks"])
 			log.Printf("Click error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -413,20 +437,20 @@ func executeTask(task Task, app *App) {
 		}
 
 		// Get clickDelay
-		clickDelay, ok := task.Data["clickDelay"].(float64)
+		clickDelay, ok := nodeData["clickDelay"].(float64)
 		if !ok {
 			clickDelay = 0.1 // Default delay of 100ms
 		}
 		clickDuration := time.Duration(clickDelay) * time.Millisecond
 
 		// Get pressReleaseDelay and releaseAfterPress
-		pressReleaseDelay, ok := task.Data["pressReleaseDelay"].(float64)
+		pressReleaseDelay, ok := nodeData["pressReleaseDelay"].(float64)
 		if !ok {
 			pressReleaseDelay = 0.1 // Default press duration of 100ms
 		}
 		pressDuration := time.Duration(pressReleaseDelay) * time.Millisecond
 
-		releaseAfterPress, _ := task.Data["releaseAfterPress"].(bool)
+		releaseAfterPress, _ := nodeData["releaseAfterPress"].(bool)
 
 		//TODO: standardise execution in order for all blcoks by how the block is displayed e.g clicks first then scroll
 		// Perform the click actions
@@ -450,8 +474,8 @@ func executeTask(task Task, app *App) {
 		}
 
 		// Get scroll options
-		scrollDirections, _ := task.Data["scrollDirection"].([]interface{})
-		scrollLines, hasScrollLines := task.Data["scrollLines"].(float64)
+		scrollDirections, _ := nodeData["scrollDirection"].([]interface{})
+		scrollLines, hasScrollLines := nodeData["scrollLines"].(float64)
 
 		// Handle scrolling if configured
 		if len(scrollDirections) > 0 && hasScrollLines && scrollLines > 0 {
@@ -484,9 +508,22 @@ func executeTask(task Task, app *App) {
 
 	case "TypeString":
 		log.Printf("TypeString task starting - Data: %+v", task.Data)
-		text, ok := task.Data["text"].(string)
+
+		// Extract nested data
+		nodeData, ok := task.Data["data"].(map[string]interface{})
 		if !ok {
-			err := fmt.Sprintf("Invalid text value: %v", task.Data["text"])
+			err := fmt.Sprintf("Invalid node data structure: %v", task.Data)
+			log.Printf("TypeString error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		text, ok := nodeData["text"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid text value: %v", nodeData["text"])
 			log.Printf("TypeString error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -504,9 +541,22 @@ func executeTask(task Task, app *App) {
 
 	case "KeyTap":
 		log.Printf("KeyTap task starting - Data: %+v", task.Data)
-		key, ok := task.Data["key"].(string)
+
+		// Extract nested data
+		nodeData, ok := task.Data["data"].(map[string]interface{})
 		if !ok {
-			err := fmt.Sprintf("Invalid key value: %v", task.Data["key"])
+			err := fmt.Sprintf("Invalid node data structure: %v", task.Data)
+			log.Printf("KeyTap error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		key, ok := nodeData["key"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid key value: %v", nodeData["key"])
 			log.Printf("KeyTap error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -524,10 +574,22 @@ func executeTask(task Task, app *App) {
 	case "DelayNode":
 		log.Printf("Delay task starting - Data: %+v", task.Data)
 
-		// Get delayType
-		delayType, ok := task.Data["delayType"].(string)
+		// Extract nested data
+		nodeData, ok := task.Data["data"].(map[string]interface{})
 		if !ok {
-			err := fmt.Sprintf("Invalid delayType value: %v", task.Data["delayType"])
+			err := fmt.Sprintf("Invalid node data structure: %v", task.Data)
+			log.Printf("Delay error: %s for task %s", err, task.ID)
+			app.emitEvent("task-error", map[string]interface{}{
+				"taskID": task.ID,
+				"error":  err,
+			})
+			return
+		}
+
+		// Get delayType
+		delayType, ok := nodeData["delayType"].(string)
+		if !ok {
+			err := fmt.Sprintf("Invalid delayType value: %v", nodeData["delayType"])
 			log.Printf("Delay error: %s for task %s", err, task.ID)
 			app.emitEvent("task-error", map[string]interface{}{
 				"taskID": task.ID,
@@ -539,9 +601,9 @@ func executeTask(task Task, app *App) {
 		switch delayType {
 		case "Fixed":
 			// Get time
-			timeFloat, ok := task.Data["time"].(float64)
+			timeFloat, ok := nodeData["time"].(float64)
 			if !ok {
-				err := fmt.Sprintf("Invalid time value: %v", task.Data["time"])
+				err := fmt.Sprintf("Invalid time value: %v", nodeData["time"])
 				log.Printf("Delay error: %s for task %s", err, task.ID)
 				app.emitEvent("task-error", map[string]interface{}{
 					"taskID": task.ID,
@@ -555,10 +617,10 @@ func executeTask(task Task, app *App) {
 
 		case "Random":
 			// Get minTime and maxTime
-			minTimeFloat, ok1 := task.Data["minTime"].(float64)
-			maxTimeFloat, ok2 := task.Data["maxTime"].(float64)
+			minTimeFloat, ok1 := nodeData["minTime"].(float64)
+			maxTimeFloat, ok2 := nodeData["maxTime"].(float64)
 			if !ok1 || !ok2 {
-				err := fmt.Sprintf("Invalid minTime or maxTime values: minTime=%v, maxTime=%v", task.Data["minTime"], task.Data["maxTime"])
+				err := fmt.Sprintf("Invalid minTime or maxTime values: minTime=%v, maxTime=%v", nodeData["minTime"], nodeData["maxTime"])
 				log.Printf("Delay error: %s for task %s", err, task.ID)
 				app.emitEvent("task-error", map[string]interface{}{
 					"taskID": task.ID,
