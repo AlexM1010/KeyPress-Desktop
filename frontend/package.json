@@ -36,15 +36,7 @@
 	"dependencies": {
 		"@dagrejs/dagre": "^1.1.4",
 		"@xyflow/svelte": "^0.1.21",
-		"dompurify": "^3.2.1",
 		"lucide-svelte": "^0.454.0",
-		"marked": "^15.0.1",
-		"marked-gfm-heading-id": "^4.1.1",
-		"marked-mangle": "^1.1.10",
-		"mode-watcher": "^0.4.1",
-		"prettier": "^3.3.3",
-		"prismjs": "^1.29.0",
-		"sass": "^1.79.5",
-		"svelte-preprocess": "^6.0.3"
+		"mode-watcher": "^0.4.1"
 	}
 }
