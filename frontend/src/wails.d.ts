@@ -15,20 +15,7 @@ interface MousePosition {
 
 // Backend interface with all available methods
 interface Backend {
-    // Existing auth methods
-    GetSession: () => Promise<SessionResponse>;
-    ValidateStoredToken: (token: string) => Promise<SessionResponse>;
-    SaveFlow: (request: SaveFlowRequest) => Promise<SaveFlowResponse>;
-    InitializeFromToken(token: string): Promise<void>;
-    SignIn(email: string, password: string): Promise<{
-        access_token: string;
-        refresh_token: string;
-        // Add other properties returned by SignIn
-    }>;
-    SignOut(token: string): Promise<void>;
-    RunSimpleClick: () => Promise<{ success: boolean; error?: string }>;
-
-    // New RobotGo methods
+    // RobotGo methods
     MouseMove(x: number, y: number): Promise<void>;
     MouseClick(button: 'left' | 'right' | 'center'): Promise<void>;
     TypeString(text: string): Promise<void>;
@@ -36,7 +23,7 @@ interface Backend {
     GetMousePosition(): Promise<MousePosition>;
     StartExecution(nodesJSON: string): Promise<void>;
 
-    // New methods for task and execution events
+    // methods for task and execution events
     StartExecution(data: string): Promise<void>;
     OnTaskStarted(callback: (taskId: string) => void): void;
     OnTaskCompleted(callback: (taskId: string) => void): void;

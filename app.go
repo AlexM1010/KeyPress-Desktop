@@ -3,33 +3,24 @@
 package main
 
 import (
+	"Keypress/utils"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/go-vgo/robotgo"
-	supa "github.com/supabase-community/auth-go"
-	"github.com/supabase-community/auth-go/types"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
-
-// AuthStore manages authentication state
-type AuthStore struct {
-	mu            sync.RWMutex
-	currentUser   *types.UserResponse
-	isInitialized bool
-}
 
 // Update the App struct
 type App struct {
 	ctx          context.Context
-	authClient   supa.Client // Change type to *supa.Client
-	auth         *AuthStore
 	taskQueue    *TaskQueue
 	isExecuting  bool
 	execMutex    sync.Mutex
@@ -61,6 +52,12 @@ type Flowchart struct {
 	Edges []Edge `json:"edges"`
 }
 
+// FlowData represents the complete flow chart data structure
+type FlowData struct {
+	Nodes []Node `json:"nodes"`
+	Edges []Edge `json:"edges"`
+}
+
 // Task represents a single executable task.
 type Task struct {
 	ID   string
@@ -79,15 +76,9 @@ type TaskQueue struct {
 	app     *App
 }
 
-// NewApp creates a new App application struct with auth
+// NewApp creates a new App application struct
 func NewApp() *App {
-	authClient := supa.New(
-		"fuobfyypdlixgvwzrvoy", // Supabase URL
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1b2JmeXlwZGxpeGd2d3pydm95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0MjAyOTQsImV4cCI6MjA0Mzk5NjI5NH0.qJv20Jw7E8F0OJR_-AwWOw8Mal0pbthtHddKhzo3afk",
-	)
 	return &App{
-		authClient:   authClient,
-		auth:         &AuthStore{},
 		taskQueue:    NewTaskQueue(nil, 100),
 		completed:    make(map[string]bool),
 		notifyCh:     make(chan string, 100),
@@ -95,107 +86,54 @@ func NewApp() *App {
 	}
 }
 
-// EmitAuthState sends the current auth state to frontend
-func (a *App) emitAuthState() {
-	a.auth.mu.RLock()
-	defer a.auth.mu.RUnlock()
-
-	authState := map[string]interface{}{
-		"user":          a.auth.currentUser,
-		"isInitialized": a.auth.isInitialized,
-	}
-
-	// Emit the auth state change event to frontend
-	runtime.EventsEmit(a.ctx, "auth:stateChange", authState)
-}
-
 // Initialize auth state on startup
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.auth.isInitialized = true
-	a.emitAuthState()
 	a.taskQueue.app = a  // Set the app reference in TaskQueue
 	a.taskQueue.Start(3) // Start 3 workers by default
 }
 
-// SignIn with updated store management
-func (a *App) SignIn(email, password string) (*types.TokenResponse, error) {
-	response, err := a.authClient.SignInWithEmailPassword(email, password)
+// SaveFile shows the native Save File dialog and saves the flow data to the selected location.
+func (a *App) SaveFile(flowData FlowData) (string, error) {
+	// First attempt to save to XDG data directory
+	defaultPath, err := utils.SaveFlowData(flowData, "default_flow")
 	if err != nil {
-		return nil, fmt.Errorf("signin failed: %w", err)
-	}
-
-	// Get user details with the new token
-	authedClient := a.authClient.WithToken(response.AccessToken)
-	user, err := authedClient.GetUser()
-	if err != nil {
-		return nil, fmt.Errorf("get user failed: %w", err)
-	}
-
-	// Update store
-	a.auth.mu.Lock()
-	a.auth.currentUser = user
-	a.auth.mu.Unlock()
-
-	// Emit state change
-	a.emitAuthState()
-
-	return response, nil
-}
-
-// SignOut with store update
-func (a *App) SignOut(token string) error {
-	authedClient := a.authClient.WithToken(token)
-
-	err := authedClient.Logout()
-	if err != nil {
-		return fmt.Errorf("signout failed: %w", err)
-	}
-
-	// Clear store
-	a.auth.mu.Lock()
-	a.auth.currentUser = nil
-	a.auth.mu.Unlock()
-
-	// Emit state change
-	a.emitAuthState()
-
-	return nil
-}
-
-// GetAuthState returns current auth state
-func (a *App) GetAuthState() map[string]interface{} {
-	a.auth.mu.RLock()
-	defer a.auth.mu.RUnlock()
-
-	return map[string]interface{}{
-		"user":          a.auth.currentUser,
-		"isInitialized": a.auth.isInitialized,
+		log.Printf("Failed to save to default location: %v", err)
+		// Continue to allow manual save
+		return "", err
+	} else {
+		// Emit save success event
+		a.emitEvent("save-success", fmt.Sprintf("Flow saved to %s", defaultPath))
+		return defaultPath, nil
 	}
 }
 
-// InitializeFromToken initializes the auth state from a stored token
-func (a *App) InitializeFromToken(token string) error {
-	if token == "" {
-		a.auth.mu.Lock()
-		a.auth.currentUser = nil
-		a.auth.mu.Unlock()
-		a.emitAuthState()
-		return nil
-	}
-
-	authedClient := a.authClient.WithToken(token)
-	user, err := authedClient.GetUser()
+// LoadLastFile attempts to load the last opened file's data
+func (a *App) LoadLastFile() (*FlowData, error) {
+	// Get the last opened file path
+	lastFilePath, err := utils.GetLastOpenedFile()
 	if err != nil {
-		return fmt.Errorf("initialize from token failed: %w", err)
+		return nil, fmt.Errorf("failed to get last opened file: %w", err)
 	}
 
-	a.auth.mu.Lock()
-	a.auth.currentUser = user
-	a.auth.mu.Unlock()
+	// If no last file exists, return nil without error
+	if lastFilePath == "" {
+		return nil, nil
+	}
 
-	a.emitAuthState()
-	return nil
+	// Read the file
+	data, err := os.ReadFile(lastFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read last file: %w", err)
+	}
+
+	// Parse the JSON data
+	var flowData FlowData
+	if err := json.Unmarshal(data, &flowData); err != nil {
+		return nil, fmt.Errorf("failed to parse flow data: %w", err)
+	}
+
+	return &flowData, nil
 }
 
 //=============================================== Flow Execution ===============================================

@@ -5,8 +5,8 @@ go 1.22.0
 toolchain go1.23.2
 
 require (
+	github.com/adrg/xdg v0.5.3
 	github.com/go-vgo/robotgo v0.110.5
-	github.com/supabase-community/auth-go v1.3.2
 	github.com/wailsapp/wails/v2 v2.9.2
 )
 
@@ -45,7 +45,6 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.9.0 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
-	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vcaesar/gops v0.40.0 // indirect
