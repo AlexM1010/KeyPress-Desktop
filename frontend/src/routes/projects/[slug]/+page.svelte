@@ -3,8 +3,6 @@
   import { getAssetURL } from '$lib/data/assets';
   import { title } from '$lib/data/projects';
   import type { Project } from '$lib/types/types';
-  import CardLogo from '$lib/components/Card/CardLogo.svelte';
-  import Markdown from '$lib/components/Markdown.svelte';
   import TabTitle from '$lib/components/TabTitle.svelte';
   import Chip from '$lib/components/Chip/Chip.svelte';
   import Banner from '$lib/components/Banner/Banner.svelte';
@@ -70,13 +68,6 @@
                 classes="inline-flex flex-row items-center justify-center"
                 href={`${base}/skills/${item.slug}`}
               >
-                <CardLogo
-                  src={getAssetURL(item.logo)}
-                  alt={item.name}
-                  radius={'0px'}
-                  size={15}
-                  classes="mr-2"
-                />
                 <span class="text-[0.9em]">{item.name}</span>
               </Chip>
             {/each}
@@ -86,7 +77,7 @@
       <div class="pt-3 pb-1 overflow-x-hidden w-full">
         <div class="px-[10px] my-5">
           {#if data.project.description}
-            <Markdown content={data.project.description} />
+            <p> {data.project.description} </p>
           {:else}
             <div class="p-5 col-center gap-3 my-auto text-[var(--border)]">
               <UIcon icon="i-carbon-text-font" classes="text-3.5em" />

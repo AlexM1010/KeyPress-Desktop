@@ -13,19 +13,15 @@
   import type { DefaultEdgeOptions } from "@xyflow/svelte";
 
   // Import custom nodes, edges, and utilities
-  import { nodesData as defaultNodesData, edgesData as defaultEdgesData } from "$lib/stores/flow";
+  import { nodesData as nodes, edgesData as edges } from "$lib/stores/flow";
   import { onNodeDrag, onNodeDragStop, onLayout } from "$lib/utils/workspaceUtils";
-
-  export let nodes = defaultNodesData;
-  export let edges = defaultEdgesData;
 
   // Nodes
   import { nodeTypes } from "$lib/components/customNodes/nodeTypes";
   //Edges
   import CustomEdge from "./CustomEdge.svelte";
   import ConnectionLine from "./ConnectionLine.svelte";
-  //Auth/Mount
-  import { isAuthenticated, user } from "$lib/stores/auth";
+
   import { onMount } from "svelte";
   //Flow
   import { flowTheme } from "$lib/stores/theme";
@@ -194,54 +190,34 @@
   }
 
   // Function to handle saving the flow
-  let isSaving = false;
-  let saveSuccess = false;
-  let saveError = false;
-  let hasAttemptedSave = false;
+  type SaveState = 
+    | { status: 'idle' }
+    | { status: 'saving' }
+    | { status: 'success' }
+    | { status: 'error', message: string };
 
-  // Modify the handleSave function
+  let saveState: SaveState = { status: 'idle' };
+
+  // Modified handleSave function
   async function handleSave() {
-    console.log("Triggering manual save...");
-    if (!$user) {
-      hasAttemptedSave = true;
-      console.error("User not authenticated");
-      return;
-    }
-
     try {
-      isSaving = true;
-      saveSuccess = false;
-      saveError = false;
-
-      // TODO: Implement save functionality here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate save
-
-      saveSuccess = true;
-      addStatusMessage({
-        id: `save-${Date.now()}`,
-        type: "success",
-        message: "Flow saved successfully.",
-      });
-
-      // Reset success state after 2 seconds
-      setTimeout(() => {
-        saveSuccess = false;
-      }, 2000);
+      saveState = { status: 'saving' };
+      const currentFlowData = toObject();
+      await window.go.main.App.SaveFile(currentFlowData);
+      saveState = { status: 'success' };
     } catch (error) {
-      console.error("Failed to save flow:", error);
-      saveError = true;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      saveState = { status: 'error', message: errorMessage };
       addStatusMessage({
         id: `save-error-${Date.now()}`,
         type: "error",
-        message: "Failed to save flow.",
+        message: "Failed to save flow: " + errorMessage
       });
-
-      // Reset error state after 2 seconds
-      setTimeout(() => {
-        saveError = false;
-      }, 2000);
     } finally {
-      isSaving = false;
+      // Reset to idle after 3 seconds
+      setTimeout(() => {
+        saveState = { status: 'idle' };
+      }, 3000);
     }
   }
 
@@ -330,11 +306,47 @@
         isSuccess = false;
       }, 1000);
     });
+
+    // Add save status listeners
+    window.runtime.EventsOn("save-success", (message) => {
+      addStatusMessage({
+        id: `save-${Date.now()}`,
+        type: "success",
+        message: message
+      });
+    });
+
+    window.runtime.EventsOn("save-error", (message) => {
+      addStatusMessage({
+        id: `save-error-${Date.now()}`,
+        type: "error",
+        message: message
+      });
+    });
+  }
+  
+  // Load the last opened file when the component mounts
+  async function loadLastOpenedFile() {
+    try {
+      const data = await window.go.main.App.LoadLastFile();
+      if (data) {
+        $nodes = data.nodes;
+        $edges = data.edges;
+      }
+    } catch (error) {
+      console.error("Failed to load last file:", error);
+      addStatusMessage({
+        id: `load-error-${Date.now()}`,
+        type: "error",
+        message: "Failed to load last file: " + error
+      });
+    }
   }
 
   // Initialize event listeners when the component mounts
   onMount(() => {
     setupEventListeners();
+    loadLastOpenedFile();
   });
 </script>
 
@@ -396,20 +408,22 @@
                 />
               </button>
               <!-- Save Button -->
-              {#if ($isAuthenticated && $user) || hasAttemptedSave}
-                <button class="flow-button" on:click={handleSave} disabled={isSaving}>
-                  <svelte:component
-                    this={isSaving ? Loader : saveError ? X : saveSuccess ? Check : Save}
-                    class="flow-icon"
-                    style={isSaving ? "animation: spin 1s linear infinite" : ""}
-                  />
-                </button>
-              {:else if hasAttemptedSave}
-                <button class="flow-button">
-                  <X class="flow-icon text-red-500" />
-                  <span class="text-red-500">Login</span>
-                </button>
-              {/if}
+              <button 
+                class="flow-button" 
+                on:click={handleSave} 
+                disabled={saveState.status === 'saving'}
+              >
+                <svelte:component
+                  this={
+                    saveState.status === 'saving' ? Loader :
+                    saveState.status === 'error' ? X :
+                    saveState.status === 'success' ? Check :
+                    Save
+                  }
+                  class="flow-icon"
+                  style={saveState.status === 'saving' ? "animation: spin 1s linear infinite" : ""}
+                />
+              </button>
               <!-- Layout Button -->
               <button
                 class="flow-button"
