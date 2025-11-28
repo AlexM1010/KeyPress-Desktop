@@ -8,7 +8,6 @@
   "frontend:dev:serverUrl": "auto",
   "wailsjsdir": "./frontend/src/lib",
   "author": {
-    "name": "AWM1010",
-    "email": "alexander.marshall6@nhs.net"
+    "name": "AlexM1010"
   }
 }
